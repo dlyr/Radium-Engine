@@ -1,8 +1,8 @@
 #ifndef RADIUMENGINE_LIGHTMANAGER_H
 #define RADIUMENGINE_LIGHTMANAGER_H
+#include <Engine/Managers/LightManager/LightStorage.hpp>
 #include <Engine/RaEngine.hpp>
 #include <Engine/System/System.hpp>
-#include <Engine/Managers/LightManager/LightStorage.hpp>
 
 #include <memory>
 
@@ -15,9 +15,11 @@ namespace Engine {
  */
 class RA_ENGINE_API LightManager : public System {
     // Radium-V2 : make light manager compatible with range for ...
+    LightManager( std::string name ) : System( name ) {}
+
   public:
     /// Constructor
-    LightManager() = default;
+    LightManager() : System( "LightManager" ) {}
 
     // Make copies impossible
     LightManager( const LightManager& ) = delete;
@@ -30,11 +32,11 @@ class RA_ENGINE_API LightManager : public System {
     virtual const Light* getLight( size_t li ) const = 0;
 
     /** Add a light to the manager ...
-     * Consider the component is already registered. The light manager will not take ownership of the added light,
-     * it will just push the light on the storage ...
+     * Consider the component is already registered. The light manager will not take ownership of
+     * the added light, it will just push the light on the storage ...
      * @param li The (already registered) light to add.
      */
-    virtual void addLight(const Light *li) = 0;
+    virtual void addLight( const Light* li ) = 0;
 
     //
     // Calls for the Renderer. Note that
@@ -72,7 +74,7 @@ class RA_ENGINE_API LightManager : public System {
 
   protected:
     /// Stores the object that stores the lights...
-    std::unique_ptr<LightStorage> m_data { nullptr };
+    std::unique_ptr<LightStorage> m_data{nullptr};
 };
 
 } // namespace Engine

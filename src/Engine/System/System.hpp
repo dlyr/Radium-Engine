@@ -35,7 +35,7 @@ class RA_ENGINE_API System {
     friend class Component;
 
   public:
-    System() = default;
+    System( std::string name ) : m_name( name ){};
     virtual ~System() = default;
 
     /**
@@ -89,9 +89,15 @@ class RA_ENGINE_API System {
      */
     virtual void unregisterAllComponents( const Entity* entity );
 
+    /**
+     * Return system name
+     */
+    std::string getName() const { return m_name; }
+
   protected:
     /// List of active components.
     std::vector<std::pair<const Entity*, Component*>> m_components;
+    const std::string m_name;
 };
 
 } // namespace Engine

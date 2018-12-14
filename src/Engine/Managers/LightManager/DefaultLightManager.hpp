@@ -1,8 +1,8 @@
 #ifndef RADIUMENGINE_DUMMYLIGHTMANAGER_HPP
 #define RADIUMENGINE_DUMMYLIGHTMANAGER_HPP
 
-#include <Engine/RadiumEngine.hpp>
 #include <Engine/Managers/LightManager/LightManager.hpp>
+#include <Engine/RadiumEngine.hpp>
 #include <Engine/Renderer/Light/Light.hpp>
 
 #include <memory>
@@ -17,8 +17,8 @@ namespace Engine {
 class RA_ENGINE_API DefaultLightStorage : public LightStorage {
   public:
     DefaultLightStorage();
-    void add(const Light *i) override;
-    void remove(const Light *li) override;
+    void add( const Light* i ) override;
+    void remove( const Light* li ) override;
     void upload() const override;
     size_t size() const override;
     void clear() override;
@@ -37,7 +37,8 @@ class RA_ENGINE_API DefaultLightManager : public LightManager {
     DefaultLightManager();
 
     const Light* getLight( size_t li ) const override;
-    void addLight(const Light *li) override;
+    void addLight( const Light* li ) override;
+    friend class LightManager;
 };
 
 } // namespace Engine
