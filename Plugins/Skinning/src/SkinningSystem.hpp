@@ -19,7 +19,7 @@ namespace SkinningPlugin {
 
 class SKIN_PLUGIN_API SkinningSystem : public Ra::Engine::System {
   public:
-    SkinningSystem() {}
+    SkinningSystem() : Ra::Engine::System( "SkinningSystem" ) {}
     virtual void generateTasks( Ra::Core::TaskQueue* taskQueue,
                                 const Ra::Engine::FrameInfo& frameInfo ) override {
         for ( const auto& compEntry : m_components )
@@ -53,7 +53,7 @@ class SKIN_PLUGIN_API SkinningSystem : public Ra::Engine::System {
                 component->handleWeightsLoading( skel );
                 registerComponent( entity, component );
 
-                /*SkinningDisplayComponent* display = */new SkinningDisplayComponent(
+                /*SkinningDisplayComponent* display = */ new SkinningDisplayComponent(
                     "SkC_DSP_" + skel->getName(), skel->getName(), entity );
                 // display->display( component->getRefData() );
             }

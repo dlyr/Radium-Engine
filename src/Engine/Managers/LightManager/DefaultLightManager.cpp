@@ -5,7 +5,7 @@
 namespace Ra {
 namespace Engine {
 
-DefaultLightManager::DefaultLightManager() : m_name( "DefaultLightManager" ) {
+DefaultLightManager::DefaultLightManager() : LightManager( "DefaultLightManager" ) {
     m_data = std::make_unique<DefaultLightStorage>();
 }
 

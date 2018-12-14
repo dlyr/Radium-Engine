@@ -15,11 +15,10 @@ namespace Engine {
  */
 class RA_ENGINE_API LightManager : public System {
     // Radium-V2 : make light manager compatible with range for ...
-    LightManager( std::string name ) : System( name ) {}
 
   public:
     /// Constructor
-    LightManager() : System( "LightManager" ) {}
+    LightManager( std::string name ) : System( name ) {}
 
     // Make copies impossible
     LightManager( const LightManager& ) = delete;

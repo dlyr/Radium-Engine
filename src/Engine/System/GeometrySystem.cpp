@@ -5,15 +5,15 @@
 #include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
 
-#include <Engine/RadiumEngine.hpp>
 #include <Engine/Component/GeometryComponent.hpp>
 #include <Engine/Entity/Entity.hpp>
 #include <Engine/Managers/ComponentMessenger/ComponentMessenger.hpp>
+#include <Engine/RadiumEngine.hpp>
 
 namespace Ra {
 namespace Engine {
 
-GeometrySystem::GeometrySystem() : Ra::Engine::System() {}
+GeometrySystem::GeometrySystem() : System( "GeometrySystem" ) {}
 
 void GeometrySystem::handleAssetLoading( Ra::Engine::Entity* entity,
                                          const Ra::Asset::FileData* fileData ) {

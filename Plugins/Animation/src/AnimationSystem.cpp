@@ -15,7 +15,7 @@
 
 namespace AnimationPlugin {
 
-AnimationSystem::AnimationSystem() {
+AnimationSystem::AnimationSystem() : Ra::Engine::System( "AnimationSystem" ) {
     m_isPlaying = false;
     m_oneStep = false;
     m_xrayOn = false;

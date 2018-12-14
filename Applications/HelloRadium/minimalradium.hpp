@@ -25,6 +25,7 @@ struct MinimalComponent : public Ra::Engine::Component {
 /// add a task to be executed, calling the spin function of the component.
 class MinimalSystem : public Ra::Engine::System {
   public:
+    MinimalSystem() : Ra::Engine::System( "MinimalSystem" ) {}
     virtual void generateTasks( Ra::Core::TaskQueue* q,
                                 const Ra::Engine::FrameInfo& info ) override;
     void addComponent( Ra::Engine::Entity* ent, MinimalComponent* comp );

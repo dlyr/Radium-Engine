@@ -16,7 +16,7 @@ namespace Engine {
 /// Also dispatches by default the generateTasks() and handleAssetLoading()
 /// methods from Ra::Engine::System.
 /// Note that Ra::Engine::Component registration methods from Ra::Engine::System
-/// are not dispatched by default, Ra::Engine::Systems managing only their own 
+/// are not dispatched by default, Ra::Engine::Systems managing only their own
 /// Ra::Engine::Components.
 ///
 /// \see CoupledTimedSystem for practical usage
@@ -26,7 +26,8 @@ namespace Engine {
 /// default implementation:
 ///
 /// \code
-/// inline void generateTasks( Core::TaskQueue* taskQueue, const Engine::FrameInfo& frameInfo ) override {
+/// inline void generateTasks( Core::TaskQueue* taskQueue, const Engine::FrameInfo& frameInfo )
+/// override {
 ///     dispatch( [taskQueue, &frameInfo]( const auto& s ) {
 ///         s->generateTasks( taskQueue, frameInfo );
 ///     } );
@@ -37,20 +38,22 @@ class BaseCouplingSystem : public _BaseAbstractSystem {
   public:
     using BaseAbstractSystem = _BaseAbstractSystem;
 
-    inline BaseCouplingSystem() {
+    inline BaseCouplingSystem( std::string name ) : BaseAbstractSystem( name ) {
         static_assert( std::is_base_of<Ra::Engine::System, BaseAbstractSystem>::value,
                        "BaseAbstractSystem must inherit Ra::Core::System" );
     }
     ~BaseCouplingSystem() override = default;
 
     BaseCouplingSystem( const BaseCouplingSystem<BaseAbstractSystem>& ) = delete;
-    BaseCouplingSystem<BaseAbstractSystem>& operator=( const BaseCouplingSystem<BaseAbstractSystem>& ) = delete;
+    BaseCouplingSystem<BaseAbstractSystem>&
+    operator=( const BaseCouplingSystem<BaseAbstractSystem>& ) = delete;
 
     /// Add management for the given system.
     /// \warning The property of the pointer is given to *this
     inline void addSystem( BaseAbstractSystem* s ) { m_systems.emplace_back( s ); }
 
-    inline void generateTasks( Core::TaskQueue* taskQueue, const Engine::FrameInfo& frameInfo ) override {
+    inline void generateTasks( Core::TaskQueue* taskQueue,
+                               const Engine::FrameInfo& frameInfo ) override {
         dispatch( [taskQueue, &frameInfo]( const auto& s ) {
             s->generateTasks( taskQueue, frameInfo );
         } );

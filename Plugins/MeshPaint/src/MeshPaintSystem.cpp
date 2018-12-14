@@ -15,7 +15,7 @@
 #include <MeshPaintComponent.hpp>
 
 namespace MeshPaintPlugin {
-MeshPaintSystem::MeshPaintSystem() : Ra::Engine::System() {}
+MeshPaintSystem::MeshPaintSystem() : Ra::Engine::System( "MeshPaintSystem" ) {}
 
 MeshPaintSystem::~MeshPaintSystem() {}
 
