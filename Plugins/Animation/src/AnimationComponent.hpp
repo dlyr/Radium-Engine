@@ -112,6 +112,15 @@ class ANIM_PLUGIN_API AnimationComponent : public Ra::Engine::Component {
     virtual void setTransform( const Ra::Core::Utils::Index& roIdx,
                                const Ra::Core::Transform& transform ) override;
 
+    /// Setup CC.
+    void setupIO( const std::string& id );
+
+    Ra::Core::Animation::WeightMatrix getWeights() const { return m_weights; }
+    void setWeights( const Ra::Core::Animation::WeightMatrix& weights ) { m_weights = weights; }
+
+    std::string getContentName() const { return m_contentName; }
+    void setContentName( const std::string& contentName ) { m_contentName = contentName; }
+    
   private:
     // Internal function to create the skinning weights.
     void createWeightMatrix( const Ra::Core::Asset::HandleData* data,
@@ -127,9 +136,7 @@ class ANIM_PLUGIN_API AnimationComponent : public Ra::Engine::Component {
     // Component Communication (CC)
     //
 
-    /// Setup CC.
-    void setupIO( const std::string& id );
-
+  private:
     /// Skeleton getter for CC.
     const Ra::Core::Animation::Skeleton* getSkeletonOutput() const;
 
@@ -147,8 +154,7 @@ class ANIM_PLUGIN_API AnimationComponent : public Ra::Engine::Component {
 
     /// Current Animation Time for CC.
     const Scalar* getTimeOutput() const;
-
-  private:
+   
     /// Entity name for CC.
     std::string m_contentName;
 
