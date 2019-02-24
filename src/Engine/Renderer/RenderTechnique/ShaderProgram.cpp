@@ -200,9 +200,29 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
         auto type = m_program->getActiveUniform( i, GL_UNIFORM_TYPE );
 
         //!\todo add other sampler type (or manage all type of sampler automatically)
-        if ( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_2D_RECT ||
-             type == GL_SAMPLER_2D_SHADOW || type == GL_SAMPLER_3D ||
-             type == GL_SAMPLER_CUBE_SHADOW )
+        if ( type == GL_SAMPLER_1D || type == GL_SAMPLER_2D || type == GL_SAMPLER_3D ||
+             type == GL_SAMPLER_CUBE || type == GL_SAMPLER_1D_SHADOW ||
+             type == GL_SAMPLER_2D_SHADOW || type == GL_SAMPLER_1D_ARRAY ||
+             type == GL_SAMPLER_2D_ARRAY || type == GL_SAMPLER_1D_ARRAY_SHADOW ||
+             type == GL_SAMPLER_2D_ARRAY_SHADOW || type == GL_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_SAMPLER_2D_MULTISAMPLE_ARRAY || type == GL_SAMPLER_CUBE_SHADOW ||
+             type == GL_SAMPLER_BUFFER || type == GL_SAMPLER_2D_RECT ||
+             type == GL_SAMPLER_2D_RECT_SHADOW || type == GL_INT_SAMPLER_1D ||
+             type == GL_INT_SAMPLER_2D || type == GL_INT_SAMPLER_3D ||
+             type == GL_INT_SAMPLER_CUBE || type == GL_INT_SAMPLER_1D_ARRAY ||
+             type == GL_INT_SAMPLER_2D_ARRAY || type == GL_INT_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY || type == GL_INT_SAMPLER_BUFFER ||
+             type == GL_INT_SAMPLER_2D_RECT || type == GL_UNSIGNED_INT_SAMPLER_1D ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D || type == GL_UNSIGNED_INT_SAMPLER_3D ||
+             type == GL_UNSIGNED_INT_SAMPLER_CUBE || type == GL_UNSIGNED_INT_SAMPLER_1D_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_BUFFER || type == GL_UNSIGNED_INT_SAMPLER_2D_RECT ||
+             type == GL_IMAGE_1D || type == GL_IMAGE_2D || type == GL_IMAGE_3D ||
+             type == GL_IMAGE_2D_RECT || type == GL_IMAGE_CUBE || type == GL_IMAGE_BUFFER ||
+             type == GL_IMAGE_1D_ARRAY || type == GL_IMAGE_2D_ARRAY ||
+             type == GL_IMAGE_2D_MULTISAMPLE )
         {
             auto location = m_program->getUniformLocation( name );
             textureUnits[name] = TextureBinding( texUnit++, location );
