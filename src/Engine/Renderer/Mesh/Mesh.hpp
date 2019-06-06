@@ -169,7 +169,7 @@ class RA_ENGINE_API Mesh : public Displayable
     /// Update the picking render mode according to the object render mode
     void updatePickingRenderMode();
 
-  private:
+  protected:
     uint m_vao{0}; /// Index of our openGL VAO
     MeshRenderMode m_renderMode{
         MeshRenderMode::RM_TRIANGLES}; /// Render mode (GL_TRIANGLES or GL_LINES, etc.)
