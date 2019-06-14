@@ -272,6 +272,10 @@ BaseApplication::BaseApplication( int argc,
     }
 
     m_lastFrameStart = Core::Utils::Clock::now();
+
+    connect( m_frameTimer, &QTimer::timeout, this, &BaseApplication::updateRadiumFrameIfNeeded );
+    const int deltaTime( m_targetFPS == 0 ? 1 : 1000 / m_targetFPS );
+    m_frameTimer->start( deltaTime );
 }
 
 void BaseApplication::createConnections() {
@@ -280,6 +284,8 @@ void BaseApplication::createConnections() {
     connect(
         m_viewer, &Gui::Viewer::glInitialized, this, &BaseApplication::initializeOpenGlPlugins );
     connect( this, &QGuiApplication::lastWindowClosed, m_viewer, &Gui::WindowQt::cleanupGL );
+
+    connect( m_viewer, &Gui::Viewer::needUpdate, this, &BaseApplication::askForUpdate );
 }
 
 void BaseApplication::setupScene() {
@@ -356,77 +362,75 @@ void BaseApplication::addBasicShaders() {
 }
 
 void BaseApplication::radiumFrame() {
-    FrameTimerData timerData;
-    timerData.frameStart = Core::Utils::Clock::now();
 
-    // ----------
-    // 0. Compute time since last frame.
-    const Scalar dt =
-        m_realFrameRate ? Core::Utils::getIntervalSeconds( m_lastFrameStart, timerData.frameStart )
-                        : 1.f / Scalar( m_targetFPS );
-    m_lastFrameStart = timerData.frameStart;
-
-    timerData.eventsStart = Core::Utils::Clock::now();
-    processEvents();
-    timerData.eventsEnd = Core::Utils::Clock::now();
-
-    // ----------
-    // 1. Gather user input and dispatch it.
-
-    // Get picking results from last frame and forward it to the selection.
-    m_viewer->processPicking();
-
-    // ----------
-    // 2. Kickoff rendering
-    m_viewer->startRendering( dt );
-
-    timerData.tasksStart = Core::Utils::Clock::now();
-
-    // ----------
-    // 3. Run the engine task queue.
-    m_engine->getTasks( m_taskQueue.get(), dt );
-
-    if ( m_recordGraph ) { m_taskQueue->printTaskGraph( std::cout ); }
-
-    // Run one frame of tasks
-    m_taskQueue->startTasks();
-    m_taskQueue->waitForTasks();
-    timerData.taskData = m_taskQueue->getTimerData();
-    m_taskQueue->flushTaskQueue();
-
-    timerData.tasksEnd = Core::Utils::Clock::now();
-
-    // ----------
-    // 4. Wait until frame is fully rendered and display.
-    m_viewer->waitForRendering();
-
-    timerData.renderData = m_viewer->getRenderer()->getTimerData();
-
-    // ----------
-    // 5. Synchronize whatever needs synchronisation
-    m_engine->endFrameSync();
-
-    // ----------
-    // 6. Frame end.
-    timerData.frameEnd = Core::Utils::Clock::now();
-    timerData.numFrame = m_frameCounter;
-
-    if ( m_recordTimings ) { timerData.print( std::cout ); }
-
-    m_timerData.push_back( timerData );
-
-    if ( m_recordFrames ) { recordFrame(); }
-
-    ++m_frameCounter;
-
-    if ( m_numFrames > 0 && m_frameCounter > m_numFrames ) { appNeedsToQuit(); }
-
-    if ( m_frameCounter % m_frameCountBeforeUpdate == 0 )
+    if ( m_isUpdateNeeded.load() )
     {
-        emit( updateFrameStats( m_timerData ) );
-        m_timerData.clear();
-    }
+        FrameTimerData timerData;
+        timerData.frameStart = Core::Utils::Clock::now();
 
+        // ----------
+        // 0. Compute time since last frame.
+        const Scalar dt = m_realFrameRate ? Core::Utils::getIntervalSeconds( m_lastFrameStart,
+                                                                             timerData.frameStart )
+                                          : 1.f / Scalar( m_targetFPS );
+        m_lastFrameStart = timerData.frameStart;
+
+        // ----------
+        // 1. Gather user input and dispatch it.
+        // Get picking results from last frame and forward it to the selection.
+        m_viewer->processPicking();
+
+        // ----------
+        // 2. Kickoff rendering
+        m_viewer->startRendering( dt );
+
+        timerData.tasksStart = Core::Utils::Clock::now();
+
+        // ----------
+        // 3. Run the engine task queue.
+        m_engine->getTasks( m_taskQueue.get(), dt );
+
+        if ( m_recordGraph ) { m_taskQueue->printTaskGraph( std::cout ); }
+
+        // Run one frame of tasks
+        m_taskQueue->startTasks();
+        m_taskQueue->waitForTasks();
+        timerData.taskData = m_taskQueue->getTimerData();
+        m_taskQueue->flushTaskQueue();
+
+        timerData.tasksEnd = Core::Utils::Clock::now();
+
+        // ----------
+        // 4. Wait until frame is fully rendered and display.
+        m_viewer->waitForRendering();
+
+        timerData.renderData = m_viewer->getRenderer()->getTimerData();
+
+        // ----------
+        // 5. Synchronize whatever needs synchronisation
+        m_engine->endFrameSync();
+
+        // ----------
+        // 6. Frame end.
+        timerData.frameEnd = Core::Utils::Clock::now();
+        timerData.numFrame = m_frameCounter;
+
+        if ( m_recordTimings ) { timerData.print( std::cout ); }
+
+        m_timerData.push_back( timerData );
+
+        if ( m_recordFrames ) { recordFrame(); }
+
+        ++m_frameCounter;
+
+        if ( m_numFrames > 0 && m_frameCounter > m_numFrames ) { appNeedsToQuit(); }
+
+        if ( m_frameCounter % m_frameCountBeforeUpdate == 0 )
+        {
+            emit( updateFrameStats( m_timerData ) );
+            m_timerData.clear();
+        }
+    }
     m_mainWindow->onFrameComplete();
 }
 
