@@ -217,10 +217,13 @@ void Renderer::render( const ViewingParameters& data ) {
 void Renderer::saveExternalFBOInternal() {
     // Save the current viewport ...
     glGetIntegerv( GL_VIEWPORT, m_qtViewport );
+    LOG(logDEBUG)<< "save viewport " <<m_qtViewport[0] <<" "<< m_qtViewport[1]<<" "<< m_qtViewport[2]<<" "<< m_qtViewport[3];
+
     // save the currently bound FBO
     GL_ASSERT( glGetIntegerv( GL_FRAMEBUFFER_BINDING, &m_qtPlz ) );
     // Set the internal rendering viewport
     glViewport( 0, 0, int( m_width ), int( m_height ) );
+    LOG(logDEBUG)<< "set viewport " << 0 <<" "<< 0 <<" "<< m_width<<" "<< m_height;
 }
 
 void Renderer::updateRenderObjectsInternal( const ViewingParameters& /*renderData*/ ) {
@@ -478,6 +481,7 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
 }
 
 void Renderer::drawScreenInternal() {
+    LOG(logDEBUG)<< "set viewport " <<m_qtViewport[0] <<" "<< m_qtViewport[1]<<" "<< m_qtViewport[2]<<" "<< m_qtViewport[3];
     glViewport( m_qtViewport[0], m_qtViewport[1], m_qtViewport[2], m_qtViewport[3] );
 
     if ( m_qtPlz == 0 )
