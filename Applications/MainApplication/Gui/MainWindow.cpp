@@ -53,7 +53,6 @@ MainWindow::MainWindow( QWidget* parent ) : MainWindowInterface( parent ) {
     connect( m_viewer, &Viewer::glInitialized, this, &MainWindow::onGLInitialized );
     connect( m_viewer, &Viewer::rendererReady, this, &MainWindow::onRendererReady );
 
-    m_viewer->createGizmoManager();
     m_viewer->setObjectName( QStringLiteral( "m_viewer" ) );
 
     QWidget* viewerwidget = QWidget::createWindowContainer( m_viewer );
@@ -89,6 +88,7 @@ void MainWindow::cleanup() {
     m_viewer->getGizmoManager()->cleanup();
 }
 
+// Connection to gizmos must be done after GL is initialized
 void MainWindow::createConnections() {
     connect( actionOpenMesh, &QAction::triggered, this, &MainWindow::loadFile );
     connect( actionReload_Shaders, &QAction::triggered, m_viewer, &Viewer::reloadShaders );
@@ -96,10 +96,6 @@ void MainWindow::createConnections() {
         actionOpen_Material_Editor, &QAction::triggered, this, &MainWindow::openMaterialEditor );
 
     // Toolbox setup
-    connect( actionToggle_Local_Global,
-             &QAction::toggled,
-             m_viewer->getGizmoManager(),
-             &GizmoManager::setLocal );
     // to update display when mode is changed
     connect( actionToggle_Local_Global,
              &QAction::toggled,
@@ -145,8 +141,6 @@ void MainWindow::createConnections() {
 
     // Make selected item event visible to plugins
     connect( this, &MainWindow::selectedItem, mainApp, &MainApplication::onSelectedItem );
-    connect(
-        this, &MainWindow::selectedItem, m_viewer->getGizmoManager(), &GizmoManager::setEditable );
 
     // Enable changing shaders
     connect(
@@ -680,8 +674,14 @@ void MainWindow::postLoadFile(const std::string &filename)
 }
 
 void MainWindow::onGLInitialized() {
+    // Connection to gizmos after their creation
+    connect( actionToggle_Local_Global,
+             &QAction::toggled,
+             m_viewer->getGizmoManager(),
+             &GizmoManager::setLocal );
+    connect(
+        this, &MainWindow::selectedItem, m_viewer->getGizmoManager(), &GizmoManager::setEditable );
 
-    LOG( logINFO ) << "onGLInitialized";
     // set default renderer once OpenGL is configured
     std::shared_ptr<Engine::Renderer> e( new Engine::ForwardRenderer() );
     addRenderer( "Forward Renderer", e );
