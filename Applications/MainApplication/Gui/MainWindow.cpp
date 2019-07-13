@@ -36,6 +36,8 @@ namespace Gui {
 
 using namespace Core::Utils; // log
 
+///\todo import read/write settings from color point app
+
 MainWindow::MainWindow( QWidget* parent ) : MainWindowInterface( parent ) {
     // Note : at this point most of the components (including the Engine) are
     // not initialized. Listen to the "started" signal.
@@ -624,7 +626,7 @@ void MainWindow::resetScene() {
 }
 
 void MainWindow::fitCamera() {
-    auto aabb = Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getSceneAabb();
+    auto aabb = Engine::RadiumEngine::getInstance()->computeSceneAabb();
     if ( aabb.isEmpty() )
     {
         m_viewer->getCameraInterface()->resetCamera();

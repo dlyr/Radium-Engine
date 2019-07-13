@@ -18,6 +18,7 @@
 #include <Engine/Managers/ComponentMessenger/ComponentMessenger.hpp>
 #include <Engine/Managers/EntityManager/EntityManager.hpp>
 #include <Engine/Managers/SignalManager/SignalManager.hpp>
+#include <Engine/Managers/SystemDisplay/SystemDisplay.hpp>
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
@@ -249,6 +250,23 @@ RadiumEngine::SystemContainer::iterator RadiumEngine::findSystem( const std::str
     return std::find_if( m_systems.begin(), m_systems.end(), [&name]( const auto& el ) {
         return el.first.second == name;
     } );
+}
+
+Core::Aabb RadiumEngine::computeSceneAabb() const {
+
+    Core::Aabb aabb;
+
+    const auto& systemEntity = Engine::SystemEntity::getInstance();
+    auto entities            = m_entityManager->getEntities();
+    for ( const auto& entity : entities )
+    {
+        if ( entity != systemEntity )
+        {
+            aabb.extend( entity->computeAabb() );
+            // RA_DISPLAY_AABB( aabb, Ra::Core::Utils::Color( 1., 0., 1. ) );
+        }
+    }
+    return aabb;
 }
 
 } // namespace Engine
