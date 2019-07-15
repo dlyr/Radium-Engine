@@ -12,6 +12,8 @@
 namespace Ra {
 namespace Engine {
 
+class ShaderProgram;
+
 /**
  * Base class of any displayable object.
  */
@@ -55,6 +57,7 @@ class RA_ENGINE_API Displayable
     //// Utility methods, used to display statistics
     virtual size_t getNumFaces() const { return 0; }
     virtual size_t getNumVertices() const { return 0; }
+    virtual void autoVertexAttribPointer( const ShaderProgram& prog ) = 0;
 
   protected:
     PickingRenderMode m_pickingRenderMode{NO_PICKING};
