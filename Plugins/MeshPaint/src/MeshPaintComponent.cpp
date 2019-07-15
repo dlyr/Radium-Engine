@@ -80,7 +80,7 @@ void MeshPaintComponent::startPaint( bool on ) {
             triangleMesh.colorize( Ra::Core::Utils::Color::Skin() );
             m_currentColorAttribHdl =
                 triangleMesh.getAttribHandle<Ra::Core::Vector4>( colAttribName );
-            m_mesh->setDirty( Ra::Engine::Mesh::VERTEX_COLOR, true );
+            m_mesh->setDirty( Ra::Engine::Mesh::VERTEX_COLOR );
         }
         else
         {
