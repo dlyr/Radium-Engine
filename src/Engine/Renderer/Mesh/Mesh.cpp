@@ -35,9 +35,10 @@ Mesh::Mesh( const std::string& name, MeshRenderMode renderMode ) :
 
 Mesh::~Mesh() {}
 
-void Mesh::render() {
+void Mesh::render( const ShaderProgram* prog ) {
     if ( m_vao )
     {
+        autoVertexAttribPointer( prog );
         m_vao->bind();
         m_vao->drawElements( static_cast<GLenum>( m_renderMode ),
                              GLsizei( m_numElements ),
@@ -198,11 +199,10 @@ void Mesh::updateGL() {
         else
         {
             m_indices->setData( m_mesh.m_triangles, GL_DYNAMIC_DRAW );
-            m_indices->setData(
-                static_cast<gl::GLsizeiptr>( m_mesh.m_triangles.size() *
-                                             sizeof( Core::Geometry::TriangleMesh::Face ) ),
-                m_mesh.m_triangles.data(),
-                GL_STATIC_DRAW );
+            m_indices->setData( static_cast<gl::GLsizeiptr>( m_mesh.m_triangles.size() *
+                                                             sizeof( Core::Vector3ui ) ),
+                                m_mesh.m_triangles.data(),
+                                GL_STATIC_DRAW );
         }
 
         auto func = [this]( Ra::Core::Utils::AttribBase* b ) {
@@ -227,38 +227,12 @@ void Mesh::updateGL() {
         m_vao->bind();
         m_vao->bindElementBuffer( m_indices.get() );
 
-        {
-            auto vertexBinding = m_vao->binding( 0 );
-            vertexBinding->setAttribute( 0 );
-            vertexBinding->setBuffer( m_vbos[0].get(), 0, sizeof( Ra::Core::Vector3 ) );
-            vertexBinding->setFormat( 3, GL_FLOAT );
-            m_vao->enable( 0 );
-        }
-        GL_CHECK_ERROR;
-
         for ( auto buffer : m_handleToBuffer )
         {
-            if ( !m_mesh.hasAttrib( buffer.first ) )
-            {
-                if ( !m_vbos[buffer.second] )
-                {
-                    LOG( logERROR ) << getName() << " disable " << buffer.first << "  idx "
-                                    << buffer.second << "/";
-
-                    m_vao->disable( buffer.second );
-                    m_vbos[buffer.second].reset( nullptr );
-                }
-            }
-            else
-            {
-                if ( m_vbos[buffer.second] )
-                {
-                    LOG( logERROR ) << getName() << " enable " << buffer.first << "  idx "
-                                    << buffer.second << "/";
-
-                    m_vao->enable( buffer.second );
-                }
-            }
+            // do not remove name from handleToBuffer to keep index ...
+            // we could also update handleToBuffer, m_vbos, m_dataDirty
+            if ( !m_mesh.hasAttrib( buffer.first ) && m_vbos[buffer.second] )
+                m_vbos[buffer.second].reset( nullptr );
         }
 
         GL_CHECK_ERROR;
@@ -307,9 +281,9 @@ void Mesh::updatePickingRenderMode() {
     }
 }
 
-void Mesh::autoVertexAttribPointer( const ShaderProgram& prog ) {
+void Mesh::autoVertexAttribPointer( const ShaderProgram* prog ) {
 
-    auto glprog           = prog.getProgramObject();
+    auto glprog           = prog->getProgramObject();
     gl::GLint attribCount = glprog->get( GL_ACTIVE_ATTRIBUTES );
 
     m_vao->bind();
@@ -328,7 +302,6 @@ void Mesh::autoVertexAttribPointer( const ShaderProgram& prog ) {
         {
             m_vao->enable( loc );
             auto binding = m_vao->binding( idx );
-
             binding->setAttribute( loc );
             binding->setBuffer( m_vbos[m_handleToBuffer[name]].get(), 0, attrib->getStride() );
             binding->setFormat( attrib->getElementSize(), GL_FLOAT );
