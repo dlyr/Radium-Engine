@@ -158,7 +158,7 @@ class RA_ENGINE_API Mesh : public Displayable
     void updateGL() override;
 
     /// Draw the mesh.
-    void render() override;
+    void render( const ShaderProgram* prog ) override;
 
     size_t getNumFaces() const override;
     inline size_t getNumVertices() const override { return m_mesh.vertices().size(); }
@@ -168,10 +168,10 @@ class RA_ENGINE_API Mesh : public Displayable
     static inline std::string getAttribName( Vec3Data type );
     static inline std::string getAttribName( Vec4Data type );
 
-    void autoVertexAttribPointer( const ShaderProgram& prog ) override;
-
   private:
     /// Update the picking render mode according to the object render mode
+
+    void autoVertexAttribPointer( const ShaderProgram* prog );
     void updatePickingRenderMode();
 
   private:
