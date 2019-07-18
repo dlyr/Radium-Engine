@@ -229,9 +229,8 @@ void RenderObject::render( const RenderParameters& lightParams,
         if ( material != nullptr ) material->bind( shader );
         GL_CHECK_ERROR;
         // render
-        getMesh()->autoVertexAttribPointer( *shader );
 
-        getMesh()->render();
+        getMesh()->render( shader );
     }
 }
 
