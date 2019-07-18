@@ -93,11 +93,17 @@ std::string Mesh::getAttribName( MeshData type ) {
 }
 
 std::string Mesh::getAttribName( Vec3Data type ) {
-    return std::string( "Vec3_attr_" ) + std::to_string( uint( type ) );
+    if ( type == VERTEX_TANGENT ) return {"in_tangent"};
+    if ( type == VERTEX_BITANGENT ) return {"in_bitangent"};
+    if ( type == VERTEX_TEXCOORD ) return {"in_texcoord"};
+    return {"invalid vec3 attr"};
 }
 
 std::string Mesh::getAttribName( Vec4Data type ) {
-    return std::string( "Vec4_attr_" ) + std::to_string( uint( type ) );
+    if ( type == VERTEX_COLOR ) return {"in_color"};
+    if ( type == VERTEX_WEIGHTS ) return {"in_weight"};
+    if ( type == VERTEX_WEIGHT_IDX ) return {"in_weight_idx"};
+    return {"invalid vec4 attr"};
 }
 
 // void Mesh::colorize( const Core::Utils::Color& color ) {
