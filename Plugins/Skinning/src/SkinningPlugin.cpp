@@ -4,6 +4,10 @@
 #include <QSpacerItem>
 #include <QVBoxLayout>
 
+#include <QFile>
+
+#include <Core/Resources/Resources.hpp>
+
 #include <Engine/RadiumEngine.hpp>
 #include <Engine/Renderer/Texture/TextureManager.hpp>
 
@@ -19,10 +23,12 @@ void SkinningPluginC::registerPlugin( const Ra::Plugins::Context& context ) {
     m_selectionManager = context.m_selectionManager;
     context.m_engine->registerSystem( "SkinningSystem", m_system );
     m_widget = new SkinningWidget;
-    connect( m_selectionManager,
-             &Ra::GuiBase::SelectionManager::currentChanged,
-             this,
-             &SkinningPluginC::onCurrentChanged );
+    if (m_selectionManager) {
+        connect( m_selectionManager,
+                 &Ra::GuiBase::SelectionManager::currentChanged,
+                 this,
+                 &SkinningPluginC::onCurrentChanged );
+    }
     connect( m_widget, &SkinningWidget::showWeights, this, &SkinningPluginC::onShowWeights );
     connect(
         m_widget, &SkinningWidget::showWeightsType, this, &SkinningPluginC::onShowWeightsType );
@@ -77,12 +83,18 @@ bool SkinningPluginC::doAddROpenGLInitializer() {
 
 void SkinningPluginC::openGlInitialize( const Ra::Plugins::Context& /*context*/ ) {
     if ( !m_system ) { return; }
+    QImage influenceImage(":/Assets/Textures/Influence0.png");
+    auto img = influenceImage.convertToFormat(QImage::Format_RGB888);
     Ra::Engine::TextureParameters texData;
     texData.wrapS     = GL_CLAMP_TO_EDGE;
     texData.wrapT     = GL_CLAMP_TO_EDGE;
     texData.minFilter = GL_NEAREST;
     texData.magFilter = GL_NEAREST;
-    texData.name      = "Assets/Textures/Influence0.png";
+    texData.width = img.width();
+    texData.height = img.height();
+    texData.format = GL_RGB;
+    texData.texels = img.bits();
+    texData.name = ":/Assets/Textures/Influence0.png";
     Ra::Engine::TextureManager::getInstance()->getOrLoadTexture( texData );
 }
 
