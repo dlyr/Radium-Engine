@@ -143,13 +143,13 @@ class RA_ENGINE_API Mesh : public Displayable
     inline const Core::Vector4Array& getData( const Vec4Data& type ) const;
 
     /// Mark one of the data types as dirty, forcing an update of the openGL buffer.
-    inline void setDirty( const MeshData& type );
+    void setDirty( const MeshData& type );
 
     /// Mark one of the data types as dirty, forcing an update of the openGL buffer.
-    inline void setDirty( const Vec3Data& type );
+    void setDirty( const Vec3Data& type );
 
     /// Mark one of the data types as dirty, forcing an update of the openGL buffer.
-    inline void setDirty( const Vec4Data& type );
+    void setDirty( const Vec4Data& type );
 
     /**
      * This function is called at the start of the rendering. It will update the
