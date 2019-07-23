@@ -1,5 +1,4 @@
 #include "Mesh.hpp"
-#include <globjects/Buffer.h>
 
 namespace Ra {
 namespace Engine {
@@ -39,51 +38,6 @@ const Core::Vector4Array& Mesh::getData( const Mesh::Vec4Data& type ) const {
     Handle handle = m_mesh.getAttribHandle<Core::Vector4>( name );
     if ( !m_mesh.isValid( handle ) ) return m_dummy4;
     return m_mesh.getAttrib( handle ).data();
-}
-
-void Mesh::setDirty( const Mesh::MeshData& type ) {
-    auto name = getAttribName( type );
-    auto itr  = m_handleToBuffer.find( name );
-    if ( itr == m_handleToBuffer.end() )
-    {
-        m_handleToBuffer[name] = m_dataDirty.size();
-        m_dataDirty.push_back( true );
-        m_vbos.emplace_back( nullptr );
-    }
-    else
-        m_dataDirty[itr->second] = true;
-
-    m_isDirty = true;
-}
-
-void Mesh::setDirty( const Vec3Data& type ) {
-    auto name = getAttribName( type );
-    auto itr  = m_handleToBuffer.find( name );
-    if ( itr == m_handleToBuffer.end() )
-    {
-        m_handleToBuffer[name] = m_dataDirty.size();
-        m_dataDirty.push_back( true );
-        m_vbos.push_back( nullptr );
-    }
-    else
-        m_dataDirty[itr->second] = true;
-
-    m_isDirty = true;
-}
-
-void Mesh::setDirty( const Vec4Data& type ) {
-    auto name = getAttribName( type );
-    auto itr  = m_handleToBuffer.find( name );
-    if ( itr == m_handleToBuffer.end() )
-    {
-        m_handleToBuffer[name] = m_dataDirty.size();
-        m_dataDirty.push_back( true );
-        m_vbos.push_back( nullptr );
-    }
-    else
-        m_dataDirty[itr->second] = true;
-
-    m_isDirty = true;
 }
 
 std::string Mesh::getAttribName( MeshData type ) {

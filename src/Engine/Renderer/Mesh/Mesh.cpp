@@ -313,5 +313,50 @@ void Mesh::autoVertexAttribPointer( const ShaderProgram* prog ) {
     m_vao->unbind();
 }
 
+void Mesh::setDirty( const Mesh::MeshData& type ) {
+    auto name = getAttribName( type );
+    auto itr  = m_handleToBuffer.find( name );
+    if ( itr == m_handleToBuffer.end() )
+    {
+        m_handleToBuffer[name] = m_dataDirty.size();
+        m_dataDirty.push_back( true );
+        m_vbos.emplace_back( nullptr );
+    }
+    else
+        m_dataDirty[itr->second] = true;
+
+    m_isDirty = true;
+}
+
+void Mesh::setDirty( const Vec3Data& type ) {
+    auto name = getAttribName( type );
+    auto itr  = m_handleToBuffer.find( name );
+    if ( itr == m_handleToBuffer.end() )
+    {
+        m_handleToBuffer[name] = m_dataDirty.size();
+        m_dataDirty.push_back( true );
+        m_vbos.push_back( nullptr );
+    }
+    else
+        m_dataDirty[itr->second] = true;
+
+    m_isDirty = true;
+}
+
+void Mesh::setDirty( const Vec4Data& type ) {
+    auto name = getAttribName( type );
+    auto itr  = m_handleToBuffer.find( name );
+    if ( itr == m_handleToBuffer.end() )
+    {
+        m_handleToBuffer[name] = m_dataDirty.size();
+        m_dataDirty.push_back( true );
+        m_vbos.push_back( nullptr );
+    }
+    else
+        m_dataDirty[itr->second] = true;
+
+    m_isDirty = true;
+}
+
 } // namespace Engine
 } // namespace Ra
