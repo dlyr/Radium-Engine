@@ -145,7 +145,8 @@ class SKIN_PLUGIN_API SkinningDisplayComponent : public Ra::Engine::Component
             TriangleMesh meshCopy( mesh );
             auto colorAttribHandle = meshCopy.addAttrib<Ra::Core::Vector4>(
                 Ra::Engine::Mesh::getAttribName( Ra::Engine::Mesh::VERTEX_COLOR ) );
-            auto colorAttrib = meshCopy.getAttrib( colorAttribHandle ).data() = color;
+            auto colorAttrib = meshCopy.getAttrib( colorAttribHandle );
+            colorAttrib.setData( color );
             displayMesh->loadGeometry( std::move( meshCopy ) );
             renderObject->setMesh( displayMesh );
 

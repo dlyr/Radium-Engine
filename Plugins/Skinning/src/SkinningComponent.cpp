@@ -10,9 +10,9 @@
 #include <Core/Animation/StretchableTwistableBoneSkinning.hpp>
 #include <Core/Geometry/DistanceQueries.hpp>
 #include <Core/Geometry/TriangleOperation.hpp>
+#include <Core/Resources/Resources.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
-#include <Core/Resources/Resources.hpp>
 
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
 #include <Engine/Renderer/Mesh/Mesh.hpp>
@@ -482,15 +482,15 @@ void SkinningComponent::showWeights( bool on ) {
     {
         ro->setRenderTechnique( m_weightTechnique );
         // get the UV attrib handle, will create it if not there.
-        handle                           = mesh->addAttrib<Ra::Core::Vector3>( attrUV );
-        mesh->getAttrib( handle ).data() = m_weightsUV;
+        handle = mesh->addAttrib<Ra::Core::Vector3>( attrUV );
+        mesh->getAttrib( handle ).setData( m_weightsUV );
     }
     else
     {
         ro->setRenderTechnique( m_baseTechnique );
         handle = mesh->getAttribHandle<Ra::Core::Vector3>( attrUV );
         // if the UV attrib existed before, reset it, otherwise remove it.
-        if ( m_baseUV.size() > 0 ) { mesh->getAttrib( handle ).data() = m_baseUV; }
+        if ( m_baseUV.size() > 0 ) { mesh->getAttrib( handle ).setData( m_baseUV ); }
         else
         {
             mesh->removeAttrib( handle );
