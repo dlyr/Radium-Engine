@@ -73,12 +73,12 @@ Ra::Core::Geometry::TriangleMesh SkeletonBoneRenderObject::makeBoneShape() {
     const Scalar l = 0.1f;
     const Scalar w = 0.1f;
 
-    mesh.vertices() = {Ra::Core::Vector3( 0, 0, 0 ),
+    mesh.setVertices( {Ra::Core::Vector3( 0, 0, 0 ),
                        Ra::Core::Vector3( 0, 0, 1 ),
                        Ra::Core::Vector3( 0, w, l ),
                        Ra::Core::Vector3( w, 0, l ),
                        Ra::Core::Vector3( 0, -w, l ),
-                       Ra::Core::Vector3( -w, 0, l )};
+                       Ra::Core::Vector3( -w, 0, l )} );
 
     mesh.m_triangles = {Ra::Core::Vector3ui( 0, 2, 3 ),
                         Ra::Core::Vector3ui( 0, 5, 2 ),
@@ -89,8 +89,10 @@ Ra::Core::Geometry::TriangleMesh SkeletonBoneRenderObject::makeBoneShape() {
                         Ra::Core::Vector3ui( 1, 4, 3 ),
                         Ra::Core::Vector3ui( 1, 5, 4 )};
 
-    Ra::Core::Geometry::uniformNormal( mesh.vertices(), mesh.m_triangles, mesh.normals() );
-
+    Ra::Core::Geometry::uniformNormal(
+        mesh.verticesWithLock(), mesh.m_triangles, mesh.normalsWithLock() );
+    mesh.verticesUnlock();
+    mesh.normalsUnlock();
     return mesh;
 }
 
