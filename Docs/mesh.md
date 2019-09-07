@@ -39,7 +39,7 @@ no attribute is copied.
 In order to copy some/all of the attributes, the dedicated methods must be used.
 
 For instance
-```c++
+```cpp
         TriangleMesh m;
         m.vertices().push_back( {0, 0, 0} );
         m.vertices().push_back( {1, 0, 0} );

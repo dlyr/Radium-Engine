@@ -51,7 +51,7 @@ more than once per frame.
 
 When creating an entity, if you set its transform, _do not forget_ to call
 `Entity::swapTransformBuffers`, this might prevent you some headache. Example :
-```c++
+```cpp
 Ra::Engine::Entity* entity = theEntityManager->getOrCreate( "MyEntity" );
 Ra::Core::Transform transform( Ra::Core::Transform::Identity() );
 transform.translation = Ra::Core::Vector3( 42, 13, 37 );

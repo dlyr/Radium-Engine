@@ -40,7 +40,7 @@ We provide in `Radium-Engine/tests/Tests.hpp` some utility functions to ease tes
 
 Let's consider the following snippet:`
 
-```c++
+```cpp
 #include <Core/Math/LinearAlgebra.hpp>                        // include path contains Radium sources,
 #include <OpenMesh/Tools/Subdivider/Uniform/CatmullClarkT.hh> // Radium's dependencies
 #include <Tests.hpp>                                          // and the testing tools 
@@ -83,7 +83,7 @@ It first initializes the testing helpers (including random number generation), a
 Repetition is strongly encouraged, especially to test or detect piece of codes involving non-deterministic behavior.
 Of course, multiple functions can be called in place of the `run()` function shown in this example. A standard use case is:
 
-```c++
+```cpp
      #pragma omp parallel for
      for(int i = 0; i < Testing::g_repeat; ++i)
      {
