@@ -167,7 +167,7 @@ Core::Matrix4 RenderObject::getTransformAsMatrix() const {
 }
 
 Core::Aabb RenderObject::computeAabb() const {
-    auto aabb = m_mesh->getGeometry().computeAabb();
+    auto aabb = m_mesh->getAbstractGeometry().computeAabb();
     Core::Aabb result;
 
     for ( int i = 0; i < 8; ++i )
