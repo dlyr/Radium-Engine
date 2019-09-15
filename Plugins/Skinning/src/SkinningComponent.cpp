@@ -105,14 +105,17 @@ void SkinningComponent::initialize() {
         m_renderObjectReader =
             compMsg->getterCallback<Ra::Core::Utils::Index>( getEntity(), m_meshName );
         m_skeletonGetter = compMsg->getterCallback<Skeleton>( getEntity(), m_contentsName );
-        m_verticesWriter =
+
+        /*m_verticesWriter =
             compMsg->rwCallback<Ra::Core::Vector3Array>( getEntity(), m_meshName + "v" );
         m_normalsWriter =
-            compMsg->rwCallback<Ra::Core::Vector3Array>( getEntity(), m_meshName + "n" );
-        m_meshWritter = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName );
+            compMsg->rwCallback<Ra::Core::Vector3Array>( getEntity(), m_meshName
+            + "n" );
+        */
+        m_meshWriter = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName );
 
         // copy mesh triangles and find duplicates for normal computation.
-        TriangleMesh* mesh = const_cast<TriangleMesh*>( m_meshWritter() );
+        TriangleMesh* mesh = const_cast<TriangleMesh*>( m_meshWriter() );
         m_refData.m_referenceMesh.copyBaseGeometry( *mesh );
         findDuplicates( *mesh, m_duplicatesMap );
 
@@ -307,8 +310,11 @@ void uniformNormal( const Ra::Core::Vector3Array& p,
 void SkinningComponent::endSkinning() {
     if ( m_frameData.m_doSkinning )
     {
-        Ra::Core::Vector3Array& vertices = *( m_verticesWriter() );
-        Ra::Core::Vector3Array& normals  = *( m_normalsWriter() );
+        //        Ra::Core::Vector3Array& vertices = *( m_verticesWriter() );
+        //        Ra::Core::Vector3Array& normals  = *( m_normalsWriter() );
+
+        Ra::Core::Vector3Array& vertices = m_meshWriter()->verticesWithLock();
+        Ra::Core::Vector3Array& normals  = m_meshWriter()->normalsWithLock();
 
         vertices = m_frameData.m_currentPos;
 
@@ -319,12 +325,17 @@ void SkinningComponent::endSkinning() {
         std::swap( m_frameData.m_previousPos, m_frameData.m_currentPos );
 
         m_frameData.m_doSkinning = false;
+
+        m_meshWriter()->verticesUnlock();
+        m_meshWriter()->normalsUnlock();
     }
     else if ( m_frameData.m_doReset )
     {
         // Reset mesh to its initial state.
-        Ra::Core::Vector3Array& vertices = *( m_verticesWriter() );
-        Ra::Core::Vector3Array& normals  = *( m_normalsWriter() );
+        //        Ra::Core::Vector3Array& vertices = *( m_verticesWriter() );
+        // Ra::Core::Vector3Array& normals  = *( m_normalsWriter() );
+        Ra::Core::Vector3Array& vertices = m_meshWriter()->verticesWithLock();
+        Ra::Core::Vector3Array& normals  = m_meshWriter()->normalsWithLock();
 
         vertices = m_refData.m_referenceMesh.vertices();
         normals  = m_refData.m_referenceMesh.normals();
@@ -339,6 +350,9 @@ void SkinningComponent::endSkinning() {
             Ra::Core::Animation::relativePose( m_frameData.m_currentPose, m_refData.m_refPose );
         m_frameData.m_prevToCurrentRelPose = Ra::Core::Animation::relativePose(
             m_frameData.m_currentPose, m_frameData.m_previousPose );
+
+        m_meshWriter()->verticesUnlock();
+        m_meshWriter()->normalsUnlock();
     }
 }
 
@@ -474,7 +488,7 @@ void SkinningComponent::setupSkinningType( SkinningType type ) {
 void SkinningComponent::showWeights( bool on ) {
     m_showingWeights   = on;
     auto ro            = getRoMgr()->getRenderObject( *m_renderObjectReader() );
-    TriangleMesh* mesh = const_cast<TriangleMesh*>( m_meshWritter() );
+    TriangleMesh* mesh = const_cast<TriangleMesh*>( m_meshWriter() );
     auto attrUV        = Ra::Engine::Mesh::getAttribName( Ra::Engine::Mesh::VERTEX_TEXCOORD );
     Ra::Core::Utils::AttribHandle<Ra::Core::Vector3> handle;
 
@@ -494,7 +508,8 @@ void SkinningComponent::showWeights( bool on ) {
         else
         {
             mesh->removeAttrib( handle );
-            m_meshWritter(); // update the Engine::Mesh's handles
+            // \fixme dlyr not needed ?
+            //            m_meshWriter(); // update the Engine::Mesh's handles
         }
     }
     m_forceUpdate = true;

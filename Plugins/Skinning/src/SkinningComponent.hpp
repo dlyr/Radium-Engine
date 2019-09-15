@@ -117,12 +117,12 @@ class SKIN_PLUGIN_API SkinningComponent : public Ra::Engine::Component
         m_skeletonGetter;
 
     /// Getter/Setter for the mesh vertices.
-    Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite
-        m_verticesWriter;
+    //    Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite
+    //        m_verticesWriter;
 
     /// Getter/Setter for the mesh normals.
-    Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite
-        m_normalsWriter;
+    //    Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite
+    //        m_normalsWriter;
 
     // Read FMC's RO idx.
     Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Utils::Index>::Getter
@@ -130,7 +130,8 @@ class SKIN_PLUGIN_API SkinningComponent : public Ra::Engine::Component
 
     // Getter/Setter to the mesh
     Ra::Engine::ComponentMessenger::CallbackTypes<Ra::Core::Geometry::TriangleMesh>::ReadWrite
-        m_meshWritter;
+        m_meshWriter;
+    // https://en.wiktionary.org/wiki/writter
 
     /// The Skinning Method.
     SkinningType m_skinningType;
