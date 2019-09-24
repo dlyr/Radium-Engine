@@ -12,6 +12,7 @@
 .\#*\#
 .vs
 .clang-format
+.*
 
 # Misc
 *Thumbs.db
