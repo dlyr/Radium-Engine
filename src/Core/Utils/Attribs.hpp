@@ -27,7 +27,8 @@ class AttribBase : public Observable<>
   public:
     explicit AttribBase( const std::string& name ) : m_name{name} {}
     virtual ~AttribBase() { notify(); }
-
+    AttribBase( const AttribBase& ) = delete;
+    AttribBase& operator=( const AttribBase& ) = delete;
     /**
      * Return the attribute's name.
      */
@@ -346,18 +347,18 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
 
     template <typename T>
     inline Attrib<T>* getAttribPtr( const AttribHandle<T>& h ) {
-        return static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ) );
+        return static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ).get() );
     }
 
     template <typename T>
     inline void setAttrib( const AttribHandle<T>& h,
                            const typename AttribHandle<T>::Container& data ) {
-        static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ) )->setData( data );
+        static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ).get() )->setData( data );
     }
 
     template <typename T>
     inline void setAttrib( const AttribHandle<T>& h, typename AttribHandle<T>::Container&& data ) {
-        static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ) )->setData( data );
+        static_cast<Attrib<T>*>( m_attribs.at( h.m_idx ).get() )->setData( data );
     }
 
     /// Get attribute by handle (const).
@@ -370,14 +371,14 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
 
     AttribBase* getAttribBase( const std::string& name ) {
         auto c = m_attribsIndex.find( name );
-        if ( c != m_attribsIndex.end() ) return m_attribs[c->second];
+        if ( c != m_attribsIndex.end() ) return m_attribs[c->second].get();
 
         return nullptr;
     }
 
     AttribBase* getAttribBase( const Index& idx ) {
 
-        if ( idx.isValid() ) return m_attribs[idx];
+        if ( idx.isValid() ) return m_attribs[idx].get();
 
         return nullptr;
     }
@@ -448,7 +449,7 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     template <typename F>
     void for_each_attrib( const F& func ) const {
         for ( const auto& attr : m_attribs )
-            if ( attr != nullptr ) func( attr );
+            if ( attr != nullptr ) func( attr.get() );
     }
 
     /// Perform \p fun on each attribute.
@@ -457,7 +458,7 @@ class RA_CORE_API AttribManager : public Observable<const std::string&>
     template <typename F>
     void for_each_attrib( const F& func ) {
         for ( auto& attr : m_attribs )
-            if ( attr != nullptr ) func( attr );
+            if ( attr != nullptr ) func( attr.get() );
     }
 
     int getNumAttribs() const { return m_numAttribs; }
