@@ -105,18 +105,11 @@ void SkinningComponent::initialize() {
         m_renderObjectReader =
             compMsg->getterCallback<Ra::Core::Utils::Index>( getEntity(), m_meshName );
         m_skeletonGetter = compMsg->getterCallback<Skeleton>( getEntity(), m_contentsName );
-
-        /*m_verticesWriter =
-            compMsg->rwCallback<Ra::Core::Vector3Array>( getEntity(), m_meshName + "v" );
-        m_normalsWriter =
-            compMsg->rwCallback<Ra::Core::Vector3Array>( getEntity(), m_meshName
-            + "n" );
-        */
-        m_meshWriter = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName );
+        m_meshWriter     = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName );
 
         // copy mesh triangles and find duplicates for normal computation.
         TriangleMesh* mesh = const_cast<TriangleMesh*>( m_meshWriter() );
-        m_refData.m_referenceMesh.copyBaseGeometry( *mesh );
+        m_refData.m_referenceMesh.copy( *mesh );
         findDuplicates( *mesh, m_duplicatesMap );
 
         // get other data
@@ -310,9 +303,6 @@ void uniformNormal( const Ra::Core::Vector3Array& p,
 void SkinningComponent::endSkinning() {
     if ( m_frameData.m_doSkinning )
     {
-        //        Ra::Core::Vector3Array& vertices = *( m_verticesWriter() );
-        //        Ra::Core::Vector3Array& normals  = *( m_normalsWriter() );
-
         Ra::Core::Vector3Array& vertices = m_meshWriter()->verticesWithLock();
         Ra::Core::Vector3Array& normals  = m_meshWriter()->normalsWithLock();
 
