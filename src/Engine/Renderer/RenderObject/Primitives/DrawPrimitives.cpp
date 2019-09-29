@@ -129,7 +129,7 @@ MeshPtr Triangle( const Core::Vector3& a,
 
     MeshPtr mesh( new Mesh( "Triangle Primitive", renderType ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -160,8 +160,7 @@ MeshPtr QuadStrip( const Core::Vector3& a,
 
     MeshPtr mesh( new Mesh( "Quad Strip Primitive", Mesh::RM_TRIANGLE_STRIP ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
     return mesh;
 }
 
@@ -194,8 +193,7 @@ MeshPtr Circle( const Core::Vector3& center,
 
     MeshPtr mesh( new Mesh( "Circle Primitive", Mesh::RM_LINE_LOOP ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
     return mesh;
 }
 
@@ -227,7 +225,7 @@ MeshPtr CircleArc( const Core::Vector3& center,
 
     MeshPtr mesh( new Mesh( "Arc Circle Primitive", Mesh::RM_LINE_STRIP ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -245,7 +243,7 @@ MeshPtr Sphere( const Core::Vector3& center, Scalar radius, const Core::Utils::C
 
     MeshPtr mesh( new Mesh( "Sphere Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( std::move( sphere ) );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -281,7 +279,7 @@ MeshPtr Capsule( const Core::Vector3& p1,
 
     MeshPtr mesh( new Mesh( "Sphere Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( std::move( capsule ) );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -320,7 +318,7 @@ MeshPtr Disk( const Core::Vector3& center,
 
     MeshPtr mesh( new Mesh( "Disk Primitive", Mesh::RM_TRIANGLE_FAN ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -360,7 +358,7 @@ MeshPtr Normal( const Core::Vector3& point,
 
     MeshPtr mesh( new Mesh( "Normal Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -389,7 +387,7 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
 
     MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES_ADJACENCY ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -429,7 +427,7 @@ MeshPtr Grid( const Core::Vector3& center,
 
     MeshPtr mesh( new Mesh( "GridPrimitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -452,7 +450,7 @@ MeshPtr AABB( const Core::Aabb& aabb, const Core::Utils::Color& color ) {
 
     MeshPtr mesh( new Mesh( "AABB Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -475,7 +473,7 @@ MeshPtr OBB( const Obb& obb, const Core::Utils::Color& color ) {
 
     MeshPtr mesh( new Mesh( "OBB Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -507,7 +505,7 @@ MeshPtr Spline( const Core::Geometry::Spline<3, 3>& spline,
 
     MeshPtr mesh( new Mesh( "Spline Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getTriangleMesh().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
