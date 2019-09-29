@@ -212,10 +212,10 @@ class DisplayableGeometry : public VaoDisplayable
      *
      * \note Attributes names are computed by #getAttribName
      */
-    template <typename Type, typename Vector>
-    [[deprecated]] void addData( const Type& type, const Core::VectorArray<Vector>& data );
-    template <typename Vector>
-    void addData( const std::string& name, const Core::VectorArray<Vector>& data );
+    //    template <typename Type, typename Vector>
+    //    [[deprecated]] void addData( const Type& type, const Core::VectorArray<Vector>& data );
+    //    template <typename Vector>
+    //    void addData( const std::string& name, const Core::VectorArray<Vector>& data );
 
   protected:
     void addAttribObserver( const std::string& name ) {

@@ -63,7 +63,7 @@ std::string VaoDisplayable::getAttribName( Vec4Data type ) {
     if ( type == VERTEX_WEIGHT_IDX ) return {"in_weight_idx"};
     return {"invalid vec4 attr"};
 }
-
+/*
 template <typename T>
 template <typename Vector>
 void DisplayableGeometry<T>::addData( const std::string& name,
@@ -103,6 +103,6 @@ template <typename Type, typename Vector>
 void DisplayableGeometry<T>::addData( const Type& type, const Core::VectorArray<Vector>& data ) {
     addData( getAttribName( type ), data );
 }
-
+*/
 } // namespace Engine
 } // namespace Ra
