@@ -1,3 +1,4 @@
 add_subdirectory(MainApplication)
 add_subdirectory(HelloRadium)
+add_subdirectory(TestDrawPrimitives)
 add_subdirectory(SimpleSubdivideExample)
