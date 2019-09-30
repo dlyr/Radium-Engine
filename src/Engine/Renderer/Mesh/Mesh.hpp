@@ -187,24 +187,17 @@ class DisplayableGeometry : public VaoDisplayable
     inline const CoreGeometry& getTriangleMesh() const;
     inline CoreGeometry& getTriangleMesh();
 
+    /// Helper function that calls Ra::Core::CoreGeometry::addAttrib()
+    template <typename A>
+    inline Ra::Core::Utils::AttribHandle<A> addAttrib( const std::string& name,
+                                                       const typename Core::VectorArray<A>& data ) {
+        return m_mesh.addAttrib( name, data );
+    }
+
     inline size_t getNumVertices() const override { return m_mesh.vertices().size(); }
 
     /// Use the given geometry as base for a display mesh. Normals are optionnal.
     void loadGeometry( CoreGeometry&& mesh ) { CORE_ASSERT( false, "must be specialized" ); }
-
-    /**
-     * Set additionnal vertex data.
-     * Initialize vertexAttrib if needed,
-     * data must have the appropriate size (i.e. num vertex) or empty (to
-     * remove the data)
-     * Theses functions might disapear to use directly Core::Geometry::TriangleMesh attribs.
-     *
-     * \note Attributes names are computed by #getAttribName
-     */
-    //    template <typename Type, typename Vector>
-    //    [[deprecated]] void addData( const Type& type, const Core::VectorArray<Vector>& data );
-    //    template <typename Vector>
-    //    void addData( const std::string& name, const Core::VectorArray<Vector>& data );
 
   protected:
     void addAttribObserver( const std::string& name ) {
