@@ -511,6 +511,27 @@ MeshPtr Spline( const Core::Geometry::Spline<3, 3>& spline,
 
     return mesh;
 }
+
+/*
+ *
+ */
+MeshPtr LineStrip( const Core::Vector3Array& vertices, const Core::Vector4Array& colors ) {
+
+    std::vector<uint> indices( vertices.size() );
+    std::iota( indices.begin(), indices.end(), 0 );
+    auto r = ( vertices.size() % 3 );
+    if ( r != 0 )
+    {
+        for ( ; r < 3; ++r )
+        {
+            indices.push_back( vertices.size() - 1 );
+        }
+    }
+    MeshPtr mesh( new Mesh( "Line Strip Primitive", Mesh::RM_LINE_STRIP ) );
+    mesh->loadGeometry( vertices, indices );
+    if ( colors.size() > 0 ) { mesh->addData( Mesh::VERTEX_COLOR, colors ); }
+    return mesh;
+}
 } // namespace DrawPrimitives
 } // namespace Engine
 } // namespace Ra

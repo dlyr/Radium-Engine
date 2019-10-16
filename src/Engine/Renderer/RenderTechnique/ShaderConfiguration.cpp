@@ -146,8 +146,8 @@ static const std::string defaultFragmentShader(
 
 #else
 /// todo : find a way to define (if this make sense) default shaders.
-static const std::string defaultVertexShader{"Shaders/Default.vert.glsl"};
-static const std::string defaultFragmentShader{"Shaders/Default.frag.glsl"};
+static const std::string defaultVertexShader{"Shaders/Materials/Plain/Plain.vert.glsl"};
+static const std::string defaultFragmentShader{"Shaders/Materials/Plain/Plain.frag.glsl"};
 #endif
 
 namespace Ra {

@@ -1,7 +1,24 @@
-#include "Structs.glsl"
+// Assume that plain rendering is based on very simple "material", without lighting.
+struct PlainTextures
+{
+    int hasKd;
+    int hasAlpha;
+
+    sampler2D kd;
+    sampler2D alpha;
+};
+
+struct Material
+{
+    vec4 kd;
+    float alpha;
+    PlainTextures tex;
+};
 
 uniform Material material;
-uniform Light light;
+
+// if this is really needed, include "DefaultLight.glsl"
+//uniform Light light;
 
 layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec3 in_texcoord;
