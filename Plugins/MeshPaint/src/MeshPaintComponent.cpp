@@ -122,7 +122,7 @@ void MeshPaintComponent::bakePaintToDiffuse() {
     // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
     // m_dataId ); however here we skip the search in the component map
     Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getTriangleMesh();
-    m_baseColors = triangleMesh.getAttrib( m_currentColorAttribHdl ).data();
+    m_baseColors       = triangleMesh.getAttrib( m_currentColorAttribHdl ).data();
     m_isBaseColorValid = true;
 }
 
@@ -156,7 +156,7 @@ void MeshPaintComponent::paintMesh( const Ra::Engine::Renderer::PickingResult& p
     // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
     // m_dataId ); however here we skip the search in the component map
 
-    const auto& T = m_mesh->getTriangleMesh().m_triangles;
+    const auto& T = m_mesh->getTriangleMesh().m_indices;
     ON_DEBUG( auto colAttrib =
                   m_mesh->getTriangleMesh().getAttribHandle<Ra::Core::Vector4>( colAttribName ) );
     CORE_ASSERT( colAttrib == m_currentColorAttribHdl, "Inconsistent AttribHandle used" );
