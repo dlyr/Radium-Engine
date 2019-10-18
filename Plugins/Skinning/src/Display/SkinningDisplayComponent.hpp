@@ -76,7 +76,7 @@ class SKIN_PLUGIN_API SkinningDisplayComponent : public Ra::Engine::Component
             }
 
             Ra::Core::Geometry::AdjacencyMatrix Adj =
-                Ra::Core::Geometry::uniformAdjacency( mesh.vertices(), mesh.m_triangles );
+                Ra::Core::Geometry::uniformAdjacency( mesh.vertices(), mesh.m_indices );
             Ra::Core::Geometry::AdjacencyMatrix Seg( weights.cols(), weights.cols() );
 
             for ( int k = 0; k < Adj.outerSize(); ++k )
