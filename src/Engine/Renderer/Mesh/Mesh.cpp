@@ -234,36 +234,6 @@ void VaoDisplayable::setDirty( const VaoDisplayable::MeshData& type ) {
     m_isDirty = true;
 }
 
-void VaoDisplayable::setDirty( const Vec3Data& type ) {
-    auto name = getAttribName( type );
-    auto itr  = m_handleToBuffer.find( name );
-    if ( itr == m_handleToBuffer.end() )
-    {
-        m_handleToBuffer[name] = m_dataDirty.size();
-        m_dataDirty.push_back( true );
-        m_vbos.push_back( nullptr );
-    }
-    else
-        m_dataDirty[itr->second] = true;
-
-    m_isDirty = true;
-}
-
-void VaoDisplayable::setDirty( const Vec4Data& type ) {
-    auto name = getAttribName( type );
-    auto itr  = m_handleToBuffer.find( name );
-    if ( itr == m_handleToBuffer.end() )
-    {
-        m_handleToBuffer[name] = m_dataDirty.size();
-        m_dataDirty.push_back( true );
-        m_vbos.push_back( nullptr );
-    }
-    else
-        m_dataDirty[itr->second] = true;
-
-    m_isDirty = true;
-}
-
 template <>
 void DisplayableGeometry<Core::Geometry::TriangleMesh>::loadGeometry(
     Core::Geometry::TriangleMesh&& mesh ) {

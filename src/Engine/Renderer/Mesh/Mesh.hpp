@@ -53,28 +53,16 @@ class RA_ENGINE_API VaoDisplayable : public Displayable
 
     /// Information which is in the mesh geometry
     enum MeshData : uint {
-        VERTEX_POSITION, ///< Vertex positions
-        VERTEX_NORMAL,   ///< Vertex normals
-
-        MAX_MESH
-    };
-
-    /// Optional vector 3 data.
-    enum Vec3Data : uint {
-        VERTEX_TANGENT = 0, ///< Vertex tangent 1
-        VERTEX_BITANGENT,   ///< Vertex tangent 2
-        VERTEX_TEXCOORD,    ///< U,V  texture coords (last coordinate not used)
-
-        MAX_VEC3
-    };
-
-    /// Optional vector 4 data
-    enum Vec4Data : uint {
-        VERTEX_COLOR = 0,  ///< RGBA color.
+        VERTEX_POSITION,   ///< Vertex positions
+        VERTEX_NORMAL,     ///< Vertex normals
+        VERTEX_TANGENT,    ///< Vertex tangent 1
+        VERTEX_BITANGENT,  ///< Vertex tangent 2
+        VERTEX_TEXCOORD,   ///< U,V  texture coords (last coordinate not used)
+        VERTEX_COLOR,      ///< RGBA color.
         VERTEX_WEIGHTS,    ///< Skinning weights (not used)
         VERTEX_WEIGHT_IDX, ///< Associated weight bones
 
-        MAX_VEC4
+        MAX_DATA
     };
     ///@}
 
@@ -100,9 +88,6 @@ class RA_ENGINE_API VaoDisplayable : public Displayable
         RM_PATCHES                  = 0x000E, // decimal value: 14
     };
 
-    /// Total number of vertex attributes.
-    constexpr static uint MAX_DATA = MAX_MESH + MAX_VEC3 + MAX_VEC4;
-
   public:
     explicit VaoDisplayable( const std::string& name, MeshRenderMode renderMode = RM_TRIANGLES );
     VaoDisplayable( const VaoDisplayable& rhs ) = delete;
@@ -122,10 +107,6 @@ class RA_ENGINE_API VaoDisplayable : public Displayable
 
     /// \param type the data to set to dirty
     void setDirty( const MeshData& type );
-    /// \param type the data to set to dirty
-    void setDirty( const Vec3Data& type );
-    /// \param type the data to set to dirty
-    void setDirty( const Vec4Data& type );
 
     /// \param name, the data buffer name to set to dirty
     void setDirty( const std::string& name );
@@ -145,8 +126,6 @@ class RA_ENGINE_API VaoDisplayable : public Displayable
     //@{
     /// Get the name expected for a given attrib.
     static inline std::string getAttribName( MeshData type );
-    static inline std::string getAttribName( Vec3Data type );
-    static inline std::string getAttribName( Vec4Data type );
     //@}
 
   protected:
