@@ -13,16 +13,12 @@ namespace Ra {
 namespace Core {
 namespace Geometry {
 
-/// Simple Mesh structure that handles indexed polygonal mesh with vertex
-/// attributes.
 /// Attributes are unique per vertex, so that same position with different
 /// normals are two vertices.
 /// Points and Normals, defining the mesh geometry, are always present.
 /// They can be accessed through vertices() and normals().
 /// Other attribs could be added with addAttrib() and accesssed with getAttrib().
 /// \note Attribute names "in_position" "in_normal" are reserved and pre-allocated.
-/// \note Attribute name "in_color" is not reserved, but automatically binded to
-/// colors by Ra::Engine::Mesh when it exists (type must be Vec4AttribHandle)
 class RA_CORE_API AttribArrayGeometry : public AbstractGeometry
 {
   public:
@@ -204,6 +200,9 @@ class RA_CORE_API PointCloud : public AttribArrayGeometry
 class RA_CORE_API LineStrip : public AttribArrayGeometry
 {};
 
+/// Simple Mesh structure that handles indexed polygonal mesh with vertex
+/// attributes. Each face is indexed with typename T = IndexType.
+/// T is assumed to be an Eigen Vector of unsigned ints
 template <typename T>
 class RA_CORE_API IndexedGeometry : public AttribArrayGeometry
 {
@@ -212,89 +211,17 @@ class RA_CORE_API IndexedGeometry : public AttribArrayGeometry
     using IndexContainerType = AlignedStdVector<IndexType>;
 
     inline IndexedGeometry() = default;
-    inline IndexedGeometry( const IndexedGeometry<IndexType>& other ) :
-        AttribArrayGeometry( other ),
-        m_indices( other.m_indices ) {}
-
-    inline IndexedGeometry( IndexedGeometry<IndexType>&& other ) :
-        AttribArrayGeometry( std::move( other ) ),
-        m_indices( std::move( other.m_indices ) ) {}
-
-    inline IndexedGeometry<IndexType>& operator=( const IndexedGeometry<IndexType>& other ) {
-        AttribArrayGeometry::operator=( other );
-        m_indices                    = other.m_indices;
-        return *this;
-    }
-    inline IndexedGeometry<IndexType>& operator=( IndexedGeometry<IndexType>&& other ) {
-        AttribArrayGeometry::operator=( std::move( other ) );
-        m_indices                    = std::move( other.m_indices );
-        return *this;
-    }
-
-    inline void clear() override {
-        m_indices.clear();
-        AttribArrayGeometry::clear();
-    }
-
-    inline void copy( const IndexedGeometry<IndexType>& other ) {
-        AttribArrayGeometry::copyBaseGeometry( other );
-        m_indices = other.m_indices;
-    }
+    inline IndexedGeometry( const IndexedGeometry<IndexType>& other );
+    inline IndexedGeometry( IndexedGeometry<IndexType>&& other );
+    inline IndexedGeometry<IndexType>& operator=( const IndexedGeometry<IndexType>& other );
+    inline IndexedGeometry<IndexType>& operator=( IndexedGeometry<IndexType>&& other );
+    inline void clear() override;
+    inline void copy( const IndexedGeometry<IndexType>& other );
 
     /// Check that the mesh is well built, asserting when it is not.
     /// only compiles to something when in debug mode.
-    inline void checkConsistency() const {
-#ifdef CORE_DEBUG
-        const auto nbVertices = vertices().size();
-        std::vector<bool> visited( nbVertices, false );
-        for ( uint t = 0; t < m_indices.size(); ++t )
-        {
-            const IndexType& face = m_indices[t];
-            for ( uint i = 0; i < IndexType::RowsAtCompileTime; ++i )
-            {
-                CORE_ASSERT( uint( face[i] ) < nbVertices,
-                             "Vertex " << face[i] << " is out of bound, in face " << t << " (#" << i
-                                       << ")" );
-                visited[face[i]] = true;
-            }
-            /*       CORE_WARN_IF( IndexType::RowsAtCompileTime == 3 &&
-                              !( Geometry::triangleArea( vertices()[face[0]],
-                                                         vertices()[face[1]],
-                                                         vertices()[face[2]] ) > 0.f ),
-                                                         "triangle " << t << " is degenerate" );*/
-        }
-
-        for ( uint v = 0; v < nbVertices; ++v )
-        {
-            CORE_ASSERT( visited[v], "Vertex " << v << " does not belong to any triangle" );
-        }
-
-        // Always have the same number of vertex data and vertices
-        CORE_ASSERT( vertices().size() == normals().size(), "Inconsistent number of normals" );
-#endif
-    }
-
-    bool append( const IndexedGeometry<IndexType>& other ) {
-        const std::size_t verticesBefore  = vertices().size();
-        const std::size_t trianglesBefore = m_indices.size();
-
-        // check same attributes through names
-        if ( !AttribArrayGeometry::append( other ) ) return false;
-
-        // now we can proceed topology
-        m_indices.insert( m_indices.end(), other.m_indices.cbegin(), other.m_indices.cend() );
-
-        // Offset the vertex indices in the triangles and faces
-        for ( size_t t = trianglesBefore; t < m_indices.size(); ++t )
-        {
-            for ( uint i = 0; i < IndexType::RowsAtCompileTime; ++i )
-            {
-                m_indices[t][i] += verticesBefore;
-            }
-        }
-
-        return true;
-    }
+    inline void checkConsistency() const;
+    bool append( const IndexedGeometry<IndexType>& other );
 
     ///\todo make it protected
     IndexContainerType m_indices;
@@ -304,24 +231,10 @@ class RA_CORE_API IndexedPointCloud : public IndexedGeometry<Vector1ui>
 {};
 
 class RA_CORE_API TriangleMesh : public IndexedGeometry<Vector3ui>
-{
-    using base = IndexedGeometry<Vector3ui>;
-
-  public:
-    inline TriangleMesh() = default;
-    using base::IndexedGeometry;
-    using base::operator=;
-};
+{};
 
 class RA_CORE_API LineMesh : public IndexedGeometry<Vector2ui>
-{
-    using base = IndexedGeometry<Vector2ui>;
-
-  public:
-    inline LineMesh() = default;
-    using base::IndexedGeometry;
-    using base::operator=;
-};
+{};
 
 } // namespace Geometry
 } // namespace Core
