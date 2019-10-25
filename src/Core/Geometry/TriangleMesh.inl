@@ -37,16 +37,6 @@ inline AttribArrayGeometry& AttribArrayGeometry::operator=( AttribArrayGeometry&
     return *this;
 }
 
-//***//
-
-//***//
-
-//***//
-
-//***//
-
-//***//
-
 inline void AttribArrayGeometry::clear() {
     m_vertexAttribs.clear();
     // restore the default attribs (empty though)

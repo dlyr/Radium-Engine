@@ -241,11 +241,66 @@ class RA_CORE_API IndexedGeometry : public AttribArrayGeometry
         m_indices = other.m_indices;
     }
 
+    /// Check that the mesh is well built, asserting when it is not.
+    /// only compiles to something when in debug mode.
+    inline void checkConsistency() const {
+#ifdef CORE_DEBUG
+        const auto nbVertices = vertices().size();
+        std::vector<bool> visited( nbVertices, false );
+        for ( uint t = 0; t < m_indices.size(); ++t )
+        {
+            const IndexType& face = m_indices[t];
+            for ( uint i = 0; i < IndexType::RowsAtCompileTime; ++i )
+            {
+                CORE_ASSERT( uint( face[i] ) < nbVertices,
+                             "Vertex " << face[i] << " is out of bound, in face " << t << " (#" << i
+                                       << ")" );
+                visited[face[i]] = true;
+            }
+            /*       CORE_WARN_IF( IndexType::RowsAtCompileTime == 3 &&
+                              !( Geometry::triangleArea( vertices()[face[0]],
+                                                         vertices()[face[1]],
+                                                         vertices()[face[2]] ) > 0.f ),
+                                                         "triangle " << t << " is degenerate" );*/
+        }
+
+        for ( uint v = 0; v < nbVertices; ++v )
+        {
+            CORE_ASSERT( visited[v], "Vertex " << v << " does not belong to any triangle" );
+        }
+
+        // Always have the same number of vertex data and vertices
+        CORE_ASSERT( vertices().size() == normals().size(), "Inconsistent number of normals" );
+#endif
+    }
+
+    bool append( const IndexedGeometry<IndexType>& other ) {
+        const std::size_t verticesBefore  = vertices().size();
+        const std::size_t trianglesBefore = m_indices.size();
+
+        // check same attributes through names
+        if ( !AttribArrayGeometry::append( other ) ) return false;
+
+        // now we can proceed topology
+        m_indices.insert( m_indices.end(), other.m_indices.cbegin(), other.m_indices.cend() );
+
+        // Offset the vertex indices in the triangles and faces
+        for ( size_t t = trianglesBefore; t < m_indices.size(); ++t )
+        {
+            for ( uint i = 0; i < IndexType::RowsAtCompileTime; ++i )
+            {
+                m_indices[t][i] += verticesBefore;
+            }
+        }
+
+        return true;
+    }
+
     ///\todo make it protected
     IndexContainerType m_indices;
 };
 
-class RA_CORE_API IndexedPointCloud : public IndexedGeometry<unsigned int>
+class RA_CORE_API IndexedPointCloud : public IndexedGeometry<Vector1ui>
 {};
 
 class RA_CORE_API TriangleMesh : public IndexedGeometry<Vector3ui>
@@ -256,11 +311,6 @@ class RA_CORE_API TriangleMesh : public IndexedGeometry<Vector3ui>
     inline TriangleMesh() = default;
     using base::IndexedGeometry;
     using base::operator=;
-
-    bool append( const TriangleMesh& other );
-    /// Check that the mesh is well built, asserting when it is not.
-    /// only compiles to something when in debug mode.
-    void checkConsistency() const;
 };
 
 class RA_CORE_API LineMesh : public IndexedGeometry<Vector2ui>
@@ -271,10 +321,6 @@ class RA_CORE_API LineMesh : public IndexedGeometry<Vector2ui>
     inline LineMesh() = default;
     using base::IndexedGeometry;
     using base::operator=;
-
-    bool append( const LineMesh& other );
-
-    /// The list of lines, typically { 0, 1 }, {1, 2}, {2, 3}, {3, 4} ...
 };
 
 } // namespace Geometry
