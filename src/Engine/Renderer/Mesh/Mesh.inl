@@ -18,33 +18,33 @@
 namespace Ra {
 namespace Engine {
 
-void VaoDisplayable::setRenderMode( MeshRenderMode mode ) {
+void AttribArrayDisplayable::setRenderMode( MeshRenderMode mode ) {
     m_renderMode = mode;
     updatePickingRenderMode();
 }
 
 template <typename CoreGeometry>
 const Ra::Core::Geometry::AbstractGeometry&
-DisplayableGeometry<CoreGeometry>::getAbstractGeometry() const {
+CoreGeometryDisplayable<CoreGeometry>::getAbstractGeometry() const {
     return m_mesh;
 }
 
 template <typename CoreGeometry>
-Ra::Core::Geometry::AbstractGeometry& DisplayableGeometry<CoreGeometry>::getAbstractGeometry() {
+Ra::Core::Geometry::AbstractGeometry& CoreGeometryDisplayable<CoreGeometry>::getAbstractGeometry() {
     return m_mesh;
 }
 
 template <typename CoreGeometry>
-const CoreGeometry& DisplayableGeometry<CoreGeometry>::getTriangleMesh() const {
+const CoreGeometry& CoreGeometryDisplayable<CoreGeometry>::getTriangleMesh() const {
     return m_mesh;
 }
 
 template <typename CoreGeometry>
-CoreGeometry& DisplayableGeometry<CoreGeometry>::getTriangleMesh() {
+CoreGeometry& CoreGeometryDisplayable<CoreGeometry>::getTriangleMesh() {
     return m_mesh;
 }
 
-std::string VaoDisplayable::getAttribName( MeshData type ) {
+std::string AttribArrayDisplayable::getAttribName( MeshData type ) {
     if ( type == VERTEX_POSITION ) return {"in_position"};
     if ( type == VERTEX_NORMAL ) return {"in_normal"};
     if ( type == VERTEX_TANGENT ) return {"in_tangent"};
@@ -57,7 +57,7 @@ std::string VaoDisplayable::getAttribName( MeshData type ) {
 }
 
 template <typename CoreGeometry>
-void DisplayableGeometry<CoreGeometry>::addAttribObserver( const std::string& name ) {
+void CoreGeometryDisplayable<CoreGeometry>::addAttribObserver( const std::string& name ) {
     auto attrib = m_mesh.getAttribBase( name );
     // if attrib not nullptr, then it's a add
     if ( attrib )
@@ -66,6 +66,14 @@ void DisplayableGeometry<CoreGeometry>::addAttribObserver( const std::string& na
         if ( itr == m_handleToBuffer.end() )
         {
             m_handleToBuffer[name] = m_dataDirty.size();
+
+            auto it = m_translationTableMeshToShader.find( name );
+            if ( it == m_translationTableMeshToShader.end() )
+            {
+                m_translationTableMeshToShader[name] = name;
+                m_translationTableShaderToMesh[name] = name;
+            }
+
             m_dataDirty.push_back( true );
             m_vbos.emplace_back( nullptr );
         }
@@ -78,7 +86,7 @@ void DisplayableGeometry<CoreGeometry>::addAttribObserver( const std::string& na
 }
 
 template <typename CoreGeometry>
-void DisplayableGeometry<CoreGeometry>::autoVertexAttribPointer( const ShaderProgram* prog ) {
+void CoreGeometryDisplayable<CoreGeometry>::autoVertexAttribPointer( const ShaderProgram* prog ) {
 
     auto glprog           = prog->getProgramObject();
     gl::GLint attribCount = glprog->get( GL_ACTIVE_ATTRIBUTES );
@@ -92,16 +100,19 @@ void DisplayableGeometry<CoreGeometry>::autoVertexAttribPointer( const ShaderPro
         gl::GLint size;
         gl::GLenum type;
         glprog->getActiveAttrib( idx, bufSize, &length, &size, &type, name );
-        auto loc    = glprog->getAttributeLocation( name );
-        auto attrib = m_mesh.getAttribBase( name );
+        auto loc = glprog->getAttributeLocation( name );
+
+        auto attribName = m_translationTableShaderToMesh[name];
+        auto attrib     = m_mesh.getAttribBase( attribName );
 
         if ( attrib )
         {
             m_vao->enable( loc );
             auto binding = m_vao->binding( idx );
             binding->setAttribute( loc );
-            CORE_ASSERT( m_vbos[m_handleToBuffer[name]].get(), "vbo is nullptr" );
-            binding->setBuffer( m_vbos[m_handleToBuffer[name]].get(), 0, attrib->getStride() );
+            CORE_ASSERT( m_vbos[m_handleToBuffer[attribName]].get(), "vbo is nullptr" );
+            binding->setBuffer(
+                m_vbos[m_handleToBuffer[attribName]].get(), 0, attrib->getStride() );
             binding->setFormat( attrib->getElementSize(), GL_FLOAT );
         }
         else
@@ -112,27 +123,35 @@ void DisplayableGeometry<CoreGeometry>::autoVertexAttribPointer( const ShaderPro
 }
 
 template <typename T>
-void DisplayableGeometry<T>::loadGeometry_common( T&& mesh ) {
+void CoreGeometryDisplayable<T>::loadGeometry_common( T&& mesh ) {
     m_mesh  = std::move( mesh );
     int idx = 0;
     m_dataDirty.resize( m_mesh.vertexAttribs().getNumAttribs() );
     m_vbos.resize( m_mesh.vertexAttribs().getNumAttribs() );
     // here capture ref to idx to propagate idx incrementation
     m_mesh.vertexAttribs().for_each_attrib( [&idx, this]( Ra::Core::Utils::AttribBase* b ) {
-        m_handleToBuffer[b->getName()] = idx;
-        m_dataDirty[idx]               = true;
+        auto name              = b->getName();
+        m_handleToBuffer[name] = idx;
+        m_dataDirty[idx]       = true;
+
+        // create a identity translation if name is not already translated.
+        auto it = m_translationTableMeshToShader.find( name );
+        if ( it == m_translationTableMeshToShader.end() )
+        {
+            m_translationTableMeshToShader[name] = name;
+            m_translationTableShaderToMesh[name] = name;
+        }
 
         b->attach( AttribObserver( this, idx ) );
-
         ++idx;
     } );
-    m_mesh.vertexAttribs().attachMember( this,
-                                         &DisplayableGeometry<CoreGeometry>::addAttribObserver );
+    m_mesh.vertexAttribs().attachMember(
+        this, &CoreGeometryDisplayable<CoreGeometry>::addAttribObserver );
     m_isDirty = true;
 }
 
 template <typename CoreGeometry>
-void DisplayableGeometry<CoreGeometry>::updateGL() {
+void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
     if ( m_isDirty )
     {
         // Check that our dirty bits are consistent.
@@ -170,6 +189,32 @@ void DisplayableGeometry<CoreGeometry>::updateGL() {
         GL_CHECK_ERROR;
         m_isDirty = false;
     }
+}
+
+template <typename CoreGeometry>
+void CoreGeometryDisplayable<CoreGeometry>::setTranslation( const std::string& meshAttribName,
+                                                            const std::string& shaderAttribName ) {
+
+    // clean previously set translation
+
+    auto it1 = std::find_if( m_translationTableShaderToMesh.begin(),
+                             m_translationTableShaderToMesh.end(),
+                             [&meshAttribName]( const TranslationTable::value_type& p ) {
+                                 return p.second == meshAttribName;
+                             } );
+
+    if ( it1 != m_translationTableShaderToMesh.end() ) m_translationTableShaderToMesh.erase( it1 );
+
+    auto it2 = std::find_if( m_translationTableMeshToShader.begin(),
+                             m_translationTableMeshToShader.end(),
+                             [&shaderAttribName]( const TranslationTable::value_type& p ) {
+                                 return p.second == shaderAttribName;
+                             } );
+
+    if ( it2 != m_translationTableMeshToShader.end() ) m_translationTableMeshToShader.erase( it2 );
+
+    m_translationTableShaderToMesh[shaderAttribName] = meshAttribName;
+    m_translationTableMeshToShader[meshAttribName]   = shaderAttribName;
 }
 
 template <typename T>
