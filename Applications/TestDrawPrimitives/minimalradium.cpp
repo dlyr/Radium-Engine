@@ -29,17 +29,31 @@ void MinimalComponent::initialize() {
     using namespace Ra::Core;
     using namespace Ra::Engine;
 
-    auto config = ShaderConfigurationFactory::getConfiguration( "Plain" );
-    auto mat    = Ra::Core::make_shared<BlinnPhongMaterial>( "Default material" );
+    auto config           = ShaderConfigurationFactory::getConfiguration( "Plain" );
+    auto mat              = Ra::Core::make_shared<BlinnPhongMaterial>( "Default material" );
+    mat->m_hasPerVertexKd = true;
     RenderTechnique rt;
     rt.setMaterial( mat );
     rt.setConfiguration( config );
 
-    std::shared_ptr<Ra::Engine::Mesh> display( new Ra::Engine::Mesh( "Cube" ) );
-    display->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
-    auto renderObject =
-        RenderObject::createRenderObject( "CubeRO", this, RenderObjectType::Geometry, display );
-    addRenderObject( renderObject );
+    std::shared_ptr<Ra::Engine::Mesh> cube1( new Ra::Engine::Mesh( "Cube" ) );
+    cube1->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
+    cube1->getTriangleMesh().addAttrib(
+        "in_color", Vector4Array{cube1->getNumVertices(), Utils::Color::Green()} );
+
+    auto renderObject1 =
+        RenderObject::createRenderObject( "CubeRO", this, RenderObjectType::Geometry, cube1, rt );
+    addRenderObject( renderObject1 );
+
+    // another cube
+    std::shared_ptr<Ra::Engine::Mesh> cube2( new Ra::Engine::Mesh( "Cube" ) );
+    cube2->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
+    cube2->getTriangleMesh().addAttrib(
+        "colour", Vector4Array{cube2->getNumVertices(), Utils::Color::Red()} );
+    cube2->setTranslation( "colour", "in_color" );
+    auto renderObject2 =
+        RenderObject::createRenderObject( "CubeRO", this, RenderObjectType::Geometry, cube2, rt );
+    addRenderObject( renderObject2 );
 
     addRenderObject( RenderObject::createRenderObject(
         "test_point",
@@ -74,7 +88,8 @@ void MinimalComponent::initialize() {
         "test_ray",
         this,
         RenderObjectType::Geometry,
-        DrawPrimitives::Ray( {{-1_ra, 1_ra, 1_ra}, {1_ra, 0_ra, 0_ra}}, Utils::Color::Yellow() ),
+        DrawPrimitives::Ray(
+            {{-1_ra, 1_ra, 1_ra}, {1_ra, 0_ra, 0_ra}}, Utils::Color::Yellow(), 3_ra ),
         rt ) );
 
     addRenderObject(
@@ -98,16 +113,17 @@ void MinimalComponent::initialize() {
                                                                     false ),
                                           rt ) );
 
-    /*            addRenderObject( RenderObject::createRenderObject(
-    "test_ray",
-    this,
-    RenderObjectType::Geometry,
-    DrawPrimitives::QuadStrip( const Core::Vector3& a,
-                                         const Core::Vector3& x,
-                                         const Core::Vector3& y,
-                                         uint quads,
-                                         const Core::Utils::Color& color );
-            addRenderObject( RenderObject::createRenderObject(
+    addRenderObject(
+        RenderObject::createRenderObject( "test_quad_strip",
+                                          this,
+                                          RenderObjectType::Geometry,
+                                          DrawPrimitives::QuadStrip( {0.1_ra, 0.0_ra, -1.0_ra},
+                                                                     {0.3_ra, 0.0_ra, 0.1_ra},
+                                                                     {-0.1_ra, 0.3_ra, 0.1_ra},
+                                                                     6,
+                                                                     {0.7_ra, 0.2_ra, 0.9_ra} ) ) );
+
+    /*        addRenderObject( RenderObject::createRenderObject(
     "test_ray",
     this,
     RenderObjectType::Geometry,

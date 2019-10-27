@@ -35,6 +35,7 @@ MinimalApp::MinimalApp( int& argc, char** argv ) :
 
     CORE_ASSERT( m_viewer != nullptr, "GUI was not initialized" );
     connect( m_viewer.get(), &Ra::Gui::Viewer::glInitialized, this, &MinimalApp::onGLInitialized );
+    m_viewer->setupKeyMappingCallbacks();
 
     // Initialize timer for the spinning cube.
     m_frame_timer = new QTimer( this );

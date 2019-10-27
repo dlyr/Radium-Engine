@@ -44,6 +44,9 @@ int main( int argc, char* argv[] ) {
     sys->addComponent( e, c );
     c->initialize();
 
+    auto aabb = Ra::Engine::RadiumEngine::getInstance()->computeSceneAabb();
+    if ( !aabb.isEmpty() ) { app.m_viewer->fitCameraToScene( aabb ); }
+
     // Start the app.
     app.m_frame_timer->start();
     return app.exec();
