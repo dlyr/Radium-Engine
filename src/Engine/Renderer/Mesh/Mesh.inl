@@ -192,8 +192,8 @@ void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
 }
 
 template <typename CoreGeometry>
-void CoreGeometryDisplayable<CoreGeometry>::setTranlatation( const std::string& meshAttribName,
-                                                             const std::string& shaderAttribName ) {
+void CoreGeometryDisplayable<CoreGeometry>::setTranslation( const std::string& meshAttribName,
+                                                            const std::string& shaderAttribName ) {
 
     // clean previously set translation
 

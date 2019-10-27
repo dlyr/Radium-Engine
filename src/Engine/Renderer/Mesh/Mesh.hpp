@@ -217,7 +217,7 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
     }
     void updateGL() override;
 
-    void setTranlatation( const std::string& meshAttribName, const std::string& shaderAttribName );
+    void setTranslation( const std::string& meshAttribName, const std::string& shaderAttribName );
 
   protected:
     virtual void updateGL_specific_impl(){};
