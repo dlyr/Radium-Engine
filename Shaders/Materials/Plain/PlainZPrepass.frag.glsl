@@ -7,7 +7,10 @@ layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec3 in_texcoord;
 layout (location = 2) in vec3 in_color;
 
-out vec4 out_color;
+layout (location = 0) out vec4 out_ambient;
+layout (location = 1) out vec4 out_normal;
+layout (location = 2) out vec4 out_diffuse;
+layout (location = 3) out vec4 out_specular;
 
 void main()
 {
@@ -15,14 +18,14 @@ void main()
     {
         discard;
     }
-    
-    if ( material.tex.hasKd == 1 )
+
+    if (material.tex.hasKd == 1)
     {
-        out_color = vec4(texture(material.tex.kd, in_texcoord.st).rgb, 1);
+        out_diffuse = vec4(texture(material.tex.kd, in_texcoord.st).rgb, 1);
     }
     else
     {
-        out_color = vec4(in_color.rgb, 1.0);
+        out_diffuse = vec4(in_color.rgb, 1.0);
     }
 }
 

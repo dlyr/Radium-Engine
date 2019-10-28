@@ -71,6 +71,8 @@ void RadiumEngine::registerDefaultPrograms() {
         m_resourcesRootDir + "Shaders/Materials/VertexAttribInterface.frag.glsl" );
 
     // Engine support some built-in materials. Register here
+    ShaderProgramManager::getInstance()->addNamedString(
+        "/Plain.glsl", m_resourcesRootDir + "Shaders/Materials/Plain/Plain.glsl" );
     Ra::Engine::ShaderConfiguration pConfig( "Plain" );
     pConfig.addShader( ShaderType_VERTEX,
                        m_resourcesRootDir + "Shaders/Materials/Plain/Plain.vert.glsl" );
