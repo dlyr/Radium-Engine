@@ -95,7 +95,6 @@ vec3 getNormal(Material material, vec2 texCoord, vec3 N, vec3 T, vec3 B)
     return normalize(N);
 }
 
-//111 ou 208
 vec4 getBaseColor(Material material, vec2 texCoord) {
     vec4 bc = vec4(getDiffuseColor(material, texCoord), material.alpha);
     if (material.tex.hasAlpha == 1)

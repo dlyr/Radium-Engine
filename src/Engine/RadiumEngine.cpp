@@ -21,6 +21,7 @@
 #include <Engine/Managers/SignalManager/SignalManager.hpp>
 #include <Engine/Managers/SystemDisplay/SystemDisplay.hpp>
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/Material/PlainMaterial.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
@@ -71,24 +72,19 @@ void RadiumEngine::registerDefaultPrograms() {
         m_resourcesRootDir + "Shaders/Materials/VertexAttribInterface.frag.glsl" );
 
     // Engine support some built-in materials. Register here
-    ShaderProgramManager::getInstance()->addNamedString(
-        "/Plain.glsl", m_resourcesRootDir + "Shaders/Materials/Plain/Plain.glsl" );
-    Ra::Engine::ShaderConfiguration pConfig( "Plain" );
-    pConfig.addShader( ShaderType_VERTEX,
-                       m_resourcesRootDir + "Shaders/Materials/Plain/Plain.vert.glsl" );
-    pConfig.addShader( ShaderType_FRAGMENT,
-                       m_resourcesRootDir + "Shaders/Materials/Plain/Plain.frag.glsl" );
-    Ra::Engine::ShaderConfigurationFactory::addConfiguration( pConfig );
-
+    /// @todo find a way to integrate "Line" material into Radium Material System
     ShaderConfiguration lConfig( "Lines" );
     lConfig.addShader( ShaderType_VERTEX, m_resourcesRootDir + "Shaders/Lines/Lines.vert.glsl" );
     lConfig.addShader( ShaderType_FRAGMENT, m_resourcesRootDir + "Shaders/Lines/Lines.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( lConfig );
 
+    // Plain is flat or diffuse
+    PlainMaterial::registerMaterial();
     BlinnPhongMaterial::registerMaterial();
 }
 
 void RadiumEngine::cleanup() {
+    PlainMaterial::unregisterMaterial();
     BlinnPhongMaterial::unregisterMaterial();
 
     m_signalManager->setOn( false );

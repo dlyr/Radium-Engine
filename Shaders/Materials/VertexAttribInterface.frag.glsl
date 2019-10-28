@@ -19,7 +19,13 @@ vec4 getWorldSpacePosition() {
 }
 
 vec3 getWorldSpaceNormal() {
-    return normalize(in_normal);
+    if (length(in_normal.xyz) < 0.0001) {
+        vec3 X = dFdx(in_position);
+        vec3 Y = dFdy(in_position);
+        return normalize(cross(X, Y));
+    } else {
+        return normalize(in_normal);
+    }
 }
 
 vec3 getWorldSpaceTangent() {

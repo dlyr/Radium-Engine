@@ -9,7 +9,7 @@
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
-#include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/Material/PlainMaterial.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -22,16 +22,22 @@ using namespace Core::Geometry;
 namespace Engine {
 namespace DrawPrimitives {
 RenderObject* Primitive( Component* component, const MeshPtr& mesh ) {
-    ShaderConfiguration config;
-    if ( mesh->getRenderMode() == Mesh::RM_LINES )
-    { config = ShaderConfigurationFactory::getConfiguration( "Lines" ); }
-    else
-    { config = ShaderConfigurationFactory::getConfiguration( "Plain" ); }
 
-    auto mat = Core::make_shared<BlinnPhongMaterial>( "Default material" );
     RenderTechnique rt;
-    rt.setMaterial( mat );
-    rt.setConfiguration( config );
+    if ( mesh->getRenderMode() == Mesh::RM_LINES )
+    {
+        auto config = ShaderConfigurationFactory::getConfiguration( "Lines" );
+        rt.setConfiguration( config );
+    }
+    else
+    {
+        auto builder = EngineRenderTechniques::getDefaultTechnique( "Plain" );
+        builder.second( rt, false );
+        auto mat = Core::make_shared<PlainMaterial>( "Default material" );
+        mat->m_perVertexColor =
+            mesh->getTriangleMesh().hasAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
+        rt.setMaterial( mat );
+    }
 
     return RenderObject::createRenderObject(
         mesh->getName(), component, RenderObjectType::Debug, mesh, rt );

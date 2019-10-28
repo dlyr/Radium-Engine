@@ -1,28 +1,20 @@
+#include "DefaultLight.glsl"
 #include "Plain.glsl"
-
-// if this is really needed, include "DefaultLight.glsl"
-//uniform Light light;
-
-layout (location = 0) in vec3 in_position;
-layout (location = 1) in vec3 in_texcoord;
-layout (location = 2) in vec3 in_color;
+#include "VertexAttribInterface.frag.glsl"
 
 out vec4 out_color;
 
 void main()
 {
-    if (material.tex.hasAlpha == 1 && texture(material.tex.alpha, in_texcoord.st).r < 0.1)
-    {
-        discard;
-    }
-    
-    if ( material.tex.hasKd == 1 )
-    {
-        out_color = vec4(texture(material.tex.kd, in_texcoord.st).rgb, 1);
-    }
-    else
-    {
-        out_color = vec4(in_color.rgb, 1.0);
+    vec4 bc = getBaseColor(material, getPerVertexTexCoord().xy);
+    if (toDiscard(material, bc))
+    discard;
+
+    if (material.shaded == 1) {
+        vec3 le    = lightContributionFrom(light, getWorldSpacePosition().xyz);
+        out_color = vec4(bc.rgb * dot(getWorldSpaceNormal(), normalize(in_lightVector)) * le, 1);
+    } else {
+        out_color = vec4(bc.rgb, 1);
     }
 }
 
