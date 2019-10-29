@@ -82,12 +82,12 @@ namespace EngineRenderTechniques {
 
 /// A default technique builder is a function that will fill the given RenderTechnique with the
 /// default configurations associated with a material
-/// This function will take as param the rendertechniwue to fill and a boolean
+/// This function will take as param the render technique to fill and a boolean
 /// set to true if the material might be transparent under som parameter values
 using DefaultTechniqueBuilder = std::function<void( RenderTechnique&, bool )>;
 
-/** register a new default builder for a technique
- *  @return true if builder added, false else (e.g, a builder with the same name exists)
+/** register a new default builder for a material class
+ *  @return true if builder added, false else (e.g, a builder with the same name already exists)
  */
 RA_ENGINE_API bool registerDefaultTechnique( const std::string& name,
                                              DefaultTechniqueBuilder builder );

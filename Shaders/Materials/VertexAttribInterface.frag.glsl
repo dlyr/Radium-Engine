@@ -4,7 +4,7 @@
 *   This inteface MUST be used ONLY on fragment shaders.
 *
 *****/
-
+//----------------- Supported vertex Attribs ---------------------
 layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec3 in_texcoord;
 layout (location = 2) in vec3 in_normal;
@@ -19,7 +19,7 @@ vec4 getWorldSpacePosition() {
 }
 
 vec3 getWorldSpaceNormal() {
-    if (length(in_normal.xyz) < 0.0001) {
+    if (length(in_normal.xyz) < 0.0001) { // Spec GLSL : vector not set -> (0, 0, 0, 1)
         vec3 X = dFdx(in_position);
         vec3 Y = dFdy(in_position);
         return normalize(cross(X, Y));
@@ -29,16 +29,11 @@ vec3 getWorldSpaceNormal() {
 }
 
 vec3 getWorldSpaceTangent() {
-    vec3 res;
-    // if tangent is not set, teh value should be (0, 0, 0, 1).
-    // So, test for the length of in_tangent.xyz to be very small and compute the tangent from geo derivatives
-    if (length(in_tangent.xyz) < 0.0001) {
-        // assume tangents are not there
-        res =  dFdx(in_position);
+    if (length(in_tangent.xyz) < 0.0001) { // Spec GLSL : vector not set -> (0, 0, 0, 1)
+        return normalize(dFdx(in_position));
     } else {
-        res = in_tangent;
+        return normalize(in_tangent);
     }
-    return normalize(res);
 }
 
 vec3 getWorldSpaceBiTangent() {
