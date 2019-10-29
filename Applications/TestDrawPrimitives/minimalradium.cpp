@@ -29,12 +29,14 @@ void MinimalComponent::initialize() {
     using namespace Ra::Core;
     using namespace Ra::Engine;
 
-    auto config           = ShaderConfigurationFactory::getConfiguration( "Plain" );
-    auto mat              = Ra::Core::make_shared<BlinnPhongMaterial>( "Default material" );
-    mat->m_hasPerVertexKd = true;
+    ///
+    // basic render technique associated with all object here, they use per vertex kd.
     RenderTechnique rt;
+    auto mat              = Ra::Core::make_shared<BlinnPhongMaterial>( "MonSuperBlinnPhong" );
+    mat->m_hasPerVertexKd = true;
     rt.setMaterial( mat );
-    rt.setConfiguration( config );
+    auto builder = Ra::Engine::EngineRenderTechniques::getDefaultTechnique( "BlinnPhong" );
+    builder.second( rt, false );
 
     std::shared_ptr<Ra::Engine::Mesh> cube1( new Ra::Engine::Mesh( "Cube" ) );
     cube1->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
@@ -50,6 +52,7 @@ void MinimalComponent::initialize() {
     cube2->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
     cube2->getTriangleMesh().addAttrib(
         "colour", Vector4Array{cube2->getNumVertices(), Utils::Color::Red()} );
+
     cube2->setTranslation( "colour", "in_color" );
     auto renderObject2 =
         RenderObject::createRenderObject( "CubeRO", this, RenderObjectType::Geometry, cube2, rt );
