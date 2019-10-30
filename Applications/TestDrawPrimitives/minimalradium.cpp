@@ -40,7 +40,7 @@ void MinimalComponent::initialize() {
 
     std::shared_ptr<Ra::Engine::Mesh> cube1( new Ra::Engine::Mesh( "Cube" ) );
     cube1->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
-    cube1->getTriangleMesh().addAttrib(
+    cube1->getCoreGeometry().addAttrib(
         "in_color", Vector4Array{cube1->getNumVertices(), Utils::Color::Green()} );
 
     auto renderObject1 =
@@ -50,7 +50,7 @@ void MinimalComponent::initialize() {
     // another cube
     std::shared_ptr<Ra::Engine::Mesh> cube2( new Ra::Engine::Mesh( "Cube" ) );
     cube2->loadGeometry( Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
-    cube2->getTriangleMesh().addAttrib(
+    cube2->getCoreGeometry().addAttrib(
         "colour", Vector4Array{cube2->getNumVertices(), Utils::Color::Red()} );
 
     cube2->setTranslation( "colour", "in_color" );

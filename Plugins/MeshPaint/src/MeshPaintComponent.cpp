@@ -67,7 +67,7 @@ void MeshPaintComponent::startPaint( bool on ) {
         // Could also be accessed using
         // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
         // m_dataId ); however here we skip the search in the component map
-        Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getTriangleMesh();
+        Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getCoreGeometry();
 
         // If any, save colors from the CPU object, otherwise set default color and notify GPU
         // object
@@ -91,13 +91,13 @@ void MeshPaintComponent::startPaint( bool on ) {
     }
     else
     {
-        ON_DEBUG( auto colAttrib = m_mesh->getTriangleMesh().getAttribHandle<Ra::Core::Vector4>(
+        ON_DEBUG( auto colAttrib = m_mesh->getCoreGeometry().getAttribHandle<Ra::Core::Vector4>(
                       colAttribName ) );
         CORE_ASSERT( colAttrib == m_currentColorAttribHdl, "Inconsistent AttribHandle used" );
         // Could also be accessed using
         // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
         // m_dataId ); however here we skip the search in the component map
-        Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getTriangleMesh();
+        Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getCoreGeometry();
         if ( m_isBaseColorValid )
             triangleMesh.getAttrib( m_currentColorAttribHdl ).setData( m_baseColors );
         else
@@ -116,12 +116,12 @@ void MeshPaintComponent::bakePaintToDiffuse() {
     CORE_ASSERT( m_mesh != nullptr, "We should be have a Mesh storing a TriangleMesh here" );
 
     ON_DEBUG( auto colAttrib =
-                  m_mesh->getTriangleMesh().getAttribHandle<Ra::Core::Vector4>( colAttribName ) );
+                  m_mesh->getCoreGeometry().getAttribHandle<Ra::Core::Vector4>( colAttribName ) );
     CORE_ASSERT( colAttrib == m_currentColorAttribHdl, "Inconsistent AttribHandle used" );
     // Could also be accessed using
     // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
     // m_dataId ); however here we skip the search in the component map
-    Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getTriangleMesh();
+    Ra::Core::Geometry::TriangleMesh& triangleMesh = m_mesh->getCoreGeometry();
     m_baseColors       = triangleMesh.getAttrib( m_currentColorAttribHdl ).data();
     m_isBaseColorValid = true;
 }
@@ -156,12 +156,12 @@ void MeshPaintComponent::paintMesh( const Ra::Engine::Renderer::PickingResult& p
     // auto triangleMesh = compMess->get<Ra::Core::Geometry::TriangleMesh>( getEntity(),
     // m_dataId ); however here we skip the search in the component map
 
-    const auto& T = m_mesh->getTriangleMesh().m_indices;
+    const auto& T = m_mesh->getCoreGeometry().m_indices;
     ON_DEBUG( auto colAttrib =
-                  m_mesh->getTriangleMesh().getAttribHandle<Ra::Core::Vector4>( colAttribName ) );
+                  m_mesh->getCoreGeometry().getAttribHandle<Ra::Core::Vector4>( colAttribName ) );
     CORE_ASSERT( colAttrib == m_currentColorAttribHdl, "Inconsistent AttribHandle used" );
 
-    auto& colorAttrib    = m_mesh->getTriangleMesh().getAttrib( m_currentColorAttribHdl );
+    auto& colorAttrib    = m_mesh->getCoreGeometry().getAttrib( m_currentColorAttribHdl );
     auto& colorContainer = colorAttrib.getDataWithLock();
 
     switch ( picking.m_mode )
