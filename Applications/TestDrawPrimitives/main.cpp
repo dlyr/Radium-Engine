@@ -9,10 +9,8 @@
 #include <Engine/Managers/EntityManager/EntityManager.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
 
-#include <minimalradium.hpp>
-/* This file contains a minimal radium/qt application which shows the
-classic "Spinning Cube" demo. */
 #include <minimalapp.hpp>
+#include <minimalradium.hpp>
 
 int main( int argc, char* argv[] ) {
 
@@ -30,6 +28,7 @@ int main( int argc, char* argv[] ) {
     // Create app and show viewer window
     MinimalApp app( argc, argv );
     app.m_viewer->show();
+    app.m_viewer->resize( {500, 500} );
     CORE_ASSERT( app.m_viewer->getContext()->isValid(), "OpenGL was not initialized" );
     // process all events so that everithing is initialized
     QApplication::processEvents();

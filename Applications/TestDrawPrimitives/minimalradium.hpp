@@ -16,9 +16,6 @@ struct MinimalComponent : public Ra::Engine::Component {
     /// This function is called when the component is properly
     /// setup, i.e. it has an entity.
     void initialize() override;
-
-    /// This function will spin our cube
-    void spin();
 };
 
 /// This system will be added to the engine. Every frame it will
