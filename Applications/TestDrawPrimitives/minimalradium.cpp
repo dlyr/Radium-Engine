@@ -247,22 +247,66 @@ void MinimalComponent::initialize() {
     for ( uint j = 0; j < end; ++j )
         for ( uint i = 0; i < end; ++i )
         {
-            Vector3 randomVec1{cellCorner + offsetVec +
-                               Vector3{Scalar( j ) / end * ( cellSize - 2 * offset ),
-                                       offset,
-                                       Scalar( i ) / end * ( cellSize - 2 * offset )}};
-            Vector3 randomVec2{Vector3{Scalar( i ), Scalar( j ), 10_ra}};
-            randomVec2.normalize();
+            Vector3 circleCenter{cellCorner + offsetVec +
+                                 Vector3{Scalar( j ) / end * ( cellSize - 2 * offset ),
+                                         offset,
+                                         Scalar( i ) / end * ( cellSize - 2 * offset )}};
+            Vector3 circleNormal{Vector3{Scalar( i ), Scalar( j ), 10_ra}};
+            circleNormal.normalize();
             Color randomCol{dis01( gen ), dis01( gen ), dis01( gen )};
-            Scalar randomRadius{Scalar( end / 2 + i ) / Scalar( 2 * end ) * cellSize / 8_ra};
-            uint randomSubdiv{3 + j * end + i};
+            Scalar circleRadius{Scalar( end / 2 + i ) / Scalar( 2 * end ) * cellSize / 8_ra};
+            uint circleSubdiv{3 + j * end + i};
+
+            addRenderObject(
+                RenderObject::createRenderObject( "test_circle",
+                                                  this,
+                                                  RenderObjectType::Geometry,
+                                                  DrawPrimitives::Circle( circleCenter,
+                                                                          circleNormal,
+                                                                          circleRadius,
+                                                                          circleSubdiv,
+                                                                          colorBoost * randomCol ),
+                                                  rt ) );
+        }
+
+    //// CIRCLE ARC ////
+
+    addRenderObject( RenderObject::createRenderObject(
+        "test_cirlce",
+        this,
+        RenderObjectType::Geometry,
+        DrawPrimitives::CircleArc( cellCorner + Vector3{0_ra, 2_ra * offset, 0_ra},
+                                   {0_ra, 0_ra, 1_ra},
+                                   cellSize / 8_ra,
+                                   1_ra,
+                                   64,
+                                   colorBoost * Utils::Color::White() ),
+        rt ) );
+
+    for ( uint j = 0; j < end; ++j )
+        for ( uint i = 0; i < end; ++i )
+        {
+            Vector3 circleCenter{cellCorner + offsetVec +
+                                 Vector3{Scalar( j ) / end * ( cellSize - 2 * offset ),
+                                         2 * offset,
+                                         Scalar( i ) / end * ( cellSize - 2 * offset )}};
+            Vector3 circleNormal{0_ra, 0_ra, 1_ra};
+            circleNormal.normalize();
+            Color randomCol{dis01( gen ), dis01( gen ), dis01( gen )};
+            Scalar circleRadius{( cellSize - 2_ra * offset ) / 20_ra};
+            Scalar circleArc{Scalar( i ) / Scalar( end ) * 2_ra};
+            uint circleSubdiv{2 + j};
 
             addRenderObject( RenderObject::createRenderObject(
                 "test_circle",
                 this,
                 RenderObjectType::Geometry,
-                DrawPrimitives::Circle(
-                    randomVec1, randomVec2, randomRadius, randomSubdiv, colorBoost * randomCol ),
+                DrawPrimitives::CircleArc( circleCenter,
+                                           circleNormal,
+                                           circleRadius,
+                                           circleArc,
+                                           circleSubdiv,
+                                           colorBoost * randomCol ),
                 rt ) );
         }
 
