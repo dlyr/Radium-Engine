@@ -366,24 +366,33 @@ void MinimalComponent::initialize() {
             DrawPrimitives::Sphere( center3, 0.01_ra + ratio * 0.01_ra, color3 ),
             rt ) );
     }
+
+    //// CAPSULE ////
+    cellCorner = {-0.75_ra, 0_ra, 0.25_ra};
+
+    addRenderObject( RenderObject::createRenderObject(
+        "test_capsule",
+        this,
+        RenderObjectType::Geometry,
+        DrawPrimitives::Capsule(
+            cellCorner, cellCorner + Vector3{0_ra, 0.1_ra, 0_ra}, 0.02_ra, Utils::Color::White() ),
+        rt ) );
+
+    //// DISK ////
+    cellCorner = {-0.5_ra, 0_ra, 0.25_ra};
+
+    addRenderObject( RenderObject::createRenderObject(
+        "test_ray",
+        this,
+        RenderObjectType::Geometry,
+        DrawPrimitives::Disk( cellCorner,
+                              Vector3{0_ra, 0_ra, 1_ra},
+                              0.05_ra,
+                              32,
+                              colorBoost * Utils::Color::White() ),
+        rt ) );
+
     /*        addRenderObject( RenderObject::createRenderObject(
-    "test_ray",
-    this,
-    RenderObjectType::Geometry,
-    DrawPrimitives::Capsule( const Core::Vector3& p1,
-                                       const Core::Vector3& p2,
-                                       Scalar radius,
-                                       const Core::Utils::Color& color );
-            addRenderObject( RenderObject::createRenderObject(
-    "test_ray",
-    this,
-    RenderObjectType::Geometry,
-    DrawPrimitives::Disk( const Core::Vector3& center,
-                                    const Core::Vector3& normal,
-                                    Scalar radius,
-                                    uint segments,
-                                    const Core::Utils::Color& color );
-            addRenderObject( RenderObject::createRenderObject(
     "test_ray",
     this,
     RenderObjectType::Geometry,
