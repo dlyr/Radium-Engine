@@ -219,27 +219,22 @@ LineMeshPtr CircleArc( const Core::Vector3& center,
     geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
                     Core::Vector4Array{geom.vertices().size(), color} );
 
-    LineMeshPtr mesh( new LineMesh( "Arc Circle Primitive", std::move( geom ) ) );
-
-    return mesh;
+    return make_shared<LineMesh>( "Arc Circle Primitive", std::move( geom ) );
 }
 
 MeshPtr Sphere( const Core::Vector3& center, Scalar radius, const Core::Utils::Color& color ) {
-    TriangleMesh sphere = makeGeodesicSphere( radius, 2 );
-    auto handle         = sphere.getAttribHandle<TriangleMesh::Point>( "in_position" );
-    auto& vertices      = sphere.getAttrib<TriangleMesh::Point>( handle );
-    auto& data          = vertices.getDataWithLock();
+    auto geom      = makeGeodesicSphere( radius, 2 );
+    auto handle    = geom.getAttribHandle<TriangleMesh::Point>( "in_position" );
+    auto& vertices = geom.getAttrib<TriangleMesh::Point>( handle );
+    auto& data     = vertices.getDataWithLock();
 
     std::for_each( data.begin(), data.end(), [center]( Core::Vector3& v ) { v += center; } );
     vertices.unlock();
 
-    Core::Vector4Array colors( sphere.vertices().size(), color );
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    MeshPtr mesh( new Mesh( "Sphere Primitive" ) );
-    mesh->loadGeometry( std::move( sphere ) );
-    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
-
-    return mesh;
+    return make_shared<Mesh>( "Sphere Primitive", std::move( geom ) );
 }
 
 MeshPtr Capsule( const Core::Vector3& p1,
