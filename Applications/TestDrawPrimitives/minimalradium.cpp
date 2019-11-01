@@ -34,6 +34,9 @@ void MinimalComponent::initialize() {
     RenderTechnique rt;
     auto mat              = make_shared<BlinnPhongMaterial>( "Default Material" );
     mat->m_hasPerVertexKd = true;
+    mat->m_ks             = Utils::Color::White();
+    mat->m_ns             = 100_ra;
+
     rt.setMaterial( mat );
     auto builder = Ra::Engine::EngineRenderTechniques::getDefaultTechnique( "BlinnPhong" );
     builder.second( rt, false );
@@ -310,25 +313,60 @@ void MinimalComponent::initialize() {
                 rt ) );
         }
 
-    /*
-            addRenderObject( RenderObject::createRenderObject(
-    "test_ray",
-    this,
-    RenderObjectType::Geometry,
-    DrawPrimitives::CircleArc( const Core::Vector3& center,
-                                         const Core::Vector3& normal,
-                                         Scalar radius,
-                                         Scalar angle,
-                                         uint segments,
-                                         const Core::Utils::Color& color );
-            addRenderObject( RenderObject::createRenderObject(
-    "test_ray",
-    this,
-    RenderObjectType::Geometry,
-    DrawPrimitives::Sphere( const Core::Vector3& center,
-                                      Scalar radius,
-                                      const Core::Utils::Color& color );
-            addRenderObject( RenderObject::createRenderObject(
+    //// SPHERE /////
+
+    cellCorner = {-1._ra, 0_ra, 0.25_ra};
+    addRenderObject( RenderObject::createRenderObject(
+        "test_sphere",
+        this,
+        RenderObjectType::Geometry,
+        DrawPrimitives::Sphere( cellCorner, 0.02_ra, Utils::Color::White() ),
+        rt ) );
+
+    end = 32;
+    for ( uint i = 0; i < end; ++i )
+    {
+        Scalar angle{Scalar( i ) / Scalar( end ) * 7_ra};
+        Scalar ratio{Scalar( i ) / Scalar( end - 1 )};
+        Vector3 center{cellCorner + Vector3{cellSize / 2_ra, ratio * .1_ra, cellSize / 2_ra}};
+        Vector3 center1{center + Vector3{ratio * cellSize * .4_ra * std::cos( angle ),
+                                         0_ra,
+                                         ratio * cellSize * .4_ra * std::sin( angle )}};
+        Vector3 center2{
+            center + Vector3{ratio * cellSize * .4_ra * std::cos( angle + Math::PiDiv3 * 2_ra ),
+                             0_ra,
+                             ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 2_ra )}};
+
+        Vector3 center3{
+            center + Vector3{ratio * cellSize * .4_ra * std::cos( angle + Math::PiDiv3 * 4_ra ),
+                             0_ra,
+                             ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 4_ra )}};
+
+        Color color1{Utils::Color::Green() * ratio};
+        Color color2{Utils::Color::Red() * ratio};
+        Color color3{Utils::Color::Blue() * ratio};
+
+        addRenderObject( RenderObject::createRenderObject(
+            "test_sphere",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Sphere( center1, 0.005_ra + ratio * 0.01_ra, color1 ),
+            rt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_sphere",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Sphere( center2, 0.005_ra + ratio * 0.01_ra, color2 ),
+            rt ) );
+
+        addRenderObject( RenderObject::createRenderObject(
+            "test_sphere",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Sphere( center3, 0.01_ra + ratio * 0.01_ra, color3 ),
+            rt ) );
+    }
+    /*        addRenderObject( RenderObject::createRenderObject(
     "test_ray",
     this,
     RenderObjectType::Geometry,
