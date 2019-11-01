@@ -248,7 +248,7 @@ MeshPtr Capsule( const Core::Vector3& p1,
                  const Core::Utils::Color& color ) {
     const Scalar l = ( p2 - p1 ).norm();
 
-    TriangleMesh capsule = makeCapsule( l, radius );
+    TriangleMesh geom = makeCapsule( l, radius );
 
     // Compute the transform so that
     // (0,0,-l/2) maps to p1 and (0,0,l/2) maps to p2
@@ -260,20 +260,26 @@ MeshPtr Capsule( const Core::Vector3& p1,
     Core::Transform t = Core::Transform::Identity();
     t.rotate( rot );
     t.pretranslate( trans );
+    Matrix3 normalMatrix = t.linear().inverse().transpose();
 
-    auto handle    = capsule.getAttribHandle<TriangleMesh::Point>( "in_position" );
-    auto& vertices = capsule.getAttrib<TriangleMesh::Point>( handle );
-    auto& data     = vertices.getDataWithLock();
+    auto vertHandle  = geom.getAttribHandle<TriangleMesh::Point>( "in_position" );
+    auto& vertAttrib = geom.getAttrib<TriangleMesh::Point>( vertHandle );
+    auto& vertData   = vertAttrib.getDataWithLock();
+    std::for_each( vertData.begin(), vertData.end(), [t]( Core::Vector3& v ) { v = t * v; } );
+    vertAttrib.unlock();
 
-    std::for_each( data.begin(), data.end(), [t]( Core::Vector3& v ) { v = t * v; } );
+    auto normalHandle  = geom.getAttribHandle<TriangleMesh::Point>( "in_normal" );
+    auto& normalAttrib = geom.getAttrib<TriangleMesh::Point>( normalHandle );
+    auto& normalData   = normalAttrib.getDataWithLock();
+    std::for_each( normalData.begin(), normalData.end(), [normalMatrix]( Core::Vector3& n ) {
+        n = normalMatrix * n;
+    } );
+    normalAttrib.unlock();
 
-    vertices.unlock();
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    Core::Vector4Array colors( capsule.vertices().size(), color );
-
-    MeshPtr mesh( new Mesh( "Sphere Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( std::move( capsule ) );
-    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
+    MeshPtr mesh( new Mesh( "Capsule Primitive", std::move( geom ) ) );
 
     return mesh;
 }
