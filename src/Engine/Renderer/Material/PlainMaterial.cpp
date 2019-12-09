@@ -66,7 +66,7 @@ void PlainMaterial::bind( const ShaderProgram* shader ) {
 
 void PlainMaterial::registerMaterial() {
     /// For internal resources management in a filesystem
-    std::string resourcesRootDir = {Core::Resources::getBaseDir()};
+    std::string resourcesRootDir = {Core::Resources::getRadiumResourcesDir()};
 
     ShaderProgramManager::getInstance()->addNamedString(
         "/Plain.glsl", resourcesRootDir + "Shaders/Materials/Plain/Plain.glsl" );
