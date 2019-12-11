@@ -21,6 +21,7 @@
 #include <Engine/Managers/SignalManager/SignalManager.hpp>
 #include <Engine/Managers/SystemDisplay/SystemDisplay.hpp>
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/Material/MaterialConverters.hpp>
 #include <Engine/Renderer/Material/PlainMaterial.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
@@ -86,6 +87,8 @@ void RadiumEngine::registerDefaultPrograms() {
 void RadiumEngine::cleanup() {
     PlainMaterial::unregisterMaterial();
     BlinnPhongMaterial::unregisterMaterial();
+    EngineRenderTechniques::cleanup();
+    EngineMaterialConverters::cleanup();
 
     m_signalManager->setOn( false );
     m_entityManager.reset();

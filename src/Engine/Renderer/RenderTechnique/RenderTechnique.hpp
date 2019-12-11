@@ -105,6 +105,7 @@ RA_ENGINE_API bool removeDefaultTechnique( const std::string& name );
 RA_ENGINE_API std::pair<bool, DefaultTechniqueBuilder>
 getDefaultTechnique( const std::string& name );
 
+RA_ENGINE_API bool cleanup();
 } // namespace EngineRenderTechniques
 
 } // namespace Engine
