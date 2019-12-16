@@ -87,8 +87,6 @@ void RadiumEngine::registerDefaultPrograms() {
 void RadiumEngine::cleanup() {
     PlainMaterial::unregisterMaterial();
     BlinnPhongMaterial::unregisterMaterial();
-    EngineRenderTechniques::cleanup();
-    EngineMaterialConverters::cleanup();
 
     m_signalManager->setOn( false );
     m_entityManager.reset();
