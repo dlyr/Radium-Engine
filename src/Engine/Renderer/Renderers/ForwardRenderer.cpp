@@ -37,7 +37,7 @@ const GLenum buffers[] = {GL_COLOR_ATTACHMENT0,
 
 ForwardRenderer::ForwardRenderer() : Renderer() {}
 
-ForwardRenderer::~ForwardRenderer(){};
+ForwardRenderer::~ForwardRenderer() {}
 
 void ForwardRenderer::initializeInternal() {
     initShaders();
