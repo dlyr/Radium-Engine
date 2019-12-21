@@ -32,10 +32,10 @@ void DebugRender::initialize() {
     auto createProgram = []( const char* vertStr, const char* fragStr ) -> ShaderProgram* {
         ShaderProgram* prog = new ShaderProgram();
         // return prog;
-        prog->addShaderFromSource( ShaderType_VERTEX,
-                                   globjects::Shader::sourceFromString( vertStr ) );
-        prog->addShaderFromSource( ShaderType_FRAGMENT,
-                                   globjects::Shader::sourceFromString( fragStr ) );
+        prog->addShaderFromSource(
+            ShaderType_VERTEX, globjects::Shader::sourceFromString( vertStr ), "", false );
+        prog->addShaderFromSource(
+            ShaderType_FRAGMENT, globjects::Shader::sourceFromString( fragStr ), "", false );
         prog->link();
 
         return prog;
