@@ -175,7 +175,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
 class RA_ENGINE_API VaoIndices
 {
   protected:
-    std::unique_ptr<globjects::Buffer> m_indices;
+    std::unique_ptr<globjects::Buffer> m_indices{nullptr};
     bool m_indicesDirty{true};
     /// number of elements to draw (i.e number of indices to use)
     size_t m_numElements{0};

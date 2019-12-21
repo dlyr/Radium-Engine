@@ -229,7 +229,7 @@ void RenderObject::render( const RenderParameters& lightParams,
         if ( material != nullptr ) material->bind( shader );
         GL_CHECK_ERROR;
         // render
-
+        std::cerr << "############ Drawing mesh " << getMesh()->getName() << std::endl;
         getMesh()->render( shader );
     }
 }
