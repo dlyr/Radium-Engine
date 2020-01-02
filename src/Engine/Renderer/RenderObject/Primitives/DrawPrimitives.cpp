@@ -375,8 +375,6 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
     Core::Vector3Array vertices = {
         pos, pos + scale * x, pos, pos + scale * y, pos, pos + scale * z};
 
-    std::vector<uint> indices = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
-
     Core::Vector4Array colors = {
         Core::Utils::Color::Red(),
         Core::Utils::Color::Red(),
@@ -386,7 +384,12 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
         Core::Utils::Color::Blue(),
     };
 
-    MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES_ADJACENCY ) );
+    // std::vector<uint> indices = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
+    // MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES_ADJACENCY ) );
+
+    std::vector<uint> indices = {0, 1, 2, 3, 4, 5};
+    MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES ) );
+
     mesh->loadGeometry( vertices, indices );
     mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
