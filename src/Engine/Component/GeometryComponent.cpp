@@ -35,8 +35,7 @@ namespace Engine {
 TriangleMeshComponent::TriangleMeshComponent( const std::string& name,
                                               Entity* entity,
                                               const Ra::Core::Asset::GeometryData* data ) :
-    Component( name, entity ),
-    m_displayMesh( nullptr ) {
+    Component( name, entity ), m_displayMesh( nullptr ) {
     generateTriangleMesh( data );
 }
 
@@ -44,10 +43,10 @@ TriangleMeshComponent::TriangleMeshComponent( const std::string& name,
                                               Entity* entity,
                                               Core::Geometry::TriangleMesh&& mesh,
                                               Core::Asset::MaterialData* mat ) :
-    Component( name, entity ),
-    m_contentName( name ),
-    m_displayMesh( new Engine::Mesh( name ) ) {
-    m_displayMesh->loadGeometry( std::move( mesh ) );
+    Component( name, entity ), m_contentName( name ), m_displayMesh( new Engine::Mesh( name ) ) {
+
+    // we know this displayMesh is a Mesh
+    static_cast<Engine::Mesh*>( m_displayMesh.get() )->loadGeometry( std::move( mesh ) );
     finalizeROFromGeometry( mat );
 }
 
@@ -58,74 +57,10 @@ TriangleMeshComponent::~TriangleMeshComponent() = default;
 
 void TriangleMeshComponent::initialize() {}
 
-void TriangleMeshComponent::generateTriangleMesh( const Ra::Core::Asset::GeometryData* data ) {
-    m_contentName = data->getName();
 
-    std::string name( m_name );
-    name.append( "_" + m_contentName );
 
-    std::string meshName = name;
-    meshName.append( "_Mesh" );
-
-    m_displayMesh = Ra::Core::make_shared<Mesh>( meshName );
-
-    Ra::Core::Geometry::TriangleMesh mesh;
-    Ra::Core::Geometry::TriangleMesh::PointAttribHandle::Container vertices;
-    Ra::Core::Geometry::TriangleMesh::NormalAttribHandle::Container normals;
-    
-    const auto T = data->getFrame();
-    const Ra::Core::Transform N( ( T.matrix() ).inverse().transpose() );
-
-    vertices.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-
-#pragma omp parallel for
-    for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-    {
-        vertices[i] = T * data->getVertices()[i];
-    }
-
-    if ( data->hasNormals() )
-    {
-        normals.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-#pragma omp parallel for
-        for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-        {
-            normals[i] = ( N * data->getNormals()[i] ).normalized();
-        }
-    }
-
-    const auto& faces = data->getFaces();
-    mesh.m_indices.resize( faces.size(), Ra::Core::Vector3ui::Zero() );
-#pragma omp parallel for
-    for ( int i = 0; i < int( faces.size() ); ++i )
-    {
-        mesh.m_indices[i] = faces[i].head<3>();
-    }
-
-    mesh.setVertices( std::move( vertices ) );
-    mesh.setNormals( std::move( normals ) );
-
-    if ( data->hasTangents() )
-    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TANGENT ), data->getTangents() ); }
-
-    if ( data->hasBiTangents() )
-    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_BITANGENT ), data->getBiTangents() ); }
-
-    if ( data->hasTextureCoordinates() )
-    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TEXCOORD ), data->getTexCoords() ); }
-
-    if ( data->hasColors() )
-    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), data->getColors() ); }
-
-    // To be discussed: Should not weights be part of the geometry ?
-    //        mesh->addData( Mesh::VERTEX_WEIGHTS, meshData.weights );
-
-    m_displayMesh->loadGeometry( std::move( mesh ) );
-
-    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr );
-}
-
-void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialData* data ) {
+template<typename T>
+finalizeROFromGeometry( const Core::Asset::MaterialData* data ) {
     // The technique for rendering this component
     RenderTechnique rt;
 
@@ -150,17 +85,17 @@ void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialD
     {
         auto mat =
             Ra::Core::make_shared<BlinnPhongMaterial>( m_contentName + "_DefaultBPMaterial" );
-        mat->m_kd            = Ra::Core::Utils::Color::Grey();
-        mat->m_ks            = Ra::Core::Utils::Color::White();
-        mat->m_renderAsSplat = m_displayMesh->getNumFaces() == 0;
-        mat->m_hasPerVertexKd =
-            m_displayMesh->getCoreGeometry().hasAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
+        mat->m_kd             = Ra::Core::Utils::Color::Grey();
+        mat->m_ks             = Ra::Core::Utils::Color::White();
+        mat->m_renderAsSplat  = m_displayMesh->getNumFaces() == 0;
+        mat->m_hasPerVertexKd = m_displayMesh->getAttribGeometry().hasAttrib(
+            Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
         rt.setMaterial( mat );
         auto builder = EngineRenderTechniques::getDefaultTechnique( "BlinnPhong" );
         builder.second( rt, false );
     }
 
-    if ( m_displayMesh->getCoreGeometry().m_indices.empty() ) // add geometry shader for splatting
+    if ( m_displayMesh->getAttribGeometry().m_indices.empty() ) // add geometry shader for splatting
     {
         auto addGeomShader = [&rt]( RenderTechnique::PassName pass ) {
             if ( rt.hasConfiguration( pass ) )
@@ -188,16 +123,92 @@ void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialD
     m_meshIndex = addRenderObject( ro );
 }
 
+
+void TriangleMeshComponent::generateTriangleMesh( const Ra::Core::Asset::GeometryData* data ) {
+    m_contentName = data->getName();
+
+    std::string name( m_name );
+    name.append( "_" + m_contentName );
+
+    std::string meshName = name;
+    meshName.append( "_Mesh" );
+
+    Ra::Core::Geometry::AttribArrayGeometry::PointAttribHandle::Container vertices;
+    Ra::Core::Geometry::AttribArrayGeometry::NormalAttribHandle::Container normals;
+
+    const auto T = data->getFrame();
+    const Ra::Core::Transform N( ( T.matrix() ).inverse().transpose() );
+
+    vertices.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
+
+#pragma omp parallel for
+    for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
+    {
+        vertices[i] = T * data->getVertices()[i];
+    }
+
+    if ( data->hasNormals() )
+    {
+        normals.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
+#pragma omp parallel for
+        for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
+        {
+            normals[i] = ( N * data->getNormals()[i] ).normalized();
+        }
+    }
+
+    const auto& faces = data->getFaces();
+
+    if ( faces.size() > 0 )
+    {
+        Ra::Core::Geometry::TriangleMesh mesh;
+        mesh.m_indices.resize( faces.size(), Ra::Core::Vector3ui::Zero() );
+#pragma omp parallel for
+        for ( int i = 0; i < int( faces.size() ); ++i )
+        {
+            mesh.m_indices[i] = faces[i].head<3>();
+        }
+
+        mesh.setVertices( std::move( vertices ) );
+        mesh.setNormals( std::move( normals ) );
+
+        if ( data->hasTangents() )
+        { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TANGENT ), data->getTangents() ); }
+
+        if ( data->hasBiTangents() )
+        {
+            mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_BITANGENT ), data->getBiTangents() );
+        }
+
+        if ( data->hasTextureCoordinates() )
+        { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TEXCOORD ), data->getTexCoords() ); }
+
+        if ( data->hasColors() )
+        { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), data->getColors() ); }
+
+        // To be discussed: Should not weights be part of the geometry ?
+        //        mesh->addData( Mesh::VERTEX_WEIGHTS, meshData.weights );
+        auto meshPtr = Ra::Core::make_shared<Mesh>( meshName );
+        meshPtr->loadGeometry( std::move( mesh ) );
+        finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr );
+    }
+    else
+    {}
+
+    m_displayMesh = meshPtr;
+}
+
 Ra::Core::Utils::Index TriangleMeshComponent::getRenderObjectIndex() const {
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
     return m_meshIndex;
 }
 
+/*
 const Ra::Core::Geometry::TriangleMesh& TriangleMeshComponent::getMesh() const {
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
     return m_displayMesh->getCoreGeometry();
 }
-
+*/
 Mesh* TriangleMeshComponent::getDisplayMesh() {
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
     return m_displayMesh.get();

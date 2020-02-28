@@ -98,6 +98,9 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     AttribArrayDisplayable( const AttribArrayDisplayable& rhs ) = delete;
     void operator=( const AttribArrayDisplayable& rhs ) = delete;
 
+    virtual inline const Core::Geometry::AttribArrayGeometry& getAttribGeometry() const = 0;
+    virtual inline Core::Geometry::AttribArrayGeometry& getAttribGeometry()             = 0;
+
     // no need to detach listener since TriangleMesh is owned by Mesh.
     ~AttribArrayDisplayable(){};
 
@@ -141,8 +144,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     {
       public:
         explicit AttribObserver( AttribArrayDisplayable* displayable, int idx ) :
-            m_displayable( displayable ),
-            m_idx( idx ) {}
+            m_displayable( displayable ), m_idx( idx ) {}
         void operator()() {
             m_displayable->m_dataDirty[m_idx] = true;
             m_displayable->m_isDirty          = true;
@@ -219,12 +221,20 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
                                       MeshRenderMode renderMode = RM_TRIANGLES );
     ///@{
     /**  Returns the underlying CoreGeometry as an Core::Geometry::AbstractGeometry */
-    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const;
-    inline Core::Geometry::AbstractGeometry& getAbstractGeometry();
+    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const override;
+    inline Core::Geometry::AbstractGeometry& getAbstractGeometry() override;
     ///@}
 
     ///@{
     /// Returns the underlying CoreGeometry
+    inline const Core::Geometry::AttribArrayGeometry& getAttribGeometry() const override {
+        return getCoreGeometry();
+    }
+
+    inline Core::Geometry::AttribArrayGeometry& getAttribGeometry() override {
+        return getCoreGeometry();
+    }
+
     inline const CoreGeometry& getCoreGeometry() const;
     inline CoreGeometry& getCoreGeometry();
     ///@}

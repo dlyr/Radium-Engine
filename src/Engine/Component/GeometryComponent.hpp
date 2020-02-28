@@ -8,6 +8,7 @@
 namespace Ra {
 namespace Engine {
 class Mesh;
+class AttribArrayDisplayable;
 } // namespace Engine
 } // namespace Ra
 
@@ -43,8 +44,9 @@ class RA_ENGINE_API TriangleMeshComponent : public Component
     void initialize() override;
 
     /// Returns the current display geometry.
-    const Ra::Core::Geometry::TriangleMesh& getMesh() const;
-    Mesh* getDisplayMesh();
+//    const Ra::Core::Geometry::TriangleMesh& getMesh() const;
+//    const AttribArrayDisplayable& getMesh() const;
+    AttribArrayDisplayable* getDisplayMesh();
 
   public:
     // Component communication management
@@ -70,7 +72,7 @@ class RA_ENGINE_API TriangleMeshComponent : public Component
     Ra::Core::Utils::Index m_meshIndex{};
     std::string m_contentName{};
     // directly hold a reference to the displayMesh to simplify accesses in handlers
-    std::shared_ptr<Mesh> m_displayMesh{nullptr};
+    std::shared_ptr<AttribArrayDisplayable> m_displayMesh{nullptr};
 };
 
 } // namespace Engine
