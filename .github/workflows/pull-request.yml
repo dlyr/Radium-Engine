@@ -71,12 +71,19 @@ jobs:
           clangFormatVersion: 9
           style: file
       - name: Find Comment
-        if: ${{ always() &&  github.event.pull_request.head.repo.full_name == github.repository }}
+        if: ${{ always() && github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/find-comment@v1
         id: fcc
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: '**CHECK FORMAT'
+      - name: Find Comment DUMMY
+        if: ${{ always() && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: peter-evans/find-comment@v1
+        id: fch
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: '**CHECK LINEAR HISTORY'
       - name: Reset comment
         if:  ${{ steps.fcc.outputs.comment-id  != ''  &&  github.event.pull_request.head.repo.full_name == github.repository}}
         uses: peter-evans/create-or-update-comment@v1
