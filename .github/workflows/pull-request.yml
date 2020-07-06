@@ -22,7 +22,7 @@ jobs:
         uses: peter-evans/find-comment@v1
         id: fch
         with:
-          issue-number: 1
+          issue-number: ${{ github.event.pull_request.number }}
           body-includes: CHECK LINEAR HISTORY FAIL
       - name: INFO
         run: |
@@ -80,7 +80,7 @@ jobs:
         uses: peter-evans/find-comment@v1
         id: fcc
         with:
-          issue-number: 1
+          issue-number: ${{ github.event.pull_request.number }}
           body-includes: CHECK FORMAT FAIL
       - name: Reset comment
         if:  ${{ steps.fcc.outputs.comment-id  != ''  &&  github.event.pull_request.head.repo.full_name == github.repository}}
