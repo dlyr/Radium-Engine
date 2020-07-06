@@ -52,7 +52,7 @@ jobs:
               echo **CHECK LINEAR HISTORY FAIL**
               echo
               echo Please rebase on current up to date master,
-              echo without merge commits (e.g. you can squash them).
+              echo "without merge commits (e.g. you can squash them)."
   format:
     name: Check format
     runs-on: ubuntu-latest
