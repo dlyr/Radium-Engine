@@ -20,17 +20,24 @@ jobs:
       - name: Find Comment
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/find-comment@v1
-        id: fc
+        id: fch
         with:
           issue-number: 1
           body-includes: CHECK LINEAR HISTORY FAIL
+      - name: INFO
+        run: |
+              echo ${{ steps.fch.outputs.comment-id }}
+              echo ${{ github.event.pull_request.head.repo.full_name }}
+              echo ${{ github.repository }}
+              echo ${{ steps.fch.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
+              echo ===              
       - name: Reset comment
-        if:  ${{ steps.fc.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
+        if:  ${{ steps.fch.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.PR_COMMENT_TOKEN }}
-          commit-id: ${{ steps.fc.outputs.comment-id }}
+          commit-id: ${{ steps.fch.outputs.comment-id }}
           edit-mode: replace
           body: |
               **CHECK LINEAR HISTORY PASS**
@@ -71,17 +78,17 @@ jobs:
       - name: Find Comment
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/find-comment@v1
-        id: fc
+        id: fcc
         with:
           issue-number: 1
           body-includes: CHECK FORMAT FAIL
       - name: Reset comment
-        if:  ${{ steps.fc.outputs.comment-id  != ''  &&  github.event.pull_request.head.repo.full_name == github.repository}}
+        if:  ${{ steps.fcc.outputs.comment-id  != ''  &&  github.event.pull_request.head.repo.full_name == github.repository}}
         uses: peter-evans/create-or-update-comment@v1
         with:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.PR_COMMENT_TOKEN }}
-          commit-id: ${{ steps.fc.outputs.comment-id }}
+          commit-id: ${{ steps.fcc.outputs.comment-id }}
           edit-mode: replace
           body: |
               **CHECK FORMAT PASS**
