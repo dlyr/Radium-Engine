@@ -24,13 +24,6 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: CHECK LINEAR HISTORY FAIL
-      - name: INFO
-        run: |
-              echo ${{ steps.fch.outputs.comment-id }}
-              echo ${{ github.event.pull_request.head.repo.full_name }}
-              echo ${{ github.repository }}
-              echo ${{ steps.fch.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
-              echo ===              
       - name: Reset comment
         if:  ${{ steps.fch.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/create-or-update-comment@v1
