@@ -23,7 +23,7 @@ jobs:
         id: fch
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: CHECK LINEAR HISTORY FAIL
+          body-includes: **CHECK LINEAR HISTORY
       - name: Reset comment
         if:  ${{ steps.fch.outputs.comment-id != '' &&  github.event.pull_request.head.repo.full_name == github.repository }}
         uses: peter-evans/create-or-update-comment@v1
@@ -40,6 +40,7 @@ jobs:
         with:
           token: ${{ secrets.PR_COMMENT_TOKEN }}
           issue-number: ${{ github.event.pull_request.number }}
+          commit-id: ${{ steps.fch.outputs.comment-id }}
           body: |
               **CHECK LINEAR HISTORY FAIL**
 
@@ -74,7 +75,7 @@ jobs:
         id: fcc
         with:
           issue-number: ${{ github.event.pull_request.number }}
-          body-includes: CHECK FORMAT FAIL
+          body-includes: **CHECK FORMAT
       - name: Reset comment
         if:  ${{ steps.fcc.outputs.comment-id  != ''  &&  github.event.pull_request.head.repo.full_name == github.repository}}
         uses: peter-evans/create-or-update-comment@v1
@@ -91,6 +92,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.PR_COMMENT_TOKEN }}
+          commit-id: ${{ steps.fch.outputs.comment-id }}
           body: |
               **CHECK FORMAT FAIL**
               You can trigger automatic format action on github with the special branch `gh-formatter`.
