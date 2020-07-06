@@ -83,7 +83,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.PR_COMMENT_TOKEN }}
-          comment-id: ${{ steps.fch.outputs.comment-id }}
+          comment-id: ${{ steps.fcc.outputs.comment-id }}
           edit-mode: replace
           body: |
               **CHECK FORMAT PASS**
@@ -93,7 +93,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.PR_COMMENT_TOKEN }}
-          comment-id: ${{ steps.fch.outputs.comment-id }}
+          comment-id: ${{ steps.fcc.outputs.comment-id }}
           edit-mode: replace
           body: |
               **CHECK FORMAT FAIL**
