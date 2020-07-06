@@ -54,7 +54,7 @@ jobs:
               without merge commits (e.g. you can squash them).  
           reactions: rocket
       - name: Echo for fork
-        if: ${{ failure() &&  github.event.pull_request.head.repo.full_name != github.repository }}
+        if: ${{ failure() && github.event.pull_request.head.repo.full_name != github.repository }}
         run: |
               echo **CHECK LINEAR HISTORY FAIL**
               echo
@@ -126,7 +126,7 @@ jobs:
               ```
           reactions: rocket
       - name: Echo for fork
-        if: ${{ failure() &&  github.event.pull_request.head.repo.full_name != github.repository }}
+        if: ${{ failure() && github.event.pull_request.head.repo.full_name != github.repository }}
         run: |
             echo **CHECK FORMAT FAIL**
             echo You can trigger automatic format action on github with the special branch `gh-formatter`.
