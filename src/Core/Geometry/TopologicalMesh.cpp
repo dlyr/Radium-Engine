@@ -312,18 +312,20 @@ TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) {
             }
         } );
 
-    size_t num_triangles = triMesh.getIndices().size();
+    size_t num_faces = triMesh.getIndices().size();
 
-    for ( unsigned int i = 0; i < num_triangles; i++ )
+    for ( unsigned int i = 0; i < num_faces; i++ )
     {
-        std::vector<TopologicalMesh::VertexHandle> face_vhandles( 3 );
-        std::vector<TopologicalMesh::Normal> face_normals( 3 );
-        std::vector<unsigned int> face_vertexIndex( 3 );
-        std::vector<WedgeIndex> face_wedges( 3 );
-        const auto& triangle = triMesh.getIndices()[i];
-        for ( size_t j = 0; j < 3; ++j )
+        const auto& face = triMesh.getIndices()[i];
+        const size_t num_vert = face.size();
+        std::vector<TopologicalMesh::VertexHandle> face_vhandles( num_vert );
+        std::vector<TopologicalMesh::Normal> face_normals( num_vert );
+        std::vector<unsigned int> face_vertexIndex( num_vert );
+        std::vector<WedgeIndex> face_wedges( num_vert );
+
+        for ( size_t j = 0; j < num_vert; ++j )
         {
-            unsigned int inMeshVertexIndex = triangle[j];
+            unsigned int inMeshVertexIndex = face[j];
             const Vector3& p               = triMesh.vertices()[inMeshVertexIndex];
             const Vector3& n               = triMesh.normals()[inMeshVertexIndex];
 
@@ -471,15 +473,16 @@ void TopologicalMesh::initWithWedge( const TriangleMesh& triMesh ) {
 
     for ( unsigned int i = 0; i < num_triangles; i++ )
     {
-        std::vector<TopologicalMesh::VertexHandle> face_vhandles( 3 );
-        std::vector<TopologicalMesh::Normal> face_normals( 3 );
-        std::vector<unsigned int> face_vertexIndex( 3 );
-        std::vector<WedgeIndex> face_wedges( 3 );
-        const auto& triangle = triMesh.getIndices()[i];
+        const auto& face = triMesh.getIndices()[i];
+        const size_t num_vert = face.size();
+        std::vector<TopologicalMesh::VertexHandle> face_vhandles( num_vert );
+        std::vector<TopologicalMesh::Normal> face_normals( num_vert );
+        std::vector<unsigned int> face_vertexIndex( num_vert );
+        std::vector<WedgeIndex> face_wedges( num_vert );
 
-        for ( size_t j = 0; j < 3; ++j )
+        for ( size_t j = 0; j < num_vert; ++j )
         {
-            unsigned int inMeshVertexIndex = triangle[j];
+            unsigned int inMeshVertexIndex = face[j];
             const Vector3& p               = triMesh.vertices()[inMeshVertexIndex];
             const Vector3& n               = triMesh.normals()[inMeshVertexIndex];
 
