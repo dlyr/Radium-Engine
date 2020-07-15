@@ -1,10 +1,176 @@
 #include "TopologicalMesh.hpp"
 
 #include <typeinfo>
+#include <unordered_map>
 
 namespace Ra {
 namespace Core {
 namespace Geometry {
+
+template <typename U, typename T>
+void copyAttribToWedgeData( const IndexedGeometry<U>& mesh,
+                            unsigned int vindex,
+                            const std::vector<AttribHandle<T>>& attrHandleVec,
+                            VectorArray<T>* to ) {
+    for ( auto handle : attrHandleVec )
+    {
+        auto& attr = mesh.template getAttrib<T>( handle );
+        to->push_back( attr.data()[vindex] );
+    }
+}
+
+template <typename T>
+void copyMeshToWedgeData( const IndexedGeometry<T>& mesh,
+                          unsigned int vindex,
+                          const std::vector<AttribHandle<float>>& wprop_float,
+                          const std::vector<AttribHandle<Vector2>>& wprop_vec2,
+                          const std::vector<AttribHandle<Vector3>>& wprop_vec3,
+                          const std::vector<AttribHandle<Vector4>>& wprop_vec4,
+                          TopologicalMesh::WedgeData* wd ) {
+
+    copyAttribToWedgeData( mesh, vindex, wprop_float, &wd->m_floatAttrib );
+    copyAttribToWedgeData( mesh, vindex, wprop_vec2, &wd->m_vector2Attrib );
+    copyAttribToWedgeData( mesh, vindex, wprop_vec3, &wd->m_vector3Attrib );
+    copyAttribToWedgeData( mesh, vindex, wprop_vec4, &wd->m_vector4Attrib );
+}
+
+template <typename T>
+void TopologicalMesh::initWithWedge( const IndexedGeometry<T>& triMesh ) {
+
+    // LOG( logINFO ) << "TopologicalMesh: load mesh with " << triMesh.getIndices().size()
+    //               << " faces and " << triMesh.vertices().size() << " vertices.";
+
+    ///\todo use a kdtree
+    struct hash_vec {
+        size_t operator()( const Vector3& lvalue ) const {
+            size_t hx = std::hash<Scalar>()( lvalue[0] );
+            size_t hy = std::hash<Scalar>()( lvalue[1] );
+            size_t hz = std::hash<Scalar>()( lvalue[2] );
+            return ( hx ^ ( hy << 1 ) ) ^ hz;
+        }
+    };
+    // use a hashmap for fast search of existing vertex position
+    using VertexMap = std::unordered_map<Vector3, TopologicalMesh::VertexHandle, hash_vec>;
+    VertexMap vertexHandles;
+
+    add_property( m_inputTriangleMeshIndexPph );
+    add_property( m_wedgeIndexPph );
+
+    // loop over all attribs and build correspondance pair
+    triMesh.vertexAttribs().for_each_attrib(
+        [&triMesh, this]( const auto& attr ) {
+            if ( attr->getSize() != triMesh.vertices().size() )
+            {
+                LOG( logWARNING ) << "[TopologicalMesh] Skip badly sized attribute "
+                                  << attr->getName();
+            }
+            else if ( attr->getName() != std::string( "in_position" ) )
+            {
+                if ( attr->isFloat() )
+                {
+                    m_wedges.m_wedgeFloatAttribHandles.push_back(
+                        triMesh.template getAttribHandle<float>( attr->getName() ) );
+                    m_wedges.addProp<float>( attr->getName() );
+                }
+                else if ( attr->isVector2() )
+                {
+                    m_wedges.m_wedgeVector2AttribHandles.push_back(
+                        triMesh.template getAttribHandle<Vector2>( attr->getName() ) );
+                    m_wedges.addProp<Vector2>( attr->getName() );
+                }
+                else if ( attr->isVector3() )
+                {
+                    m_wedges.m_wedgeVector3AttribHandles.push_back(
+                        triMesh.template getAttribHandle<Vector3>( attr->getName() ) );
+                    m_wedges.addProp<Vector3>( attr->getName() );
+                }
+                else if ( attr->isVector4() )
+                {
+                    m_wedges.m_wedgeVector4AttribHandles.push_back(
+                        triMesh.template getAttribHandle<Vector4>( attr->getName() ) );
+                    m_wedges.addProp<Vector4>( attr->getName() );
+                }
+                else
+                    LOG( logWARNING )
+                        << "Warning, mesh attribute " << attr->getName()
+                        << " type is not supported (only float, vec2, vec3 nor vec4 are supported)";
+            }
+        } );
+
+    size_t num_triangles = triMesh.getIndices().size();
+
+    for ( size_t i = 0; i < triMesh.vertices().size(); ++i )
+    {
+        WedgeData wd;
+        wd.m_position = triMesh.vertices()[i];
+        copyMeshToWedgeData<T>( triMesh,
+                                i,
+                                m_wedges.m_wedgeFloatAttribHandles,
+                                m_wedges.m_wedgeVector2AttribHandles,
+                                m_wedges.m_wedgeVector3AttribHandles,
+                                m_wedges.m_wedgeVector4AttribHandles,
+                                &wd );
+
+        m_wedges.m_data.emplace_back( wd );
+        /// the newly added wedge is not referenced yet.
+        auto idx = m_wedges.m_data.size() - 1;
+        m_wedges.del( idx );
+    }
+
+    // LOG( logINFO ) << "TopologicalMesh: have " << m_wedges.size() << " wedges ";
+
+    for ( unsigned int i = 0; i < num_triangles; i++ )
+    {
+        const auto& face      = triMesh.getIndices()[i];
+        const size_t num_vert = face.size();
+        // LOG( logINFO ) << "TopologicalMesh: add face "
+        // << i << " with " << num_vert << " vertices ";
+        std::vector<TopologicalMesh::VertexHandle> face_vhandles( num_vert );
+        std::vector<TopologicalMesh::Normal> face_normals( num_vert );
+        std::vector<unsigned int> face_vertexIndex( num_vert );
+        std::vector<WedgeIndex> face_wedges( num_vert );
+
+        for ( size_t j = 0; j < num_vert; ++j )
+        {
+            unsigned int inMeshVertexIndex = face[j];
+            const Vector3& p               = triMesh.vertices()[inMeshVertexIndex];
+            const Vector3& n               = triMesh.normals()[inMeshVertexIndex];
+
+            typename VertexMap::iterator vtr = vertexHandles.find( p );
+            TopologicalMesh::VertexHandle vh;
+            if ( vtr == vertexHandles.end() )
+            {
+                vh = add_vertex( p );
+                vertexHandles.insert( vtr, typename VertexMap::value_type( p, vh ) );
+            }
+            else
+            { vh = vtr->second; }
+
+            face_vhandles[j]    = vh;
+            face_normals[j]     = n;
+            face_vertexIndex[j] = inMeshVertexIndex;
+            face_wedges[j]      = WedgeIndex {int( inMeshVertexIndex )};
+        }
+
+        // Add the face, then add attribs to vh
+        TopologicalMesh::FaceHandle fh = add_face( face_vhandles );
+        if ( fh.is_valid() )
+        {
+            for ( size_t vindex = 0; vindex < face_vhandles.size(); vindex++ )
+            {
+                TopologicalMesh::HalfedgeHandle heh = halfedge_handle( face_vhandles[vindex], fh );
+                set_normal( heh, face_normals[vindex] );
+                property( m_wedgeIndexPph, heh ) = m_wedges.newReference( face_wedges[vindex] );
+            }
+        }
+        else
+        { LOG( logWARNING ) << "Invalid face handle returned : face not added (2)"; }
+        face_vhandles.clear();
+        face_normals.clear();
+        face_vertexIndex.clear();
+    }
+    // LOG( logINFO ) << "TopologicalMesh: load end with  " << m_wedges.size() << " wedges ";
+}
 
 inline const TopologicalMesh::Normal& TopologicalMesh::normal( VertexHandle vh,
                                                                FaceHandle fh ) const {

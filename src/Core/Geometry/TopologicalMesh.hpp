@@ -72,7 +72,9 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note This is a costly operation.
      */
     explicit TopologicalMesh( const Ra::Core::Geometry::TriangleMesh& triMesh );
-    void initWithWedge( const Ra::Core::Geometry::TriangleMesh& triMesh );
+
+    template <typename T>
+    void initWithWedge( const Ra::Core::Geometry::IndexedGeometry<T>& mesh );
 
     /**
      * Construct an empty topological mesh
@@ -92,6 +94,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \warning It uses the attributes defined on wedges
      */
     TriangleMesh toTriangleMeshFromWedges();
+    PolyMesh toPolyMeshFromWedges();
 
     /**
      * Update triangle mesh data, assuming the mesh and this topo mesh has the
