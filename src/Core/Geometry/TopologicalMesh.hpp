@@ -152,17 +152,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
     inline const OpenMesh::HPropHandleT<Index>& getOutputTriangleMeshIndexPropHandle() const;
 
     /**
-     * \name Const access to handles of the HalfEdge properties coming from
-     * the TriangleMesh attributes.
-     */
-    ///@{
-    inline const std::vector<OpenMesh::HPropHandleT<float>>& getFloatPropsHandles() const;
-    inline const std::vector<OpenMesh::HPropHandleT<Vector2>>& getVector2PropsHandles() const;
-    inline const std::vector<OpenMesh::HPropHandleT<Vector3>>& getVector3PropsHandles() const;
-    inline const std::vector<OpenMesh::HPropHandleT<Vector4>>& getVector4PropsHandles() const;
-    ///@}
-
-    /**
      * \name Dealing with normals
      * Utils to deal with normals when modifying the mesh topology.
      */
@@ -275,21 +264,13 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note These new properties will have to be propagated onto the newly created
      * halfedges with copyAllProps().
      */
-    inline void createAllPropsOnFaces( OpenMesh::FPropHandleT<Normal>& normalProp,
-                                       std::vector<OpenMesh::FPropHandleT<Scalar>>& floatProps,
-                                       std::vector<OpenMesh::FPropHandleT<Vector2>>& vec2Props,
-                                       std::vector<OpenMesh::FPropHandleT<Vector3>>& vec3Props,
-                                       std::vector<OpenMesh::FPropHandleT<Vector4>>& vec4Props );
+    inline void createAllPropsOnFaces( OpenMesh::FPropHandleT<Normal>& normalProp );
 
     /**
      * Remove all the given properties from \a mesh.
      * \note Invalidates \a normalProp and clears the given property containers.
      */
-    inline void clearAllProps( OpenMesh::FPropHandleT<Normal>& normalProp,
-                               std::vector<OpenMesh::FPropHandleT<Scalar>>& floatProps,
-                               std::vector<OpenMesh::FPropHandleT<Vector2>>& vec2Props,
-                               std::vector<OpenMesh::FPropHandleT<Vector3>>& vec3Props,
-                               std::vector<OpenMesh::FPropHandleT<Vector4>>& vec4Props );
+    inline void clearAllProps( OpenMesh::FPropHandleT<Normal>& normalProp );
 
     /**
      * Copy all properties from \a input_heh to \a copy_heh.
@@ -304,11 +285,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      */
     inline void copyAllPropsFromFace( FaceHandle fh,
                                       HalfedgeHandle heh,
-                                      OpenMesh::FPropHandleT<Normal> normalProp,
-                                      std::vector<OpenMesh::FPropHandleT<Scalar>>& floatProps,
-                                      std::vector<OpenMesh::FPropHandleT<Vector2>>& vec2Props,
-                                      std::vector<OpenMesh::FPropHandleT<Vector3>>& vec3Props,
-                                      std::vector<OpenMesh::FPropHandleT<Vector4>>& vec4Props );
+                                      OpenMesh::FPropHandleT<Normal> normalProp );
 
     /**
      * Interpolate all properties on edge center (after edge split).
@@ -322,13 +299,8 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * through createAllPropsOnFaces(), or individually through
      * createNormalPropOnFaces() and createPropsOnFaces().
      */
-    inline void
-    interpolateAllPropsOnFaces( FaceHandle fh,
-                                OpenMesh::FPropHandleT<Normal> normalProp,
-                                std::vector<OpenMesh::FPropHandleT<Scalar>>& floatProps,
-                                std::vector<OpenMesh::FPropHandleT<Vector2>>& vec2Props,
-                                std::vector<OpenMesh::FPropHandleT<Vector3>>& vec3Props,
-                                std::vector<OpenMesh::FPropHandleT<Vector4>>& vec4Props );
+    inline void interpolateAllPropsOnFaces( FaceHandle fh,
+                                            OpenMesh::FPropHandleT<Normal> normalProp );
     ///@}
 
     /**
@@ -603,10 +575,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
     ///\todo to be deleted/updated
     OpenMesh::HPropHandleT<Index> m_inputTriangleMeshIndexPph;
     OpenMesh::HPropHandleT<Index> m_outputTriangleMeshIndexPph;
-    std::vector<OpenMesh::HPropHandleT<float>> m_floatPph;
-    std::vector<OpenMesh::HPropHandleT<Vector2>> m_vec2Pph;
-    std::vector<OpenMesh::HPropHandleT<Vector3>> m_vec3Pph;
-    std::vector<OpenMesh::HPropHandleT<Vector4>> m_vec4Pph;
 
     friend class TMOperations;
 };

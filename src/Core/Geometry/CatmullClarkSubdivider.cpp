@@ -9,8 +9,7 @@ bool CatmullClarkSubdivider::prepare( TopologicalMesh& mesh ) {
     mesh.add_property( m_epH );
     mesh.add_property( m_fpH );
     mesh.add_property( m_creaseWeights );
-    mesh.createAllPropsOnFaces(
-        m_normalPropF, m_floatPropsF, m_vec2PropsF, m_vec3PropsF, m_vec4PropsF );
+    mesh.createAllPropsOnFaces( m_normalPropF );
     mesh.add_property( m_hV );
     for ( uint i = 0; i < mesh.n_halfedges(); ++i )
     {
@@ -30,7 +29,7 @@ bool CatmullClarkSubdivider::cleanup( TopologicalMesh& mesh ) {
     mesh.remove_property( m_epH );
     mesh.remove_property( m_fpH );
     mesh.remove_property( m_creaseWeights );
-    mesh.clearAllProps( m_normalPropF, m_floatPropsF, m_vec2PropsF, m_vec3PropsF, m_vec4PropsF );
+    mesh.clearAllProps( m_normalPropF );
     mesh.remove_property( m_hV );
     return true;
 }
@@ -78,8 +77,7 @@ bool CatmullClarkSubdivider::subdivide( TopologicalMesh& mesh,
 #pragma omp critical
             { m_newFaceVertexOps[iter].push_back( V_OPS( vh, ops ) ); }
             // deal with properties
-            mesh.interpolateAllPropsOnFaces(
-                fh, m_normalPropF, m_floatPropsF, m_vec2PropsF, m_vec3PropsF, m_vec4PropsF );
+            mesh.interpolateAllPropsOnFaces( fh, m_normalPropF );
         }
 
         // Compute position for new (edge-) vertices and store them in the edge property
@@ -200,8 +198,7 @@ void CatmullClarkSubdivider::split_face( TopologicalMesh& mesh,
     mesh.set_face_handle( hold, fh );
 
     // deal with properties for vh
-    mesh.copyAllPropsFromFace(
-        fh, hold, m_normalPropF, m_floatPropsF, m_vec2PropsF, m_vec3PropsF, m_vec4PropsF );
+    mesh.copyAllPropsFromFace( fh, hold, m_normalPropF );
 
     // go around new vertex to build topology
     hold = mesh.opposite_halfedge_handle( hold );
@@ -231,8 +228,7 @@ void CatmullClarkSubdivider::split_face( TopologicalMesh& mesh,
         mesh.set_next_halfedge_handle( hold, hh );
 
         // deal with properties for hnew
-        mesh.copyAllPropsFromFace(
-            fh, hnew, m_normalPropF, m_floatPropsF, m_vec2PropsF, m_vec3PropsF, m_vec4PropsF );
+        mesh.copyAllPropsFromFace( fh, hnew, m_normalPropF );
 
         // prepare for next face
         hh   = mesh.next_halfedge_handle( hnext );
