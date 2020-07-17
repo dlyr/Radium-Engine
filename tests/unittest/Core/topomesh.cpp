@@ -245,44 +245,36 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
     // Test for close mesh
     mesh            = Ra::Core::Geometry::makeBox();
     topologicalMesh = TopologicalMesh( mesh );
-    newMesh2        = topologicalMesh.toTriangleMeshFromWedges();
     newMesh         = topologicalMesh.toTriangleMesh();
     REQUIRE( isSameMesh( mesh, newMesh ) );
-    REQUIRE( isSameMesh( mesh, newMesh2 ) );
-    REQUIRE( isSameMeshWedge( mesh, newMesh2 ) );
+    REQUIRE( isSameMeshWedge( mesh, newMesh ) );
     REQUIRE( topologicalMesh.checkIntegrity() );
 
     mesh            = Ra::Core::Geometry::makeSharpBox();
     topologicalMesh = TopologicalMesh( mesh );
     newMesh         = topologicalMesh.toTriangleMesh();
-    newMesh2        = topologicalMesh.toTriangleMeshFromWedges();
     REQUIRE( isSameMesh( mesh, newMesh ) );
-    REQUIRE( isSameMesh( mesh, newMesh2 ) );
-    REQUIRE( isSameMeshWedge( mesh, newMesh2 ) );
+    REQUIRE( isSameMeshWedge( mesh, newMesh ) );
     REQUIRE( topologicalMesh.checkIntegrity() );
 
     // Test for mesh with boundaries
     mesh            = Ra::Core::Geometry::makePlaneGrid( 2, 2 );
     topologicalMesh = TopologicalMesh( mesh );
     newMesh         = topologicalMesh.toTriangleMesh();
-    newMesh2        = topologicalMesh.toTriangleMeshFromWedges();
     REQUIRE( isSameMesh( mesh, newMesh ) );
-    REQUIRE( isSameMesh( mesh, newMesh2 ) );
-    REQUIRE( isSameMeshWedge( mesh, newMesh2 ) );
+    REQUIRE( isSameMeshWedge( mesh, newMesh ) );
     REQUIRE( topologicalMesh.checkIntegrity() );
 
     mesh = Ra::Core::Geometry::makeCylinder( Vector3( 0, 0, 0 ), Vector3( 0, 0, 1 ), 1 );
 
     topologicalMesh = TopologicalMesh( mesh );
     newMesh         = topologicalMesh.toTriangleMesh();
-    newMesh2        = topologicalMesh.toTriangleMeshFromWedges();
     topologicalMesh.setWedgeData(
         TopologicalMesh::WedgeIndex {0}, "in_normal", Vector3( 0, 0, 0 ) );
     auto newMesh3 = topologicalMesh.toTriangleMeshFromWedges();
 
     REQUIRE( isSameMesh( mesh, newMesh ) );
-    REQUIRE( isSameMesh( mesh, newMesh2 ) );
-    REQUIRE( isSameMeshWedge( mesh, newMesh2 ) );
+    REQUIRE( isSameMeshWedge( mesh, newMesh ) );
     REQUIRE( !isSameMeshWedge( mesh, newMesh3 ) );
     REQUIRE( topologicalMesh.checkIntegrity() );
 
