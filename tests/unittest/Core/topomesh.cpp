@@ -255,21 +255,10 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
     using Ra::Core::Geometry::TriangleMesh;
 
     auto testConverter = []( const TriangleMesh& mesh ) {
-        auto topologicalMesh      = TopologicalMesh( mesh );
-        auto topologicalMeshWedge = TopologicalMesh {};
-        topologicalMeshWedge.initWithWedge( mesh );
-        auto newMeshWedge        = topologicalMesh.toTriangleMeshFromWedges();
-        auto newMesh             = topologicalMesh.toTriangleMesh();
-        auto newMeshWedgeWedge   = topologicalMeshWedge.toTriangleMeshFromWedges();
-        auto newMeshWedgeWithout = topologicalMeshWedge.toTriangleMesh();
+        auto topologicalMesh = TopologicalMesh( mesh );
+        auto newMesh         = topologicalMesh.toTriangleMesh();
         REQUIRE( isSameMesh( mesh, newMesh ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedge ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedgeWedge ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedgeWithout ) );
-        REQUIRE( isSameMeshWedge( mesh, newMeshWedge ) );
-        REQUIRE( isSameMeshWedge( mesh, newMeshWedgeWedge ) );
         REQUIRE( topologicalMesh.checkIntegrity() );
-        REQUIRE( topologicalMeshWedge.checkIntegrity() );
     };
 
     SECTION( "Closed mesh" ) {
@@ -329,53 +318,22 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         attrib4.unlock();
         attrib5.unlock();
 
-        auto topologicalMesh      = TopologicalMesh( mesh );
-        auto topologicalMeshWedge = TopologicalMesh {};
-        topologicalMeshWedge.initWithWedge( mesh );
-        auto newMesh             = topologicalMesh.toTriangleMesh();
-        auto newMeshWedge        = topologicalMesh.toTriangleMeshFromWedges();
-        auto newMeshWedgeWedge   = topologicalMeshWedge.toTriangleMeshFromWedges();
-        auto newMeshWedgeWithout = topologicalMeshWedge.toTriangleMesh();
+        auto topologicalMesh = TopologicalMesh( mesh );
+        auto newMesh         = topologicalMesh.toTriangleMesh();
         REQUIRE( isSameMesh( mesh, newMesh ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedge ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedgeWedge ) );
-        REQUIRE( isSameMesh( mesh, newMeshWedgeWithout ) );
-        REQUIRE( isSameMeshWedge( mesh, newMeshWedge ) );
-        REQUIRE( isSameMeshWedge( mesh, newMeshWedgeWedge ) );
         REQUIRE( topologicalMesh.checkIntegrity() );
-        REQUIRE( topologicalMeshWedge.checkIntegrity() );
 
         // oversize attrib not suported
         REQUIRE( !newMesh.hasAttrib( "vector5_attrib" ) );
-        REQUIRE( !newMeshWedge.hasAttrib( "vector5_attrib" ) );
-        REQUIRE( !newMeshWedgeWedge.hasAttrib( "vector5_attrib" ) );
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "vector5_attrib" ) );
 
         REQUIRE( newMesh.hasAttrib( "vector2_attrib" ) );
-        REQUIRE( newMeshWedge.hasAttrib( "vector2_attrib" ) );
-        REQUIRE( newMeshWedgeWedge.hasAttrib( "vector2_attrib" ) );
 
         REQUIRE( newMesh.hasAttrib( "vector4_attrib" ) );
-        REQUIRE( newMeshWedge.hasAttrib( "vector4_attrib" ) );
-        REQUIRE( newMeshWedgeWedge.hasAttrib( "vector4_attrib" ) );
-
-        // When init with wedge, and converted from propos (without wedges) wedge, attribs are lost.
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "vector2_attrib" ) );
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "vector4_attrib" ) );
 
         // empty attrib not converted
         REQUIRE( !newMesh.hasAttrib( "evector2_attrib" ) );
-        REQUIRE( !newMeshWedge.hasAttrib( "evector2_attrib" ) );
-        REQUIRE( !newMeshWedgeWedge.hasAttrib( "veector2_attrib" ) );
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "veector2_attrib" ) );
         REQUIRE( !newMesh.hasAttrib( "evector4_attrib" ) );
-        REQUIRE( !newMeshWedge.hasAttrib( "evector4_attrib" ) );
-        REQUIRE( !newMeshWedgeWedge.hasAttrib( "veector4_attrib" ) );
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "veector4_attrib" ) );
         REQUIRE( !newMesh.hasAttrib( "evector5_attrib" ) );
-        REQUIRE( !newMeshWedge.hasAttrib( "evector5_attrib" ) );
-        REQUIRE( !newMeshWedgeWedge.hasAttrib( "evector5_attrib" ) );
-        REQUIRE( !newMeshWedgeWithout.hasAttrib( "evector5_attrib" ) );
     }
 
     SECTION( "Edit topo mesh" ) {
@@ -383,14 +341,11 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
 
         auto topologicalMesh = TopologicalMesh( mesh );
         auto newMesh         = topologicalMesh.toTriangleMesh();
-        auto newMesh2        = topologicalMesh.toTriangleMeshFromWedges();
         topologicalMesh.setWedgeData(
             TopologicalMesh::WedgeIndex {0}, "in_normal", Vector3( 0, 0, 0 ) );
-        auto newMesh3 = topologicalMesh.toTriangleMeshFromWedges();
+        auto newMesh3 = topologicalMesh.toTriangleMesh();
 
         REQUIRE( isSameMesh( mesh, newMesh ) );
-        REQUIRE( isSameMesh( mesh, newMesh2 ) );
-        REQUIRE( isSameMeshWedge( mesh, newMesh2 ) );
         REQUIRE( !isSameMeshWedge( mesh, newMesh3 ) );
         REQUIRE( topologicalMesh.checkIntegrity() );
     }
@@ -398,17 +353,10 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
     SECTION( "Test skip empty attributes" ) {
         auto mesh = Ra::Core::Geometry::makeCylinder( Vector3( 0, 0, 0 ), Vector3( 0, 0, 1 ), 1 );
         mesh.addAttrib<float>( "empty" );
-        auto topologicalMesh      = TopologicalMesh( mesh );
-        auto topologicalMeshWedge = TopologicalMesh {};
-        topologicalMeshWedge.initWithWedge( mesh );
-        auto newMesh           = topologicalMesh.toTriangleMesh();
-        auto newMeshWedge      = topologicalMesh.toTriangleMeshFromWedges();
-        auto newMeshWedgeWedge = topologicalMeshWedge.toTriangleMeshFromWedges();
+        auto topologicalMesh = TopologicalMesh( mesh );
+        auto newMesh         = topologicalMesh.toTriangleMesh();
         REQUIRE( !newMesh.hasAttrib( "empty" ) );
-        REQUIRE( !newMeshWedge.hasAttrib( "empty" ) );
-        REQUIRE( !newMeshWedgeWedge.hasAttrib( "empty" ) );
         REQUIRE( topologicalMesh.checkIntegrity() );
-        REQUIRE( topologicalMeshWedge.checkIntegrity() );
     }
 
     /// \todo update to wedges
@@ -458,14 +406,8 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         mesh.setVertices( std::move( vertices ) );
         mesh.setIndices( std::move( indices ) );
         TopologicalMesh topo1 {mesh};
-        TopologicalMesh topo2;
-        topo2.initWithWedge( mesh );
-
         REQUIRE( topo1.checkIntegrity() );
-        REQUIRE( topo2.checkIntegrity() );
-
         TriangleMesh mesh1 = topo1.toTriangleMesh();
-        TriangleMesh mesh2 = topo2.toTriangleMeshFromWedges();
 
         // there is no normals at all.
         REQUIRE( !topo1.has_halfedge_normals() );
@@ -500,12 +442,9 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         REQUIRE( !topo1.has_halfedge_normals() );
 
         REQUIRE( mesh.vertexAttribs().hasSameAttribs( mesh1.vertexAttribs() ) );
-        REQUIRE( mesh.vertexAttribs().hasSameAttribs( mesh2.vertexAttribs() ) );
         REQUIRE( isSameMesh( mesh, mesh1 ) );
-        REQUIRE( isSameMesh( mesh, mesh2 ) );
 
         REQUIRE( mesh1.normals().size() == 0 );
-        REQUIRE( mesh2.normals().size() == 0 );
     }
 }
 
@@ -597,7 +536,6 @@ void test_poly() {
     polyMesh.setIndices( {quad, hepta, degen, degen2} );
 
     TopologicalMesh topologicalMesh;
-
     topologicalMesh.initWithWedge( polyMesh );
     auto newMesh = topologicalMesh.toPolyMeshFromWedges();
     REQUIRE( isSameMeshWedge( newMesh, polyMesh ) );
@@ -698,25 +636,12 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Manifold", "[Core][Core/Geometry][Topo
                                  MyNonManifoldCommand command ) {
             // test with functor
             TopologicalMesh topoWithCommand {candidateMesh, command};
-            TopologicalMesh topoWedgeWithCommand;
-            topoWedgeWithCommand.initWithWedge( candidateMesh, command );
-            auto convertedMeshWithCommand          = topoWithCommand.toTriangleMesh();
-            auto convertedMeshWithCommandFromWedge = topoWithCommand.toTriangleMeshFromWedges();
-            auto convertedMeshWedgeWithCommand = topoWedgeWithCommand.toTriangleMeshFromWedges();
+            auto convertedMeshWithCommand = topoWithCommand.toTriangleMesh();
             REQUIRE( isSameMesh( referenceMesh, convertedMeshWithCommand ) );
-            REQUIRE( isSameMesh( referenceMesh, convertedMeshWedgeWithCommand ) );
-            REQUIRE( isSameMesh( referenceMesh, convertedMeshWithCommandFromWedge ) );
             // test without functor
             TopologicalMesh topoWithoutCommand {candidateMesh};
-            TopologicalMesh topoWedgeWithoutCommand {};
-            topoWedgeWithoutCommand.initWithWedge( candidateMesh );
             auto convertedMeshWithoutCommand = topoWithoutCommand.toTriangleMesh();
-            auto convertedMeshWithoutCommandFromWedge =
-                topoWithoutCommand.toTriangleMeshFromWedges();
-            auto convertedMeshWedgeWithoutCommand = topoWedgeWithoutCommand.toTriangleMesh();
             REQUIRE( isSameMesh( referenceMesh, convertedMeshWithoutCommand ) );
-            REQUIRE( isSameMesh( referenceMesh, convertedMeshWedgeWithoutCommand ) );
-            REQUIRE( isSameMesh( referenceMesh, convertedMeshWithoutCommandFromWedge ) );
             return convertedMeshWithoutCommand;
         };
 
@@ -910,8 +835,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Initialization",
 TEST_CASE( "Core/Geometry/TopologicalMesh/MergeWedges", "[Core][Core/Geometry][TopologicalMesh]" ) {
 
     auto mesh = Ra::Core::Geometry::makeSharpBox();
-    auto topo = TopologicalMesh {};
-    topo.initWithWedge( mesh );
+    auto topo = TopologicalMesh {mesh};
 
     std::set<TopologicalMesh::WedgeIndex> wedgesIndices;
     for ( auto itr = topo.halfedges_begin(), stop = topo.halfedges_end(); itr != stop; ++itr )
