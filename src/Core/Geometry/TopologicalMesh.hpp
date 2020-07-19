@@ -109,8 +109,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note This is a costly operation.
      * \warning It uses the attributes defined on wedges
      */
-    TriangleMesh toTriangleMeshFromWedges();
-    PolyMesh toPolyMeshFromWedges();
+    PolyMesh toPolyMesh();
 
     /**
      * Update triangle mesh data, assuming the mesh and this topo mesh has the
@@ -157,7 +156,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * If you work with vertex normals, please call this function on all vertex
      * handles before convertion with toTriangleMesh.
      */
-    [[deprecated]] void propagate_normal_to_halfedges( VertexHandle vh );
+    void propagate_normal_to_wedges( VertexHandle vh );
 
     /**
      * Return a handle to the halfedge property storing vertices indices within
@@ -379,7 +378,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note f=0 correspond to halfedge_handle( eh, 0 ) (i.e. first vertex of
      * the edge)
      */
-    bool splitEdge( TopologicalMesh::EdgeHandle eh, Scalar f );
+    bool splitEdge( TopologicalMesh::EdgeHandle eh, Scalar f ) { return splitEdgeWedge( eh, f ); }
     bool splitEdgeWedge( TopologicalMesh::EdgeHandle eh, Scalar f );
 
     /**
@@ -605,6 +604,15 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
         /// \see TopologicalMesh::setWedgeData<T>
         template <typename T>
         inline bool setWedgeData( const WedgeIndex& idx, const std::string& name, const T& value );
+
+        /// change WedgeData member name to value.
+        /// wd is moidified accordingly.
+        /// \return false if name is not of type T
+        /// \retrun true on sucess
+        template <typename T>
+        inline bool
+        setWedgeAttrib( TopologicalMesh::WedgeData& wd, const std::string& name, const T& value );
+
         inline bool setWedgePosition( const WedgeIndex& idx, const Vector3& value );
         template <typename T>
         inline void setWedgeData( const TopologicalMesh::WedgeIndex& idx,
