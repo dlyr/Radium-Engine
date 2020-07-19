@@ -577,6 +577,26 @@ inline void TopologicalMesh::WedgeCollection::garbageCollection() {
                   m_data.end() );
 }
 
+template <typename T>
+inline bool TopologicalMesh::WedgeCollection::setWedgeAttrib( TopologicalMesh::WedgeData& wd,
+                                                              const std::string& name,
+                                                              const T& value ) {
+    auto nameArray = getNameArray<T>();
+    auto itr       = std::find( nameArray.begin(), nameArray.end(), name );
+    if ( itr != nameArray.end() )
+    {
+        auto attrIndex                    = std::distance( nameArray.begin(), itr );
+        wd.getAttribArray<T>()[attrIndex] = value;
+        return true;
+    }
+    else
+    {
+        LOG( logERROR ) << "Warning, set wedge: no wedge attrib named " << name << " of type "
+                        << typeid( T ).name();
+    }
+    return false;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////      WedgeData                //////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

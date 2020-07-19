@@ -123,7 +123,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note Asserts if vh is not a member of fh.
      */
     void set_normal( VertexHandle vh, FaceHandle fh, const Normal& n );
-
     /// Import Base definition of normal and set normal.
     ///@{
     using base::normal;
@@ -174,7 +173,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * Copy the normal property from \a input_heh to \a copy_heh.
      */
     inline void copyNormal( HalfedgeHandle input_heh, HalfedgeHandle copy_heh );
-
     /** Copy the face normal property \a fProp from \a fh to \a heh.
      * \note \a fProp must have been previously created through createNormalPropOnFaces().
      */
@@ -271,7 +269,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note Invalidates \a normalProp and clears the given property containers.
      */
     inline void clearAllProps( OpenMesh::FPropHandleT<Normal>& normalProp );
-
     /**
      * Copy all properties from \a input_heh to \a copy_heh.
      */
@@ -528,6 +525,15 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
         /// \see TopologicalMesh::setWedgeData<T>
         template <typename T>
         inline bool setWedgeData( const WedgeIndex& idx, const std::string& name, const T& value );
+
+        /// change WedgeData member name to value.
+        /// wd is moidified accordingly.
+        /// \return false if name is not of type T
+        /// \retrun true on sucess
+        template <typename T>
+        inline bool
+        setWedgeAttrib( TopologicalMesh::WedgeData& wd, const std::string& name, const T& value );
+
         inline bool setWedgePosition( const WedgeIndex& idx, const Vector3& value );
 
         // name is supposed to be unique within all attribs
