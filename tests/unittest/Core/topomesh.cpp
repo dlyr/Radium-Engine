@@ -343,10 +343,11 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         auto newMesh         = topologicalMesh.toTriangleMesh();
         topologicalMesh.setWedgeData(
             TopologicalMesh::WedgeIndex {0}, "in_normal", Vector3( 0, 0, 0 ) );
-        auto newMesh3 = topologicalMesh.toTriangleMesh();
+        auto newMeshModified = topologicalMesh.toTriangleMesh();
 
         REQUIRE( isSameMesh( mesh, newMesh ) );
-        REQUIRE( !isSameMeshWedge( mesh, newMesh3 ) );
+        REQUIRE( isSameMeshWedge( mesh, newMesh ) );
+        REQUIRE( !isSameMeshWedge( mesh, newMeshModified ) );
         REQUIRE( topologicalMesh.checkIntegrity() );
     }
 
@@ -359,8 +360,6 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         REQUIRE( topologicalMesh.checkIntegrity() );
     }
 
-    /// \todo update to wedges
-    /*
     SECTION( "Test normals" ) {
         auto mesh            = Ra::Core::Geometry::makeBox();
         auto topologicalMesh = TopologicalMesh( mesh );
@@ -377,7 +376,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
               v_it != topologicalMesh.vertices_end();
               ++v_it )
         {
-            topologicalMesh.propagate_normal_to_halfedges( *v_it );
+            topologicalMesh.propagate_normal_to_wedges( *v_it );
         }
 
         auto newMesh = topologicalMesh.toTriangleMesh();
@@ -395,7 +394,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
         REQUIRE( check2 );
         REQUIRE( topologicalMesh.checkIntegrity() );
     }
-    */
+
     SECTION( "Test without normals" ) {
         VectorArray<Vector3> vertices = {
             {0_ra, 0_ra, 0_ra}, {0_ra, 1_ra, 0_ra}, {1_ra, 1_ra, 0_ra}, {1_ra, 0_ra, 0_ra}};
@@ -420,7 +419,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
                 auto n = topo1.normal( *vitr, *fitr );
                 REQUIRE( Math::areApproxEqual( n.squaredNorm(), 0_ra ) );
             }
-            topo1.propagate_normal_to_halfedges( *vitr );
+            topo1.propagate_normal_to_wedges( *vitr );
             REQUIRE( !topo1.has_halfedge_normals() );
             REQUIRE( !topo1.has_face_normals() );
         }
@@ -537,7 +536,7 @@ void test_poly() {
 
     TopologicalMesh topologicalMesh;
     topologicalMesh.initWithWedge( polyMesh );
-    auto newMesh = topologicalMesh.toPolyMeshFromWedges();
+    auto newMesh = topologicalMesh.toPolyMesh();
     REQUIRE( isSameMeshWedge( newMesh, polyMesh ) );
 }
 
