@@ -183,10 +183,14 @@ inline void TopologicalMesh::set_normal( VertexHandle vh, FaceHandle fh, const N
     set_normal( halfedge_handle( vh, fh ), n );
 }
 
-inline void TopologicalMesh::propagate_normal_to_halfedges( VertexHandle vh ) {
+inline void TopologicalMesh::propagate_normal_to_wedges( VertexHandle vh ) {
     for ( VertexIHalfedgeIter vih_it = vih_iter( vh ); vih_it.is_valid(); ++vih_it )
     {
-        set_normal( *vih_it, normal( vh ) );
+        auto wd = getWedgeData( property( getWedgeIndexPph(), *vih_it ) );
+
+        m_wedges.setWedgeAttrib( wd, "in_normal", normal( vh ) );
+
+        replaceWedge( *vih_it, wd );
     }
 }
 

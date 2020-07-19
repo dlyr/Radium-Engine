@@ -301,7 +301,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh", "[Core][Core/Geometry][TopologicalMe
           v_it != topologicalMesh.vertices_end();
           ++v_it )
     {
-        topologicalMesh.propagate_normal_to_halfedges( *v_it );
+        topologicalMesh.propagate_normal_to_wedges( *v_it );
     }
 
     {

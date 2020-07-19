@@ -135,7 +135,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * If you work with vertex normals, please call this function on all vertex
      * handles before convertion with toTriangleMesh.
      */
-    void propagate_normal_to_halfedges( VertexHandle vh );
+    void propagate_normal_to_wedges( VertexHandle vh );
 
     /**
      * Return a handle to the halfedge property storing vertices indices within
@@ -351,7 +351,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note f=0 correspond to halfedge_handle( eh, 0 ) (i.e. first vertex of
      * the edge)
      */
-    bool splitEdge( TopologicalMesh::EdgeHandle eh, Scalar f );
+    bool splitEdge( TopologicalMesh::EdgeHandle eh, Scalar f ) { return splitEdgeWedge( eh, f ); }
     bool splitEdgeWedge( TopologicalMesh::EdgeHandle eh, Scalar f );
 
     /**
