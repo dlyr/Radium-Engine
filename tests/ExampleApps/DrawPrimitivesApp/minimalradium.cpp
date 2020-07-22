@@ -25,10 +25,9 @@
  * supported by Radium
  */
 
-namespace internal
-{
-Ra::Core::Vector3Array getPolyMeshVertices () {
-    return Ra::Core::Vector3Array ( {
+namespace internal {
+Ra::Core::Vector3Array getPolyMeshVertices() {
+    return Ra::Core::Vector3Array( {
         // quad
         {-1.1_ra, -0_ra, 0_ra},
         {1.1_ra, -0_ra, 0_ra},
@@ -55,11 +54,9 @@ Ra::Core::Vector3Array getPolyMeshVertices () {
     } );
 }
 
-Ra::Core::VectorNuArray
-getPolyMeshFaces ()
-{
+Ra::Core::VectorNuArray getPolyMeshFaces() {
     using VectorType = Eigen::Matrix<uint, Eigen::Dynamic, 1>;
-    auto quad = VectorType( 4 );
+    auto quad        = VectorType( 4 );
     quad << 0, 1, 2, 3;
     auto hepta = VectorType( 7 );
     hepta << 3, 2, 4, 5, 6, 7, 8;
@@ -581,7 +578,7 @@ void MinimalSystem::addComponent( Ra::Engine::Entity* ent, MinimalComponent* com
 
         GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
         Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
-                   Eigen::UniformScaling<Scalar>( 0.06_ra )};
+                                  Eigen::UniformScaling<Scalar>( 0.06_ra )};
         geometry.setFrame( tr );
         geometry.setVertices( internal::getPolyMeshVertices() );
         geometry.setFaces( internal::getPolyMeshFaces() );
