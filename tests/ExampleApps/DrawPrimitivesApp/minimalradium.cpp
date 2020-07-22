@@ -1,13 +1,16 @@
 
 #include <minimalradium.hpp>
 
+#include <Core/Asset/FileData.hpp>
 #include <Core/Containers/MakeShared.hpp>
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
 #include <Core/Utils/Timer.hpp>
 
+#include <Engine/Component/GeometryComponent.hpp>
 #include <Engine/FrameInfo.hpp>
+#include <Engine/Managers/EntityManager/EntityManager.hpp>
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
 #include <Engine/Renderer/Material/LambertianMaterial.hpp>
 #include <Engine/Renderer/Material/PlainMaterial.hpp>
@@ -18,10 +21,56 @@
 
 #include <random>
 
-/* This file contains a minimal radium/qt application which shows the
-classic "Spinning Cube" demo. */
+/* This file contains a minimal radium/qt application which shows the geometrical primitives
+ * supported by Radium
+ */
 
-/// This is a very basic component which holds a spinning cube.
+namespace internal
+{
+Ra::Core::Vector3Array getPolyMeshVertices () {
+    return Ra::Core::Vector3Array ( {
+        // quad
+        {-1.1_ra, -0_ra, 0_ra},
+        {1.1_ra, -0_ra, 0_ra},
+        {1_ra, 1_ra, 0_ra},
+        {-1_ra, 1_ra, 0_ra},
+        // hepta
+        {2_ra, 2_ra, 0_ra},
+        {2_ra, 3_ra, 0_ra},
+        {0_ra, 4_ra, 0_ra},
+        {-2_ra, 3_ra, 0_ra},
+        {-2_ra, 2_ra, 0_ra},
+        // degen
+        {-1.1_ra, -2_ra, 0_ra},
+        {-0.5_ra, -2_ra, 0_ra},
+        {-0.3_ra, -2_ra, 0_ra},
+        {0.0_ra, -2_ra, 0_ra},
+        {0.0_ra, -2_ra, 0_ra},
+        {0.3_ra, -2_ra, 0_ra},
+        {0.5_ra, -2_ra, 0_ra},
+        {1.1_ra, -2_ra, 0_ra},
+        // degen2
+        {-1_ra, -3_ra, 0_ra},
+        {1_ra, -3_ra, 0_ra},
+    } );
+}
+
+Ra::Core::VectorNuArray
+getPolyMeshFaces ()
+{
+    using VectorType = Eigen::Matrix<uint, Eigen::Dynamic, 1>;
+    auto quad = VectorType( 4 );
+    quad << 0, 1, 2, 3;
+    auto hepta = VectorType( 7 );
+    hepta << 3, 2, 4, 5, 6, 7, 8;
+    auto degen = VectorType( 10 );
+    degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
+    auto degen2 = VectorType( 10 );
+    degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
+
+    return Ra::Core::VectorNuArray( {quad, hepta, degen, degen2} );
+}
+} // namespace internal
 
 MinimalComponent::MinimalComponent( Ra::Engine::Entity* entity ) :
     Ra::Engine::Component( "Minimal Component", entity ) {}
@@ -482,32 +531,7 @@ void MinimalComponent::initialize() {
     //// PolyMesh ////
     {
         Ra::Core::Geometry::PolyMesh polyMesh;
-        polyMesh.setVertices( {
-            // quad
-            {-1.1_ra, -0_ra, 0_ra},
-            {1.1_ra, -0_ra, 0_ra},
-            {1_ra, 1_ra, 0_ra},
-            {-1_ra, 1_ra, 0_ra},
-            // hepta
-            {2_ra, 2_ra, 0_ra},
-            {2_ra, 3_ra, 0_ra},
-            {0_ra, 4_ra, 0_ra},
-            {-2_ra, 3_ra, 0_ra},
-            {-2_ra, 2_ra, 0_ra},
-            // degen
-            {-1.1_ra, -2_ra, 0_ra},
-            {-0.5_ra, -2_ra, 0_ra},
-            {-0.3_ra, -2_ra, 0_ra},
-            {0.0_ra, -2_ra, 0_ra},
-            {0.0_ra, -2_ra, 0_ra},
-            {0.3_ra, -2_ra, 0_ra},
-            {0.5_ra, -2_ra, 0_ra},
-            {1.1_ra, -2_ra, 0_ra},
-            // degen2
-            {-1_ra, -3_ra, 0_ra},
-            {1_ra, -3_ra, 0_ra},
-
-        } );
+        polyMesh.setVertices( internal::getPolyMeshVertices() );
 
         Vector3Array normals;
         normals.resize( polyMesh.vertices().size() );
@@ -518,15 +542,7 @@ void MinimalComponent::initialize() {
             []( const Vector3& v ) { return ( v + Vector3( 0_ra, 0_ra, 1_ra ) ).normalized(); } );
         polyMesh.setNormals( normals );
 
-        auto quad = VectorNui( 4 );
-        quad << 0, 1, 2, 3;
-        auto hepta = VectorNui( 7 );
-        hepta << 3, 2, 4, 5, 6, 7, 8;
-        auto degen = VectorNui( 10 );
-        degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
-        auto degen2 = VectorNui( 10 );
-        degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
-        polyMesh.setIndices( {quad, hepta, degen, degen2} );
+        polyMesh.setIndices( internal::getPolyMeshFaces() );
 
         std::shared_ptr<Ra::Engine::PolyMesh> poly1(
             new Ra::Engine::PolyMesh( "Poly", std::move( polyMesh ) ) );
@@ -558,4 +574,20 @@ void MinimalSystem::generateTasks( Ra::Core::TaskQueue* q, const Ra::Engine::Fra
 
 void MinimalSystem::addComponent( Ra::Engine::Entity* ent, MinimalComponent* comp ) {
     registerComponent( ent, comp );
+
+    //// POLYMESH FROM FILEDATA ////
+    {
+        using Ra::Core::Asset::GeometryData;
+
+        GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
+        Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
+                   Eigen::UniformScaling<Scalar>( 0.06_ra )};
+        geometry.setFrame( tr );
+        geometry.setVertices( internal::getPolyMeshVertices() );
+        geometry.setFaces( internal::getPolyMeshFaces() );
+
+        auto comp2 = new Ra::Engine::PolyMeshComponent( "GeometryComponent", ent, &geometry );
+        registerComponent( ent, comp2 );
+        comp2->initialize();
+    }
 }
