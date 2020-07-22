@@ -53,6 +53,50 @@ using namespace Ra::Engine::Scene;
  * supported by Radium
  */
 
+namespace internal {
+Ra::Core::Vector3Array getPolyMeshVertices() {
+    return Ra::Core::Vector3Array( {
+        // quad
+        {-1.1_ra, -0_ra, 0_ra},
+        {1.1_ra, -0_ra, 0_ra},
+        {1_ra, 1_ra, 0_ra},
+        {-1_ra, 1_ra, 0_ra},
+        // hepta
+        {2_ra, 2_ra, 0_ra},
+        {2_ra, 3_ra, 0_ra},
+        {0_ra, 4_ra, 0_ra},
+        {-2_ra, 3_ra, 0_ra},
+        {-2_ra, 2_ra, 0_ra},
+        // degen
+        {-1.1_ra, -2_ra, 0_ra},
+        {-0.5_ra, -2_ra, 0_ra},
+        {-0.3_ra, -2_ra, 0_ra},
+        {0.0_ra, -2_ra, 0_ra},
+        {0.0_ra, -2_ra, 0_ra},
+        {0.3_ra, -2_ra, 0_ra},
+        {0.5_ra, -2_ra, 0_ra},
+        {1.1_ra, -2_ra, 0_ra},
+        // degen2
+        {-1_ra, -3_ra, 0_ra},
+        {1_ra, -3_ra, 0_ra},
+    } );
+}
+
+Ra::Core::VectorNuArray getPolyMeshFaces() {
+    using VectorType = Eigen::Matrix<uint, Eigen::Dynamic, 1>;
+    auto quad        = VectorType( 4 );
+    quad << 0, 1, 2, 3;
+    auto hepta = VectorType( 7 );
+    hepta << 3, 2, 4, 5, 6, 7, 8;
+    auto degen = VectorType( 10 );
+    degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
+    auto degen2 = VectorType( 10 );
+    degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
+
+    return Ra::Core::VectorNuArray( {quad, hepta, degen, degen2} );
+}
+} // namespace internal
+
 MinimalComponent::MinimalComponent( Ra::Engine::Scene::Entity* entity ) :
     Ra::Engine::Scene::Component( "Minimal Component", entity ) {}
 
@@ -697,4 +741,22 @@ void MinimalSystem::generateTasks( Ra::Core::TaskQueue*, const Ra::Engine::Frame
 
 void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalComponent* comp ) {
     registerComponent( ent, comp );
+
+    //// POLYMESH FROM FILEDATA ////
+    /*  {
+          using Ra::Core::Asset::GeometryData;
+
+          GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
+          Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
+                                    Eigen::UniformScaling<Scalar>( 0.06_ra )};
+          geometry.setFrame( tr );
+          geometry.setVertices( internal::getPolyMeshVertices() );
+          geometry.setFaces( internal::getPolyMeshFaces() );
+
+          auto comp2 =
+              new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
+          registerComponent( ent, comp2 );
+          comp2->initialize();
+      }
+  */
 }
