@@ -1,0 +1,14 @@
+
+@import './common';
+@use 'node_modules/@material/button/mdc-button';
+@use 'node_modules/@material/button';
+
+.inverse {
+    background-color: $mdc-theme-primary;
+  color: white;
+}
+
+
+.foo-button {
+  @include button.container-fill-color(darksalmon);
+}
