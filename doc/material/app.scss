@@ -1,0 +1,15 @@
+@use "@material/theme" with (
+  $primary:       #fbc02d,
+  $on-primary:    #000000,
+  $secondary:	  #0097a7,
+  $on-secondary:  #ffffff,
+  $surface:       #FFFBFA,
+  $on-surface:    #000000,
+  $background:    #FFFFFF,
+);
+@use "material-components-web";
+
+@use '@material/button/mdc-button';
+@use '@material/button';
+@import "@material/typography/mdc-typography";
+

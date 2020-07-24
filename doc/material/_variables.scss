@@ -11,3 +11,14 @@ $primary-light:#fff263;
 $primary-dark:#c49000;
 $secondary-light:#56c8d8;
 $secondary-dark:#006978;
+
+@use "@material/theme" with (
+  $primary: $mdc-theme-primary,
+  $on-primary: $mdc-theme-on-primary,
+  $secondary:	    $mdc-theme-secondary,	   
+  $on-secondary:  $mdc-theme-on-secondary, 
+  $surface:	    $mdc-theme-surface,	   
+  $on-surface:    $mdc-theme-on-surface,   
+  $background:    $mdc-theme-background,   
+  $on-background: $mdc-theme-on-background,
+);
