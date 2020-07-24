@@ -97,8 +97,9 @@ if(DOXYGEN_FOUND)
     set( DOXYGEN_INTERACTIVE_SVG        "YES")
     set( DOXYGEN_TOC_INCLUDE_HEADINGS   "2")
     set( DOXYGEN_IMAGE_PATH             "${CMAKE_CURRENT_SOURCE_DIR}/images")
-    set( DOXYGEN_HTML_EXTRA_STYLESHEET  "${CMAKE_CURRENT_SOURCE_DIR}/my.css")
-    
+#    set( DOXYGEN_HTML_EXTRA_STYLESHEET  "${CMAKE_CURRENT_SOURCE_DIR}/my.css")
+    set( DOXYGEN_HTML_HEADER            "${CMAKE_CURRENT_SOURCE_DIR}/header.html")
+    set( DOXYGEN_HTML_EXTRA_FILES           "${CMAKE_CURRENT_SOURCE_DIR}/bundle.css; ${CMAKE_CURRENT_SOURCE_DIR}/bundle.js")
     doxygen_add_docs(RadiumDoc
         ${md_pages_order} ${md_files} ${RADIUM_SRC_DIR} ${CURRENT_SRC_DIR}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
