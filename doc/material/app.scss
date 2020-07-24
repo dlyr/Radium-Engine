@@ -11,5 +11,78 @@
 
 @use '@material/button/mdc-button';
 @use '@material/button';
+
+$mdc-theme-primary: #fbc02d;
+$mdc-theme-on-primary: #000000;
+$mdc-theme-secondary: #0097a7;
+$mdc-theme-on-secondary: #ffffff;
+$mdc-theme-surface: #FFFBFA;
+$mdc-theme-on-surface: #000000;
+$mdc-theme-background: #FFFFFF;
+$mdc-theme-on-background: #000000;
+
+$mdc-theme-primary-light:#fff263;
+$mdc-theme-primary-dark:#c49000;
+$mdc-theme-secondary-light:#56c8d8;
+$mdc-theme-secondary-dark:#006978;
+
+
 @import "@material/typography/mdc-typography";
 
+
+body{   
+    background-color: $mdc-theme-surface;
+}
+
+.content{
+    background-color: var(--mdc-theme-surface, #fff);
+    color: var(--mdc-theme-on-surface, #000);
+}
+
+#nav-tree{
+    background-color: var(--mdc-theme-primary-light, #fff);
+    color: var(--mdc-theme-on-primary-light, #000);
+}
+
+#main-nav{
+    border-top: 1px solid $mdc-theme-primary-light;
+    background-color: var(--mdc-theme-primary, #fff);
+    color: var(--mdc-theme-on-primary, #000);
+}
+
+div.header{
+    background-color: $mdc-theme-secondary;
+    color: $mdc-theme-on-secondary;
+}
+
+.sm-dox {
+    background-image: none;
+    background-color: var(--mdc-theme-primary, #fff); 
+}
+
+.navpath{
+    all:unset;
+    background-color: $mdc-theme-secondary;
+    color: $mdc-theme-on-secondary;
+}
+
+.navpath ul{
+    background-image:none;
+    background-color: $mdc-theme-primary;
+    color: $mdc-theme-on-primary;
+}
+
+#titlearea{
+    border-bottom: 1px solid $mdc-theme-primary-dark;
+}
+
+#selected{
+    background-image:none;
+        background-color: $mdc-theme-secondary;
+    color: $mdc-theme-on-secondary;
+}
+
+#selected a{
+    background-color: $mdc-theme-secondary;
+    color: $mdc-theme-on-secondary;
+}

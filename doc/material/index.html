@@ -1,88 +1,47 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"><head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=9">
-<meta name="generator" content="Doxygen 1.8.13">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen 1.8.17"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Radium Engine: Main Page</title>
-
-
-
-
-<link rel="stylesheet" href="bundle.css">
-
-  
-  <script src="bundle.js" async></script>
-
-
-  
-<script type="text/javascript" src="test_files/jquery.js"></script>
-<script type="text/javascript" src="test_files/dynsections.js"></script>
-<script type="text/javascript" src="test_files/resize.js"></script>
-<script type="text/javascript" src="test_files/navtreedata.js"></script>
-<script type="text/javascript" src="test_files/navtree.js"></script>
-
-
-
-
-<script type="text/javascript">
-  $(document).ready(initResizable);
-</script>
-
-
-<script type="text/javascript" src="test_files/searchdata.js"></script>
-<script type="text/javascript" src="test_files/search.js"></script>
-<script type="text/x-mathjax-config;executed=true">
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js", "TeX/AMSsymbols.js", "TeX/AMSmath.js"],
     jax: ["input/TeX","output/HTML-CSS"],
 });
-</script><script type="text/javascript" src="test_files/MathJax.js"></script><style type="text/css">.MathJax_Preview {color: #888}
-#MathJax_Message {position: fixed; left: 1px; bottom: 2px; background-color: #E6E6E6; border: 1px solid #959595; margin: 0px; padding: 2px 8px; z-index: 102; color: black; font-size: 80%; width: auto; white-space: nowrap}
-#MathJax_MSIE_Frame {position: absolute; top: 0; left: 0; width: 0px; z-index: 101; border: 0px; margin: 0px; padding: 0px}
-.MathJax_Error {color: #CC0000; font-style: italic}
-</style>
-<link href="test_files/doxygen.css" rel="stylesheet" type="text/css">
-<script id="navtreeindex18" type="text/javascript" src="test_files/navtreeindex18.js"></script><style type="text/css">#MathJax_About {position: fixed; left: 50%; width: auto; text-align: center; border: 3px outset; padding: 1em 2em; background-color: #DDDDDD; color: black; cursor: default; font-family: message-box; font-size: 120%; font-style: normal; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 15px; -webkit-border-radius: 15px; -moz-border-radius: 15px; -khtml-border-radius: 15px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
-#MathJax_About.MathJax_MousePost {outline: none}
-.MathJax_Menu {position: absolute; background-color: white; color: black; width: auto; padding: 5px 0px; border: 1px solid #CCCCCC; margin: 0; cursor: default; font: menu; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; z-index: 201; border-radius: 5px; -webkit-border-radius: 5px; -moz-border-radius: 5px; -khtml-border-radius: 5px; box-shadow: 0px 10px 20px #808080; -webkit-box-shadow: 0px 10px 20px #808080; -moz-box-shadow: 0px 10px 20px #808080; -khtml-box-shadow: 0px 10px 20px #808080; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
-.MathJax_MenuItem {padding: 1px 2em; background: transparent}
-.MathJax_MenuArrow {position: absolute; right: .5em; padding-top: .25em; color: #666666; font-size: .75em}
-.MathJax_MenuActive .MathJax_MenuArrow {color: white}
-.MathJax_MenuArrow.RTL {left: .5em; right: auto}
-.MathJax_MenuCheck {position: absolute; left: .7em}
-.MathJax_MenuCheck.RTL {right: .7em; left: auto}
-.MathJax_MenuRadioCheck {position: absolute; left: .7em}
-.MathJax_MenuRadioCheck.RTL {right: .7em; left: auto}
-.MathJax_MenuLabel {padding: 1px 2em 3px 1.33em; font-style: italic}
-.MathJax_MenuRule {border-top: 1px solid #DDDDDD; margin: 4px 3px}
-.MathJax_MenuDisabled {color: GrayText}
-.MathJax_MenuActive {background-color: #606872; color: white}
-.MathJax_MenuDisabled:focus, .MathJax_MenuLabel:focus {background-color: #E8E8E8}
-.MathJax_ContextMenu:focus {outline: none}
-.MathJax_ContextMenu .MathJax_MenuItem:focus {outline: none}
-#MathJax_AboutClose {top: .2em; right: .2em}
-.MathJax_Menu .MathJax_MenuClose {top: -10px; left: -10px}
-.MathJax_MenuClose {position: absolute; cursor: pointer; display: inline-block; border: 2px solid #AAA; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; font-family: 'Courier New',Courier; font-size: 24px; color: #F0F0F0}
-.MathJax_MenuClose span {display: block; background-color: #AAA; border: 1.5px solid; border-radius: 18px; -webkit-border-radius: 18px; -moz-border-radius: 18px; -khtml-border-radius: 18px; line-height: 0; padding: 8px 0 6px}
-.MathJax_MenuClose:hover {color: white!important; border: 2px solid #CCC!important}
-.MathJax_MenuClose:hover span {background-color: #CCC!important}
-.MathJax_MenuClose:hover:focus {outline: none}
-</style><style type="text/css">#MathJax_Zoom {position: absolute; background-color: #F0F0F0; overflow: auto; display: block; z-index: 301; padding: .5em; border: 1px solid black; margin: 0; font-weight: normal; font-style: normal; text-align: left; text-indent: 0; text-transform: none; line-height: normal; letter-spacing: normal; word-spacing: normal; word-wrap: normal; white-space: nowrap; float: none; -webkit-box-sizing: content-box; -moz-box-sizing: content-box; box-sizing: content-box; box-shadow: 5px 5px 15px #AAAAAA; -webkit-box-shadow: 5px 5px 15px #AAAAAA; -moz-box-shadow: 5px 5px 15px #AAAAAA; -khtml-box-shadow: 5px 5px 15px #AAAAAA; filter: progid:DXImageTransform.Microsoft.dropshadow(OffX=2, OffY=2, Color='gray', Positive='true')}
-#MathJax_ZoomOverlay {position: absolute; left: 0; top: 0; z-index: 300; display: inline-block; width: 100%; height: 100%; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
-#MathJax_ZoomFrame {position: relative; display: inline-block; height: 0; width: 0}
-#MathJax_ZoomEventTrap {position: absolute; left: 0; top: 0; z-index: 302; display: inline-block; border: 0; padding: 0; margin: 0; background-color: white; opacity: 0; filter: alpha(opacity=0)}
-</style></head>
-<body><div id="MathJax_Message" style="display: none;"></div>
+</script>
+<script type="text/javascript" async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" href="bundle.css" />
+<script src="bundle.js" async></script>
+      
+
+
+
+
+</head>
+<body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 <div id="titlearea">
 <table cellspacing="0" cellpadding="0">
  <tbody>
  <tr style="height: 56px;">
-  <td id="projectlogo"><img alt="Logo" src="test_files/radium-logo.png"></td>
+  <td id="projectlogo"><img alt="Logo" src="radium-logo.png"/></td>
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">Radium Engine
-   &nbsp;<span id="projectnumber">b68bd01333236424ca5e5301ef76780a95d83474</span>
+   &#160;<span id="projectnumber">7258033ade5b94f9b93639d1d0f84ed7338ac3d2</span>
    </div>
   </td>
  </tr>
@@ -90,44 +49,54 @@
 </table>
 </div>
 <!-- end header part -->
-<!-- Generated by Doxygen 1.8.13 -->
+<!-- Generated by Doxygen 1.8.17 -->
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 var searchBox = new SearchBox("searchBox", "search",false,'Search');
+/* @license-end */
 </script>
-<script type="text/javascript" src="test_files/menudata.js"></script>
-<script type="text/javascript" src="test_files/menu.js"></script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
 <script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
 $(function() {
   initMenu('',true,false,'search.php','Search');
   $(document).ready(function() { init_search(); });
 });
-</script>
-<div id="main-nav"><ul class="sm sm-dox" id="main-menu" data-smartmenus-id="15955397089057932"><li><a href="https://storm-irit.github.io/Radium-Engine/index.html">Main Page</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/pages.html">Related Pages</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespaces.html" class="has-submenu" id="sm-15955397089057932-1" aria-haspopup="true" aria-controls="sm-15955397089057932-2" aria-expanded="false"><span class="sub-arrow">+</span>Namespaces</a><ul id="sm-15955397089057932-2" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-1" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespaces.html">Namespace List</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers.html" class="has-submenu" id="sm-15955397089057932-3" aria-haspopup="true" aria-controls="sm-15955397089057932-4" aria-expanded="false"><span class="sub-arrow">+</span>Namespace Members</a><ul id="sm-15955397089057932-4" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-3" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers.html" class="has-submenu" id="sm-15955397089057932-5" aria-haspopup="true" aria-controls="sm-15955397089057932-6" aria-expanded="false"><span class="sub-arrow">+</span>All</a><ul id="sm-15955397089057932-6" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-5" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_b.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_c.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_d.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_e.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_f.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_g.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_h.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_i.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_k.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_l.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_m.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_n.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_o.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_p.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_q.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_r.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_s.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_t.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_u.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_v.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_w.html#index_w">w</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_z.html#index_z">z</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_0x7e.html#index_0x7e">~</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func.html" class="has-submenu" id="sm-15955397089057932-7" aria-haspopup="true" aria-controls="sm-15955397089057932-8" aria-expanded="false"><span class="sub-arrow">+</span>Functions</a><ul id="sm-15955397089057932-8" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-7" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_b.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_c.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_d.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_e.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_f.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_g.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_h.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_i.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_k.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_l.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_m.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_n.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_o.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_p.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_q.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_r.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_s.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_t.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_u.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_v.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_w.html#index_w">w</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_func_0x7e.html#index_0x7e">~</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html" class="has-submenu" id="sm-15955397089057932-9" aria-haspopup="true" aria-controls="sm-15955397089057932-10" aria-expanded="false"><span class="sub-arrow">+</span>Variables</a><ul id="sm-15955397089057932-10" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-9" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_vars.html#index_t">t</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html" class="has-submenu" id="sm-15955397089057932-11" aria-haspopup="true" aria-controls="sm-15955397089057932-12" aria-expanded="false"><span class="sub-arrow">+</span>Typedefs</a><ul id="sm-15955397089057932-12" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-11" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_type.html#index_w">w</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_enum.html">Enumerations</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/namespacemembers_eval.html">Enumerator</a></li></ul></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/annotated.html" class="has-submenu" id="sm-15955397089057932-13" aria-haspopup="true" aria-controls="sm-15955397089057932-14" aria-expanded="false"><span class="sub-arrow">+</span>Classes</a><ul id="sm-15955397089057932-14" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-13" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/annotated.html">Class List</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/classes.html">Class Index</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/inherits.html">Class Hierarchy</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions.html" class="has-submenu" id="sm-15955397089057932-15" aria-haspopup="true" aria-controls="sm-15955397089057932-16" aria-expanded="false"><span class="sub-arrow">+</span>Class Members</a><ul id="sm-15955397089057932-16" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-15" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions.html" class="has-submenu" id="sm-15955397089057932-17" aria-haspopup="true" aria-controls="sm-15955397089057932-18" aria-expanded="false"><span class="sub-arrow">+</span>All</a><ul id="sm-15955397089057932-18" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-17" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions.html#index_0x3a">:</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions__.html#index__">_</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_a.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_b.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_c.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_d.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_e.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_f.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_g.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_h.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_i.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_k.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_l.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_m.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_n.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_o.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_p.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_q.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_r.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_s.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_t.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_u.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_v.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_w.html#index_w">w</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_y.html#index_y">y</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_0x7e.html#index_0x7e">~</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func.html" class="has-submenu" id="sm-15955397089057932-19" aria-haspopup="true" aria-controls="sm-15955397089057932-20" aria-expanded="false"><span class="sub-arrow">+</span>Functions</a><ul id="sm-15955397089057932-20" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-19" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func.html#index__">_</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_a.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_b.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_c.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_d.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_e.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_f.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_g.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_h.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_i.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_k.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_l.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_m.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_n.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_o.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_p.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_q.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_r.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_s.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_t.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_u.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_v.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_w.html#index_w">w</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_y.html#index_y">y</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_func_0x7e.html#index_0x7e">~</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars.html" class="has-submenu" id="sm-15955397089057932-21" aria-haspopup="true" aria-controls="sm-15955397089057932-22" aria-expanded="false"><span class="sub-arrow">+</span>Variables</a><ul id="sm-15955397089057932-22" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-21" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_b.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_c.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_d.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_e.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_f.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_h.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_i.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_l.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_m.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_n.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_o.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_p.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_q.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_r.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_s.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_t.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_u.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_v.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_vars_w.html#index_w">w</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html" class="has-submenu" id="sm-15955397089057932-23" aria-haspopup="true" aria-controls="sm-15955397089057932-24" aria-expanded="false"><span class="sub-arrow">+</span>Typedefs</a><ul id="sm-15955397089057932-24" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-23" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_i">i</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_v">v</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_type.html#index_w">w</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_enum.html">Enumerations</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html" class="has-submenu" id="sm-15955397089057932-25" aria-haspopup="true" aria-controls="sm-15955397089057932-26" aria-expanded="false"><span class="sub-arrow">+</span>Enumerator</a><ul id="sm-15955397089057932-26" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-25" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_a">a</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_b">b</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_h">h</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_u">u</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_eval.html#index_v">v</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/functions_rela.html">Related Functions</a></li></ul></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/files.html" class="has-submenu" id="sm-15955397089057932-27" aria-haspopup="true" aria-controls="sm-15955397089057932-28" aria-expanded="false"><span class="sub-arrow">+</span>Files</a><ul id="sm-15955397089057932-28" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-27" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/files.html">File List</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html" class="has-submenu" id="sm-15955397089057932-29" aria-haspopup="true" aria-controls="sm-15955397089057932-30" aria-expanded="false"><span class="sub-arrow">+</span>File Members</a><ul id="sm-15955397089057932-30" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-29" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html" class="has-submenu" id="sm-15955397089057932-31" aria-haspopup="true" aria-controls="sm-15955397089057932-32" aria-expanded="false"><span class="sub-arrow">+</span>All</a><ul id="sm-15955397089057932-32" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-31" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_p">p</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_t">t</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals.html#index_u">u</a></li></ul></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_func.html">Functions</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_vars.html">Variables</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_type.html">Typedefs</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html" class="has-submenu" id="sm-15955397089057932-33" aria-haspopup="true" aria-controls="sm-15955397089057932-34" aria-expanded="false"><span class="sub-arrow">+</span>Macros</a><ul id="sm-15955397089057932-34" role="group" aria-hidden="true" aria-labelledby="sm-15955397089057932-33" aria-expanded="false"><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_c">c</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_d">d</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_e">e</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_f">f</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_g">g</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_k">k</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_l">l</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_m">m</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_n">n</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_o">o</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_q">q</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_r">r</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_s">s</a></li><li><a href="https://storm-irit.github.io/Radium-Engine/globals_defs.html#index_t">t</a></li></ul></li></ul></li></ul></li><li style="float:right"><div id="MSearchBox" class="MSearchBoxInactive"><span class="left"><img id="MSearchSelect" src="test_files/mag_sel.png" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()" alt=""><input type="text" id="MSearchField" value="Search" accesskey="S" onfocus="searchBox.OnSearchFieldFocus(true)" onblur="searchBox.OnSearchFieldFocus(false)" onkeyup="searchBox.OnSearchFieldChange(event)"></span><span class="right"><a id="MSearchClose" href="javascript:searchBox.CloseResultsWindow()"><img id="MSearchCloseImg" src="test_files/close.png" alt="" border="0"></a></span></div></li></ul></div>
+/* @license-end */</script>
+<div id="main-nav"></div>
 </div><!-- top -->
-<div id="side-nav" class="ui-resizable side-nav-resizable" style="width: 588px; height: 994px;">
-  <div id="nav-tree" style="height: 994px;">
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
     <div id="nav-tree-contents">
-      <div id="nav-sync" class="sync" style="top: 30px;"><img src="test_files/sync_on.png" title="click to disable panel synchronisation"></div>
-    <ul style="display: block;"><li><div class="item selected" id="selected"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 0px;">▼</span></a><span class="label"><a class="index.html" href="https://storm-irit.github.io/Radium-Engine/index.html">Radium Engine</a></span></div><ul class="children_ul" style=""><li><div class="item"><span class="arrow" style="width: 32px;">&nbsp;</span><span class="label"><a class="index.html:autotoc_md0" href="https://storm-irit.github.io/Radium-Engine/index.html#autotoc_md0">Badges</a></span></div></li><li><div class="item"><span class="arrow" style="width: 32px;">&nbsp;</span><span class="label"><a class="index.html:autotoc_md1" href="https://storm-irit.github.io/Radium-Engine/index.html#autotoc_md1">Overview</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="basicsmanual.html" href="https://storm-irit.github.io/Radium-Engine/basicsmanual.html">Radium Basics</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="conceptsmanual.html" href="https://storm-irit.github.io/Radium-Engine/conceptsmanual.html">Radium Concepts</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="develmanual.html" href="https://storm-irit.github.io/Radium-Engine/develmanual.html">Developer manual</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="licenses.html" href="https://storm-irit.github.io/Radium-Engine/licenses.html">Licenses</a></span></div></li><li><div class="item"><span class="arrow" style="width: 32px;">&nbsp;</span><span class="label"><a class="autotoc_md92.html" href="https://storm-irit.github.io/Radium-Engine/autotoc_md92.html">Timeline And Keyframes</a></span></div></li><li><div class="item"><span class="arrow" style="width: 32px;">&nbsp;</span><span class="label"><a class="todo.html" href="https://storm-irit.github.io/Radium-Engine/todo.html">Todo List</a></span></div></li><li><div class="item"><span class="arrow" style="width: 32px;">&nbsp;</span><span class="label"><a class="deprecated.html" href="https://storm-irit.github.io/Radium-Engine/deprecated.html">Deprecated List</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="nolink" href="javascript:void(0)">Namespaces</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="annotated.html" href="https://storm-irit.github.io/Radium-Engine/annotated.html">Classes</a></span></div></li><li><div class="item"><a href="javascript:void(0)"><span class="arrow" style="padding-left: 16px;">►</span></a><span class="label"><a class="nolink" href="javascript:void(0)">Files</a></span></div></li></ul></li></ul></div>
+      <div id="nav-sync" class="sync"></div>
+    </div>
   </div>
-  <div id="splitbar" style="-moz-user-select:none;" class="ui-resizable-handle">
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
   </div>
-<div class="ui-resizable-handle ui-resizable-e"></div><div class="ui-resizable-handle ui-resizable-s"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1001;"></div></div>
+</div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('index.html','');});
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('index.html',''); initResizable(); });
+/* @license-end */
 </script>
-<div id="doc-content" style="margin-left: 594px; height: 994px;">
+<div id="doc-content">
 <!-- window showing the filter options -->
-<div id="MSearchSelectWindow" onmouseover="return searchBox.OnSearchSelectShow()" onmouseout="return searchBox.OnSearchSelectHide()" onkeydown="return searchBox.OnSearchSelectKey(event)">
-<a class="SelectItem" onclick="searchBox.OnSelectItem(0)" href="javascript:void(0)"><span class="SelectionMark">•</span>All</a><a class="SelectItem" onclick="searchBox.OnSelectItem(1)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Classes</a><a class="SelectItem" onclick="searchBox.OnSelectItem(2)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Namespaces</a><a class="SelectItem" onclick="searchBox.OnSelectItem(3)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Files</a><a class="SelectItem" onclick="searchBox.OnSelectItem(4)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Functions</a><a class="SelectItem" onclick="searchBox.OnSelectItem(5)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Variables</a><a class="SelectItem" onclick="searchBox.OnSelectItem(6)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Typedefs</a><a class="SelectItem" onclick="searchBox.OnSelectItem(7)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Enumerations</a><a class="SelectItem" onclick="searchBox.OnSelectItem(8)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Enumerator</a><a class="SelectItem" onclick="searchBox.OnSelectItem(9)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Friends</a><a class="SelectItem" onclick="searchBox.OnSelectItem(10)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Macros</a><a class="SelectItem" onclick="searchBox.OnSelectItem(11)" href="javascript:void(0)"><span class="SelectionMark">&nbsp;</span>Pages</a></div>
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
 
 <!-- iframe showing the search results (closed by default) -->
 <div id="MSearchResultsWindow">
-<iframe src="javascript:void(0)" name="MSearchResults" id="MSearchResults" frameborder="0">
+<iframe src="javascript:void(0)" frameborder="0" 
+        name="MSearchResults" id="MSearchResults">
 </iframe>
 </div>
 
-<div class="header">
+<div class="PageDoc"><div class="header">
   <div class="headertitle">
 <div class="title">Radium Engine Documentation</div>  </div>
 </div><!--header-->
@@ -136,43 +105,34 @@ $(document).ready(function(){initNavTree('index.html','');});
 <p>The source code is hosted on github: <a href="https://github.com/STORM-IRIT/Radium-Engine">https://github.com/STORM-IRIT/Radium-Engine</a></p>
 <h1><a class="anchor" id="autotoc_md0"></a>
 Badges</h1>
-<table class="doxtable">
-<tbody><tr>
-<th>Status </th><th>Tool used  </th></tr>
-<tr>
-<td><div class="image">
-<img src="test_files/Radium-Engine.svg" alt="Build Status (linux-macosx)">
-</div>
- </td><td><a href="https://travis-ci.com/STORM-IRIT/Radium-Engine">CI on MacOSx and Linux with TravisCI</a> </td></tr>
-<tr>
-<td><div class="image">
-<img src="test_files/master.svg" alt="Build status(windows)">
-</div>
- </td><td><a href="https://ci.appveyor.com/project/nmellado/radium-engine/branch/master">CI on Windows with Appveyor</a> </td></tr>
-<tr>
-<td><div class="image">
-<img src="test_files/faf8701c9fb142f7b6215871ec40c5fe.svg" alt="Codacy Badge">
-</div>
-</td><td><a href="https://app.codacy.com/app/STORM/Radium-Engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=STORM-IRIT/Radium-Engine&amp;utm_campaign=Badge_Grade_Dashboard">Automated code review with codacy</a> </td></tr>
-</tbody></table>
+<table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadNone">Status </th><th class="markdownTableHeadNone">Tool used  </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><object type="image/svg+xml" data="https://travis-ci.com/STORM-IRIT/Radium-Engine.svg?branch=master" style="pointer-events: none;">Build Status (linux-macosx)</object> </td><td class="markdownTableBodyNone"><a href="https://travis-ci.com/STORM-IRIT/Radium-Engine">CI on MacOSx and Linux with TravisCI</a>  </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyNone"><img src="https://ci.appveyor.com/api/projects/status/y782apb6urx0krj3/branch/master?svg=true" alt="Build status(windows)" class="inline"/> </td><td class="markdownTableBodyNone"><a href="https://ci.appveyor.com/project/nmellado/radium-engine/branch/master">CI on Windows with Appveyor</a>  </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyNone"><img src="https://api.codacy.com/project/badge/Grade/faf8701c9fb142f7b6215871ec40c5fe" alt="Codacy Badge" class="inline"/> </td><td class="markdownTableBodyNone"><a href="https://app.codacy.com/app/STORM/Radium-Engine?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=STORM-IRIT/Radium-Engine&amp;utm_campaign=Badge_Grade_Dashboard">Automated code review with codacy</a>  </td></tr>
+</table>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Overview</h1>
 <p>See <a href="https://docs.google.com/presentation/d/12W2KXY7ctJXFIelmgNEn7obiBv_E4bmcMl3mXeJPVgc/edit?usp=sharing">this presentation</a> for an overview of the project.</p>
 <p>The documentation is structured as follow:</p><ul>
-<li><a class="el" href="https://storm-irit.github.io/Radium-Engine/basicsmanual.html">Radium Basics</a> : how to compile Radium and use it in your own project.</li>
-<li><a class="el" href="https://storm-irit.github.io/Radium-Engine/conceptsmanual.html">Radium Concepts</a> : high level concepts use in Radium Engine</li>
-<li><a class="el" href="https://storm-irit.github.io/Radium-Engine/develmanual.html">Developer manual</a> : general topics (e.g. coding conventions) and description of the concepts found in the API of Radium. </li>
+<li><a class="el" href="basicsmanual.html">Radium Basics</a> : how to compile Radium and use it in your own project.</li>
+<li><a class="el" href="conceptsmanual.html">Radium Concepts</a> : high level concepts use in Radium Engine</li>
+<li><a class="el" href="develmanual.html">Developer manual</a> : general topics (e.g. coding conventions) and description of the concepts found in the API of Radium. </li>
 </ul>
-</div></div><!-- contents -->
+</div></div><!-- PageDoc -->
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Jul 23 2020 20:20:43 for Radium Engine by
+    <li class="footer">Generated on Wed Jul 22 2020 16:21:02 for Radium Engine by
     <a href="http://www.doxygen.org/index.html">
-    <img class="footer" src="test_files/doxygen.png" alt="doxygen"></a> 1.8.13 </li>
+    <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.17 </li>
   </ul>
 </div>
-
-
-</body></html>
+</body>
+</html>
