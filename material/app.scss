@@ -11,6 +11,7 @@
 
 @use '@material/button/mdc-button';
 @use '@material/button';
+@use "@material/ripple";
 
 $mdc-theme-primary: #fbc02d;
 $mdc-theme-on-primary: #000000;
@@ -46,16 +47,32 @@ body{
 
 #main-nav{
     border-top: 1px solid $mdc-theme-primary-light;
-    background-color: var(--mdc-theme-primary, #fff);
+    background-color: #f00;
     color: var(--mdc-theme-on-primary, #000);
 }
 
+#main-nav > li {
+    border-top: 1px solid $mdc-theme-primary-light;
+    background-color:  #f00;
+    color: var(--mdc-theme-on-primary, #000);
+}
+
+li .item {
+    @include ripple.surface;
+    @include ripple.radius-bounded;
+    @include ripple.states-base-color(black);
+    @include ripple.states-opacities((hover: .1, focus: .3, press: .4));
+    border-top: 1px solid $mdc-theme-primary-light;
+    color: var(--mdc-theme-on-primary, #000);
+}
 div.header{
     background-color: $mdc-theme-secondary;
     color: $mdc-theme-on-secondary;
 }
 
 .sm-dox {
+    @include ripple.radius-bounded;
+    @include ripple.states;
     background-image: none;
     background-color: var(--mdc-theme-primary, #fff); 
 }
