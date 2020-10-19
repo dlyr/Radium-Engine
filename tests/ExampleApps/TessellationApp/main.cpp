@@ -37,6 +37,15 @@ int main( int argc, char* argv[] ) {
     auto c = new Ra::Engine::TriangleMeshComponent( "Cube Mesh", e, std::move( cube ), nullptr );
     //! [Create a geometry component with the cube]
 
+    //! [Register the entity/component association to the geometry system ]
+    auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
+    geometrySystem->addComponent( e, c );
+    //! [Register the entity/component association to the geometry system ]
+
+    //! [Tell the window that something is to be displayed]
+    app.m_mainWindow->postLoadFile( "Cube" );
+    //! [Tell the window that something is to be displayed]
+
     c->getDisplayable()->setRenderMode( Ra::Engine::AttribArrayDisplayable::RM_PATCHES );
     auto renderObject =
         Ra::Engine::RadiumEngine::getInstance()->getRenderObjectManager()->getRenderObject(
@@ -51,6 +60,7 @@ int main( int argc, char* argv[] ) {
     configuration1.addShader( Ra::Engine::ShaderType_TESS_CONTROL, resDir + ".tcs.glsl" );
     configuration1.addShader( Ra::Engine::ShaderType_TESS_EVALUATION, resDir + ".tes.glsl" );
     configuration1.addShader( Ra::Engine::ShaderType_VERTEX, resDir + ".vert.glsl" );
+    configuration1.addShader( Ra::Engine::ShaderType_GEOMETRY, resDir + ".geom.glsl" );
     configuration1.addShader( Ra::Engine::ShaderType_FRAGMENT, resDir + ".frag.glsl" );
     renderTechnique->setConfiguration( configuration1, DefaultRenderingPasses::LIGHTING_OPAQUE );
 
@@ -58,19 +68,9 @@ int main( int argc, char* argv[] ) {
     configuration0.addShader( Ra::Engine::ShaderType_TESS_CONTROL, resDir + ".tcs.glsl" );
     configuration0.addShader( Ra::Engine::ShaderType_TESS_EVALUATION, resDir + ".tes.glsl" );
     configuration0.addShader( Ra::Engine::ShaderType_VERTEX, resDir + ".vert.glsl" );
+    configuration0.addShader( Ra::Engine::ShaderType_GEOMETRY, resDir + ".geom.glsl" );
     configuration0.addShader( Ra::Engine::ShaderType_FRAGMENT, resDir + "ZPrePass.frag.glsl" );
     renderTechnique->setConfiguration( configuration0, DefaultRenderingPasses::Z_PREPASS );
-
-    renderTechnique->updateGL();
-    //! [Register the entity/component association to the geometry system ]
-    auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
-    geometrySystem->addComponent( e, c );
-    //! [Register the entity/component association to the geometry system ]
-
-    //! [Tell the window that something is to be displayed]
-    app.m_mainWindow->postLoadFile( "Cube" );
-    //! [Tell the window that something is to be displayed]
-
     // terminate the app after 4 second (approximatively). Camera can be moved using mouse moves.
     //  auto close_timer = new QTimer( &app );
     // close_timer->setInterval( 4000 );

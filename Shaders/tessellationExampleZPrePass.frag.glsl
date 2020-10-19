@@ -10,7 +10,7 @@ layout( location = 3 ) out vec4 out_specular;
 
 //------------------- main ---------------------
 void main() {
-
+    
     // Discard non fully opaque fragments
     vec4 bc = getBaseColor( material, getPerVertexTexCoord() );
     if ( toDiscard( material, bc ) ) discard;

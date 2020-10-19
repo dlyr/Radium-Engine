@@ -8,12 +8,20 @@
 
 layout( location = 5 ) in vec3 in_viewVector;
 layout( location = 6 ) in vec3 in_lightVector;
+layout( location = 7 ) in vec3 g_patchDistance;
+layout( location = 8 ) in vec3 g_dist;
 
 out vec4 fragColor;
 
 // -----------------------------------------------------------
 
+float line( vec3 dist, float w ) {
+ float d = min( min( dist.x, dist.y ), dist.z );
+ return smoothstep( 0., 0.01, d - w );
+}
+
 void main() {
+
     // discard non opaque fragment
     vec4 bc = getDiffuseColor( material, getPerVertexTexCoord() );
 
@@ -47,4 +55,8 @@ void main() {
     vec3 bsdf         = evaluateBSDF( material, getPerVertexTexCoord(), lightDir, viewDir );
     vec3 contribution = lightContributionFrom( light, getWorldSpacePosition().xyz );
     fragColor         = vec4( bsdf * contribution, 1.0 );
+
+    float d1  = line(g_dist, 0.01);
+    float d2  = line(g_patchDistance, 0.02);
+    fragColor = vec4( bsdf * contribution*d1*d2, 1. );
 }

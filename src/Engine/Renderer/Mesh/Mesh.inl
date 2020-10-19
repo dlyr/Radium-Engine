@@ -155,10 +155,12 @@ void IndexedAttribArrayDisplayable<I>::render( const ShaderProgram* prog ) {
     {
         autoVertexAttribPointer( prog );
         m_vao->bind();
+        if ( m_renderMode == RM_PATCHES ) glPatchParameteri( GL_PATCH_VERTICES, 3 );
         m_vao->drawElements( static_cast<GLenum>( m_renderMode ),
                              GLsizei( m_numElements ),
                              GL_UNSIGNED_INT,
                              nullptr );
+
         m_vao->unbind();
     }
 }
@@ -450,6 +452,7 @@ void IndexedGeometry<T>::render( const ShaderProgram* prog ) {
         GL_CHECK_ERROR;
         base::m_vao->bind();
         GL_CHECK_ERROR;
+        if ( base::m_renderMode == base::RM_PATCHES ) glPatchParameteri( GL_PATCH_VERTICES, 3 );
         base::m_vao->drawElements( static_cast<GLenum>( base::m_renderMode ),
                                    GLsizei( m_numElements ),
                                    GL_UNSIGNED_INT,

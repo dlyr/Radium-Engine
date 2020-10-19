@@ -105,10 +105,12 @@ RenderTechnique::getParametersProvider( Core::Utils::Index pass ) const {
 }
 
 void RenderTechnique::updateGL() {
+
     for ( auto p = Index( 0 ); p < m_numActivePass; ++p )
     {
         if ( hasConfiguration( p ) && ( ( nullptr == m_activePasses[p].second ) || isDirty( p ) ) )
         {
+            LOG( logDEBUG2 ) << m_activePasses[p].first.getName();
             m_activePasses[p].second =
                 ShaderProgramManager::getInstance()->getShaderProgram( m_activePasses[p].first );
             clearDirty( p );

@@ -6,62 +6,69 @@ layout( triangles, equal_spacing ) in;
 // Shader
 #include "DefaultLight.glsl"
 
-in vec3 tes_position[];
-in vec3 tes_normal[];
-in vec3 tes_texcoord[];
-in vec3 tes_vertexcolor[];
-in vec3 tes_tangent[];
-in vec3 tes_viewVector[];
-in vec3 tes_lightVector[];
+in vec3 tcs_position[];
+in vec3 tcs_normal[];
+in vec3 tcs_tangent[];
+in vec3 tcs_bitangent[];
+in vec3 tcs_texcoord[];
+in vec4 tcs_color[];
 
 uniform Transform transform;
 
-layout( location = 0 ) out vec3 out_position;
-layout( location = 1 ) out vec3 out_normal;
-layout( location = 2 ) out vec3 out_texcoord;
-layout( location = 3 ) out vec3 out_vertexcolor;
-layout( location = 4 ) out vec3 out_tangent;
-layout( location = 5 ) out vec3 out_viewVector;
-layout( location = 6 ) out vec3 out_lightVector;
+layout( location = 0 ) out vec3 tes_position;
+layout( location = 1 ) out vec3 tes_normal;
+layout( location = 2 ) out vec3 tes_texcoord;
+layout( location = 3 ) out vec3 tes_vertexcolor;
+layout( location = 4 ) out vec3 tes_tangent;
+layout( location = 5 ) out vec3 tes_viewVector;
+layout( location = 6 ) out vec3 tes_lightVector;
+layout( location = 7 ) out vec3 tes_patchDistance;
 
 vec3 lerp3D( vec3 v0, vec3 v1, vec3 v2 ) {
     return vec3( gl_TessCoord.x ) * v0 + vec3( gl_TessCoord.y ) * v1 + vec3( gl_TessCoord.z ) * v2;
 }
 
-
-vec3 lerp3D( vec3 v0, vec3 v1, vec3 v2 ) {
-    return vec3( gl_TessCoord.x ) * v0 + vec3( gl_TessCoord.y ) * v1 + vec3( gl_TessCoord.z ) * v2;
+in gl_PerVertex {
+    vec4 gl_Position;
+    float gl_PointSize;
+    float gl_ClipDistance[];
 }
+gl_in[gl_MaxPatchVertices];
 
+out gl_PerVertex {
+    vec4 gl_Position;
+    float gl_PointSize;
+    float gl_ClipDistance[];
+};
 
 void main() {
 
     mat4 mvp = transform.proj * transform.view * transform.model;
 
-    vec3 in_position  = lerp3D( tes_position[0], tes_position[1], tes_position[2] );
-    vec3 in_normal    = lerp3D( tes_normal[0], tes_normal[1], tes_normal[2] );
-    vec3 in_tangent   = lerp3D( tes_tangent[0], tes_tangent[1], tes_tangent[2] );
-    vec3 in_bitangent = lerp3D( tes_bitangent[0], tes_bitangent[1], tes_bitangent[2] );
-    vec3 in_texcoord  = lerp3D( tes_texcoord[0], tes_texcoord[1], tes_texcoord[2] );
-    vec3 in_color     = lerp3D( tes_color[0].rgb, tes_color[1].rgb, tes_color[2].rgb );
+    vec3 interp_position  = lerp3D( tcs_position[0], tcs_position[1], tcs_position[2] );
+    gl_Position        = mvp * vec4( interp_position, 1. );
+    vec3 interp_normal    = lerp3D( tcs_normal[0], tcs_normal[1], tcs_normal[2] );
+    vec3 interp_tangent   = lerp3D( tcs_tangent[0], tcs_tangent[1], tcs_tangent[2] );
+    vec3 interp_bitangent = lerp3D( tcs_bitangent[0], tcs_bitangent[1], tcs_bitangent[2] );
+    vec3 interp_texcoord  = lerp3D( tcs_texcoord[0], tcs_texcoord[1], tcs_texcoord[2] );
+    vec3 interp_color     = lerp3D( tcs_color[0].rgb, tcs_color[1].rgb, tcs_color[2].rgb );
 
-    gl_Position = mvp * vec4( lerp3D( tes_position[0], tes_position[1], tes_position[2] ), 1.0 );
-
-    vec4 pos = transform.model * vec4( in_position, 1.0 );
+    vec4 pos = transform.model * vec4( interp_position, 1.0 );
     pos /= pos.w;
 
-    vec3 normal  = mat3( transform.worldNormal ) * in_normal;
-    vec3 tangent = mat3( transform.model ) * in_tangent;
+    vec3 normal  = mat3( transform.worldNormal ) * interp_normal;
+    vec3 tangent = mat3( transform.model ) * interp_tangent;
 
     vec3 eye = -transform.view[3].xyz * mat3( transform.view );
 
-    out_position = vec3( pos );
-    out_texcoord = in_texcoord;
+    tes_position = vec3( pos );
+    tes_texcoord = interp_texcoord;
 
-    out_normal  = normal;
-    out_tangent = tangent;
+    tes_normal  = normal;
+    tes_tangent = tangent;
 
-    out_viewVector  = vec3( eye - out_position );
-    out_lightVector = getLightDirection( light, out_position );
-    out_vertexcolor = in_color.rgb;
+    tes_viewVector    = vec3( eye - interp_position );
+    tes_lightVector   = getLightDirection( light, interp_position );
+    tes_vertexcolor   = interp_color.rgb;
+    tes_patchDistance = gl_TessCoord;
 }
