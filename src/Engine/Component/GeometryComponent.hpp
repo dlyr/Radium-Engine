@@ -35,7 +35,8 @@ class RA_ENGINE_API GeometryComponent : public Component
     //    void setDeformable( bool b );
 
     /// Returns the index of the associated RO (the display mesh)
-    //    Ra::Core::Utils::Index getRenderObjectIndex() const;
+    Ra::Core::Utils::Index getRenderObjectIndex() const { return m_roIndex; }
+
   protected:
     const std::string& getContentName() const { return m_contentName; }
 

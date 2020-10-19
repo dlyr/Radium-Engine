@@ -135,7 +135,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     class AttribObserver
     {
       public:
-        explicit AttribObserver( AttribArrayDisplayable* displayable, int idx ) :
+        explicit AttribObserver( AttribArrayDisplayable* displayable, unsigned int idx ) :
             m_displayable( displayable ), m_idx( idx ) {}
         void operator()() {
             if ( m_idx < m_displayable->m_dataDirty.size() )
@@ -149,7 +149,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
 
       private:
         AttribArrayDisplayable* m_displayable;
-        int m_idx;
+        unsigned int m_idx;
     };
 
   protected:

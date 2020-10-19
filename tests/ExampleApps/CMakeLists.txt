@@ -29,6 +29,7 @@ add_dependencies(${PROJECT_NAME} CoreExampleApp)
 find_package(Qt5 COMPONENTS Core Widgets OpenGL Xml REQUIRED)
 find_package(OpenGL REQUIRED)
 set(CMAKE_AUTOMOC ON)
+
 add_executable(HelloRadium MACOSX_BUNDLE
     HelloRadium/main.cpp)
 target_include_directories(HelloRadium PRIVATE HelloRadium)
@@ -77,3 +78,17 @@ add_dependencies(${PROJECT_NAME} SimpleAnimationApp)
 message(STATUS " Installing SimpleAnimationApp into ${CMAKE_INSTALL_PREFIX}")
 configure_radium_app(NAME SimpleAnimationApp)
 #endif ()
+
+
+
+add_executable(TessellationApp MACOSX_BUNDLE
+    TessellationApp/main.cpp)
+target_include_directories(TessellationApp PRIVATE TessellationApp)
+target_link_libraries(TessellationApp PUBLIC
+    Core Engine GuiBase
+    Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Xml
+    OpenGL::GL)
+add_dependencies(${PROJECT_NAME} TessellationApp)
+message(STATUS " Installing TessellationApp into ${CMAKE_INSTALL_PREFIX}")
+configure_radium_app(NAME TessellationApp)
+
