@@ -59,4 +59,5 @@ void main() {
     float d1  = line(g_dist, 0.01);
     float d2  = line(g_patchDistance, 0.02);
     fragColor = vec4( bsdf * contribution*d1*d2, 1. );
+    fragColor = vec4( g_patchDistance, 1.);
 }

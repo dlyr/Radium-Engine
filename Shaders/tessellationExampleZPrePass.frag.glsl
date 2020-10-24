@@ -24,4 +24,5 @@ void main() {
     out_normal  = vec4( normalWorld * 0.5 + 0.5, 1.0 );
     out_diffuse = vec4( bc.xyz, 1.0 );
     out_specular = vec4( getSpecularColor( material, getPerVertexTexCoord() ), 1.0 );
+    out_ambient = vec4(0.);
 }

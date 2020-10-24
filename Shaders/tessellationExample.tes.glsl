@@ -1,4 +1,15 @@
-layout( triangles, equal_spacing ) in;
+// layout( triangles, equal_spacing ) in;
+layout( triangles, fractional_odd_spacing ) in;
+// layout( triangles, fractional_even_spacing ) in;
+// he TES has options that control the spacing between tessellated vertices of the abstract patch.
+// The possible values for this are:
+//
+//     equal_spacing: There will be equal distances between vertices in the abstract patch.
+//     fractional_even_spacing: There will always be an even number of segments. Two of the segments
+//     will grow and shrink based on how close the tessellation level is to generating more
+//     vertices. fractional_odd_spacing: As even-spacing, but there will always be an odd number of
+//     segments.
+//
 
 #include "TransformStructs.glsl"
 
@@ -46,12 +57,14 @@ void main() {
     mat4 mvp = transform.proj * transform.view * transform.model;
 
     vec3 interp_position  = lerp3D( tcs_position[0], tcs_position[1], tcs_position[2] );
-    gl_Position        = mvp * vec4( interp_position, 1. );
+    //  gl_Position           = mvp * vec4( 0.1 * normalize( interp_position ), 1. );
+
     vec3 interp_normal    = lerp3D( tcs_normal[0], tcs_normal[1], tcs_normal[2] );
     vec3 interp_tangent   = lerp3D( tcs_tangent[0], tcs_tangent[1], tcs_tangent[2] );
     vec3 interp_bitangent = lerp3D( tcs_bitangent[0], tcs_bitangent[1], tcs_bitangent[2] );
     vec3 interp_texcoord  = lerp3D( tcs_texcoord[0], tcs_texcoord[1], tcs_texcoord[2] );
     vec3 interp_color     = lerp3D( tcs_color[0].rgb, tcs_color[1].rgb, tcs_color[2].rgb );
+    interp_position += cos(gl_TessCoord.x*10.)*interp_normal*0.01;
 
     vec4 pos = transform.model * vec4( interp_position, 1.0 );
     pos /= pos.w;
@@ -71,4 +84,6 @@ void main() {
     tes_lightVector   = getLightDirection( light, interp_position );
     tes_vertexcolor   = interp_color.rgb;
     tes_patchDistance = gl_TessCoord;
+    gl_Position           = mvp * vec4( interp_position, 1. );
+
 }
