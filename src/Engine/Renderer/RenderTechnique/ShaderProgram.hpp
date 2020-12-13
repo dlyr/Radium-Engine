@@ -46,6 +46,9 @@ class RA_ENGINE_API ShaderProgram final
     template <typename T>
     void setUniform( const char* name, const T& value ) const;
 
+    template <typename T>
+    void setUniform( int location, const T& value ) const;
+
     void setUniform( const char* name, Texture* tex, int texUnit ) const;
 
     //! use automatic texture unit computation

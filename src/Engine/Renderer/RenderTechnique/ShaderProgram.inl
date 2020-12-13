@@ -28,5 +28,10 @@ inline void ShaderProgram::setUniform( const char* name, const T& value ) const 
     m_program->setUniform<T>( name, value );
 }
 
+template <typename T>
+inline void ShaderProgram::setUniform( int location, const T& value ) const {
+    m_program->setUniform<T>( location, value );
+}
+
 } // namespace Engine
 } // namespace Ra

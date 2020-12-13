@@ -344,6 +344,7 @@ template <>
 void ShaderProgram::setUniform( const char* name, const Core::Matrix4d& value ) const {
     m_program->setUniform( name, value.cast<float>().eval() );
 }
+
 void ShaderProgram::setUniform( const char* name, Texture* tex, int texUnit ) const {
     tex->bind( texUnit );
 
