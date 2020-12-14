@@ -18,12 +18,8 @@ Depending on you needs, you may want to:
 
 ## Badges
 
-[![CI badge linux](https://byob.yarr.is/STORM-IRIT/Radium-Engine/ubuntu-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
-[![CI badge macos](https://byob.yarr.is/STORM-IRIT/Radium-Engine/macos-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
-[![CI badge windows](https://byob.yarr.is/STORM-IRIT/Radium-Engine/windows-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
-[![source format badge](https://byob.yarr.is/STORM-IRIT/Radium-Engine/format)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/test.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/format.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/ubuntu-latest.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/macos-latest.json)
-![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/windows-latest.json)
+![CI linux badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/ubuntu-latest.json)
+![CI macos badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/macos-latest.json)
+![CI windows  badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/windows-latest.json)
+![source format badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/format.json)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/faf8701c9fb142f7b6215871ec40c5fe)](https://app.codacy.com/app/STORM/Radium-Engine?utm_source=github.com&utm_medium=referral&utm_content=STORM-IRIT/Radium-Engine&utm_campaign=Badge_Grade_Dashboard)
