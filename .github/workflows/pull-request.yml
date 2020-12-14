@@ -155,7 +155,7 @@ jobs:
             echo 
 
       - name: Badge
-        if: ${{ failure() && github.event.push }}
+        if: ${{ failure() &&  github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
@@ -166,7 +166,7 @@ jobs:
           namedLogo: C++
           color: CC1B1B
       - name: Badge
-        if: ${{ success() && github.event.push }}
+        if: ${{ success() &&  github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
