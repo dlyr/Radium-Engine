@@ -6,11 +6,12 @@ Devopped and maintained by the [STORM research group](https://www.irit.fr/STORM/
 The source code is hosted on github: https://github.com/STORM-IRIT/Radium-Engine
 
 # Badges
-   Status     |    Tool used
-------------- | -------------
-![Build Status (linux-macosx)](https://travis-ci.com/STORM-IRIT/Radium-Engine.svg?branch=master)  | [CI on MacOSx and Linux with TravisCI](https://travis-ci.com/STORM-IRIT/Radium-Engine)
-![Build status(windows)](https://ci.appveyor.com/api/projects/status/y782apb6urx0krj3/branch/master?svg=true) | [CI on Windows with Appveyor](https://ci.appveyor.com/project/nmellado/radium-engine/branch/master)
-![Codacy Badge](https://api.codacy.com/project/badge/Grade/faf8701c9fb142f7b6215871ec40c5fe)| [Automated code review with codacy](https://app.codacy.com/app/STORM/Radium-Engine?utm_source=github.com&utm_medium=referral&utm_content=STORM-IRIT/Radium-Engine&utm_campaign=Badge_Grade_Dashboard)
+
+[![CI badge linux](https://byob.yarr.is/STORM-IRIT/Radium-Engine/ubuntu-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
+[![CI badge macos](https://byob.yarr.is/STORM-IRIT/Radium-Engine/macos-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
+[![CI badge windows](https://byob.yarr.is/STORM-IRIT/Radium-Engine/windows-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
+[![source format badge](https://byob.yarr.is/STORM-IRIT/Radium-Engine/format)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/faf8701c9fb142f7b6215871ec40c5fe)](https://app.codacy.com/app/STORM/Radium-Engine?utm_source=github.com&utm_medium=referral&utm_content=STORM-IRIT/Radium-Engine&utm_campaign=Badge_Grade_Dashboard)
 
 # Overview
 
