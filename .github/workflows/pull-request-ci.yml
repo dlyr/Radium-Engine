@@ -65,7 +65,7 @@ jobs:
 #          path: ${{ matrix.config.os }}.txt
       - name: Badge
 #        if: ${{ success() && github.event.pull_request.merged }}
-        if: ${{ success() }}
+        if: ${{ failure() }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
@@ -90,7 +90,7 @@ jobs:
           logoColor: white
           color: 1BCC1B              
       - name: Badge
-        if: ${{ success() && github.event.pull_request.merged }}
+        if: ${{ failure() && github.event.pull_request.merged }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
