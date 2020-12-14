@@ -23,6 +23,7 @@ Depending on you needs, you may want to:
 [![CI badge windows](https://byob.yarr.is/STORM-IRIT/Radium-Engine/windows-latest)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
 [![source format badge](https://byob.yarr.is/STORM-IRIT/Radium-Engine/format)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Update+badges+on+master%22)
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/test.json)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/format.json)
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/ubuntu-latest.json)
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/macos-latest.json)
 ![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/dlyr/41fbddac0a090d541dac83c587681892/raw/windows-latest.json)
