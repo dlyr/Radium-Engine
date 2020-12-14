@@ -149,7 +149,7 @@ jobs:
             echo 
       - name: Badge
  #       if: ${{ failure() && github.event.pull_request.merged }}
-        if: ${{  github.event.pull_request.merged }}
+        if: ${{  !github.event.pull_request.merged }}
         uses: RubbaBoy/BYOB@v1.1.0
         with:
           NAME: format
@@ -159,7 +159,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Badge
 #        if: ${{ success() && !github.event.pull_request.merged }}
-        if: ${{ !github.event.pull_request.merged }}
+        if: ${{ github.event.pull_request.merged }}
         uses: RubbaBoy/BYOB@v1.1.0
         with:
           NAME: format
@@ -168,3 +168,12 @@ jobs:
           COLOR: 1BCC1B
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           
+      - name: b2
+        uses: schneegans/dynamic-badges-action@v1.0.0
+        with:
+          auth: ${{ secrets.GIST_BADGES_SECRET }}
+          gistID: 41fbddac0a090d541dac83c587681892
+          filename: test.json
+          label: Hello
+          message: World
+          color: orange

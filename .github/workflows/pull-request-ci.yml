@@ -98,7 +98,7 @@ jobs:
         run: |
           echo "::set-output name=STATUS::`cat status/${{ matrix.config.os }}.txt`"
       - name: Badge
-        if: ${{  steps.badgestatus.outputs.STATUS == 'passing' }}
+        if: ${{  steps.badgestatus.outputs.STATUS == 'passing' && github.event.pull_request.merged }}
         uses: RubbaBoy/BYOB@v1.1.0
         with:
           NAME: ${{matrix.config.os}}
@@ -107,7 +107,7 @@ jobs:
           COLOR: 1BCC1B
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Badge
-        if: ${{  steps.badgestatus.outputs.STATUS == 'failing' }}
+        if: ${{  steps.badgestatus.outputs.STATUS == 'failing' && github.event.pull_request.merged}}
         uses: RubbaBoy/BYOB@v1.1.0
         with:
           NAME: ${{matrix.config.os}}
