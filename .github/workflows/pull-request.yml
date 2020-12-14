@@ -158,7 +158,7 @@ jobs:
           filename: format.json
           label: format
           message: 'not conform'
-          namedLogo: cplusplus
+          namedLogo: C++
           color: CC1B1B
       - name: Badge
 #        if: ${{ success() && github.event.pull_request.merged }}
@@ -170,5 +170,5 @@ jobs:
           filename: format.json
           label: format
           message: conform
-          namedLogo: cplusplus
+          namedLogo: C++
           color: 1BCC1B
