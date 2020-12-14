@@ -71,7 +71,7 @@ jobs:
 #          name: status
 #          path: ${{ matrix.config.os }}.txt
       - name: Update badge on merge (failure)
-        if: ${{ failure() && github.event.pull_request.merged }}
+        if: ${{ failure() && github.event.push }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
@@ -83,7 +83,7 @@ jobs:
           logoColor: white
           color: CC1B1B
       - name: Update badge on merge (success)
-        if: ${{ success() && github.event.pull_request.merged }}
+        if: ${{ success() && github.event.push }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
@@ -118,7 +118,7 @@ jobs:
 #        run: |
 #          echo "::set-output name=STATUS::`cat status/${{ matrix.config.os }}.txt`"
 #      - name: Badge
-##        if: ${{ success() && github.event.pull_request.merged }}
+##        if: ${{ success() && github.event.pull_request. }}
 #        if: ${{ success() }}
 #        uses: schneegans/dynamic-badges-action@v1.0.0
 #        with:

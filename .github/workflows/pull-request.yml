@@ -155,9 +155,8 @@ jobs:
             echo 
 
       - name: Badge
-        #       if: ${{ failure() && github.event.pull_request.merged }}
+        if: ${{ failure() && github.event.push }}
         uses: schneegans/dynamic-badges-action@v1.0.0
-        if: ${{ failure() }}
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
           gistID: 41fbddac0a090d541dac83c587681892
@@ -167,8 +166,7 @@ jobs:
           namedLogo: C++
           color: CC1B1B
       - name: Badge
-        #        if: ${{ success() && github.event.pull_request.merged }}
-        if: ${{ success() }}
+        if: ${{ success() && github.event.push }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
