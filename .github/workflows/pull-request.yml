@@ -147,3 +147,24 @@ jobs:
             echo git reset --hard gh-formatter
             echo git push
             echo 
+      - name: Badge
+ #       if: ${{ failure() && github.event.pull_request.merged }}
+        if: ${{  github.event.pull_request.merged }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: format
+          LABEL: 'format'
+          STATUS: "not conform"
+          COLOR: CC1B1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Badge
+#        if: ${{ success() && !github.event.pull_request.merged }}
+        if: ${{ !github.event.pull_request.merged }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: format
+          LABEL: 'format'
+          STATUS: "conform"
+          COLOR: 1BCC1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
