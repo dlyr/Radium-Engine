@@ -134,14 +134,6 @@ jobs:
         run: |
           echo "::set-output name=STATUS::`cat status/${{ matrix.config.os }}.txt`"
       - name: Badge
-        uses: RubbaBoy/BYOB@v1.1.0
-        with:
-          NAME: arg
-          LABEL: 'CI ${{ matrix.config.name }}'
-          STATUS: '${{ steps.badgestatus.outputs.STATUS }}'
-          COLOR: 1BCC1B
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Badge
         if: ${{  steps.badgestatus.outputs.STATUS == 'passing' }}
         uses: RubbaBoy/BYOB@v1.1.0
         with:
