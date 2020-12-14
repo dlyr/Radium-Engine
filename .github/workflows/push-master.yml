@@ -1,0 +1,161 @@
+name: Update badges on master
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+  push:
+    branches:
+      - 'master'
+      
+jobs:
+  format:
+    name: Source code format
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@master
+      - name: Check coding style
+        id: format-check
+        uses: DoozyX/clang-format-lint-action@v0.6
+        with:
+          source: '.'
+          exclude: './tests/external ./external'
+          extensions: 'hpp,inl,cpp,glsl'
+          clangFormatVersion: 9
+          style: file
+      - name: Badge
+        if: ${{ failure() }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: format
+          LABEL: 'format'
+          STATUS: "not conform"
+          COLOR: CC1B1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Badge
+        if: ${{ success() }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: format
+          LABEL: 'format'
+          STATUS: "conform"
+          COLOR: 1BCC1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+  build:
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Windows MSVC", os: windows-latest, cc: "cl.exe", cxx: "cl.exe", assimp: "OFF" }
+          - { name: "Ubuntu gcc", os: ubuntu-latest, cc: "gcc", cxx: "g++", assimp: "ON" }
+          - { name: "MacOS clang", os: macos-latest, cc: "clang", cxx: "clang++", assimp: "ON" }
+    steps:
+      - uses: seanmiddleditch/gha-setup-ninja@master
+
+      - name: Add msbuild to PATH
+        uses: seanmiddleditch/gha-setup-vsdevenv@master
+        if: runner.os == 'Windows'
+ 
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          cached: false
+      - name: Prepare directories
+        run: |
+          mkdir -p install/
+          mkdir -p src/Radium-Engine
+          mkdir -p build/Radium-Engine
+         
+      - name: Checkout remote head
+        uses: actions/checkout@master
+        with:
+          path: src/Radium-Engine
+
+      - name: Configure Radium
+        run: |
+          cd build/Radium-Engine
+          cmake ../../src/Radium-Engine -GNinja -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../install/ -DRADIUM_IO_ASSIMP=${{ matrix.config.assimp }} -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DRADIUM_UPDATE_VERSION=OFF -DRADIUM_EXTERNAL_CMAKE_INSTALL_MESSAGE=LAZY
+ 
+      - name: Build Radium
+        run: |
+          cd build/Radium-Engine
+          cmake --build . --parallel --config Release --target install
+ 
+      - name: Run unit tests
+        if: runner.os != 'Windows'
+        run: |
+          cd build/Radium-Engine
+          cmake --build . --parallel --config Release --target check
+
+      - name: Store status
+        shell: bash
+        if: ${{ failure() }}
+        run: |
+          echo "failing" > ${{ matrix.config.os }}.txt
+      - name: Store status
+        shell: bash
+        if: ${{ success() }}
+        run: |
+          echo "passing" > ${{ matrix.config.os }}.txt
+      - name: Save upload url for next step
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v1
+        with:
+          name: status
+          path: ${{ matrix.config.os }}.txt
+          
+    
+  badges:
+    name: Updage badges
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      # prevent git pull push race
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Windows MSVC", os: windows-latest, cc: "cl.exe", cxx: "cl.exe", assimp: "OFF" }
+          - { name: "Ubuntu gcc", os: ubuntu-latest, cc: "gcc", cxx: "g++", assimp: "ON" }
+          - { name: "MacOS clang", os: macos-latest, cc: "clang", cxx: "clang++", assimp: "ON" }
+    steps:
+      - name: Load artifacts from build
+        uses: actions/download-artifact@v1
+        with:
+          name: status
+      - id: badgestatus
+        run: |
+          echo "::set-output name=STATUS::`cat status/${{ matrix.config.os }}.txt`"
+      - name: Badge
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: arg
+          LABEL: 'CI ${{ matrix.config.name }}'
+          STATUS: '${{ steps.badgestatus.outputs.STATUS }}'
+          COLOR: 1BCC1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Badge
+        if: ${{  steps.badgestatus.outputs.STATUS == 'passing' }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: ${{matrix.config.os}}
+          LABEL: 'CI ${{ matrix.config.name }}'
+          STATUS: 'passing'
+          COLOR: 1BCC1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Badge
+        if: ${{  steps.badgestatus.outputs.STATUS == 'failing' }}
+        uses: RubbaBoy/BYOB@v1.1.0
+        with:
+          NAME: ${{matrix.config.os}}
+          LABEL: 'CI ${{ matrix.config.name }}'
+          STATUS: 'failing'
+          COLOR: CC1B1B
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
