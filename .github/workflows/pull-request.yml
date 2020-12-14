@@ -10,6 +10,7 @@ on:
 
 jobs:
   hitory:
+    if: ${{ github.event_name != 'push' }}
     name: Check linear history
     runs-on: ubuntu-latest
     steps:
