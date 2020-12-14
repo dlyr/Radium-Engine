@@ -3,8 +3,9 @@ name: Compile and Test Radium libraries
 defaults:
   run:
     shell: bash
-
-on: [pull_request]
+on: 
+  pull_request:
+    types: [opened, closed]
 
 jobs:
   build:
