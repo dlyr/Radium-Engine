@@ -115,6 +115,7 @@ jobs:
   badges:
     name: Updage badges
     needs: build
+    if: always()
     runs-on: ubuntu-latest
     strategy:
       # prevent git pull push race
