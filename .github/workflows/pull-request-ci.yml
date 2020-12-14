@@ -64,51 +64,25 @@ jobs:
 #        with:
 #          name: status
 #          path: ${{ matrix.config.os }}.txt
-      - name: Badge
-#        if: ${{ success() && github.event.pull_request.merged }}
-        if: ${{ failure() }}
-        uses: schneegans/dynamic-badges-action@v1.0.0
-        with:
-          auth: ${{ secrets.GIST_BADGES_SECRET }}
-          gistID: 41fbddac0a090d541dac83c587681892
-          filename: "${{ matrix.config.os }}.json"
-          label: CI
-          message: 'falling'
-          namedLogo: ${{ matrix.config.icon }}
-          logoColor: white
-          color: CC1B1B
-      - name: Badge
-#        if: ${{ success() && github.event.pull_request.merged }}
-        if: ${{ success() }}
-        uses: schneegans/dynamic-badges-action@v1.0.0
-        with:
-          auth: ${{ secrets.GIST_BADGES_SECRET }}
-          gistID: 41fbddac0a090d541dac83c587681892
-          filename: "${{ matrix.config.os }}.json"
-          label: CI
-          message: 'passing'
-          namedLogo: ${{ matrix.config.icon }}
-          logoColor: white
-          color: 1BCC1B              
-      - name: Badge
+      - name: Update badge on merge (failure)
         if: ${{ failure() && github.event.pull_request.merged }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
           gistID: 41fbddac0a090d541dac83c587681892
-          filename: "merge-${{ matrix.config.os }}.json"
+          filename: "${{ matrix.config.os }}.json"
           label: CI
           message: 'falling'
           namedLogo: ${{ matrix.config.icon }}
           logoColor: white
           color: CC1B1B
-      - name: Badge
+      - name: Update badge on merge (success)
         if: ${{ success() && github.event.pull_request.merged }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
           gistID: 41fbddac0a090d541dac83c587681892
-          filename: "merge-${{ matrix.config.os }}.json"
+          filename: "${{ matrix.config.os }}.json"
           label: CI
           message: 'passing'
           namedLogo: ${{ matrix.config.icon }}
