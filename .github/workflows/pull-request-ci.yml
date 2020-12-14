@@ -34,19 +34,19 @@ jobs:
         uses: actions/checkout@master
         with:
           path: src/Radium-Engine
-      - name: Configure Radium
-        run: |
-          cd build/Radium-Engine
-          cmake ../../src/Radium-Engine -GNinja -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../install/ -DRADIUM_IO_ASSIMP=${{ matrix.config.assimp }} -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DRADIUM_UPDATE_VERSION=OFF -DRADIUM_EXTERNAL_CMAKE_INSTALL_MESSAGE=LAZY
-      - name: Build Radium
-        run: |
-          cd build/Radium-Engine
-          cmake --build . --parallel --config Release --target install
-      - name: Run unit tests
-        if: runner.os != 'Windows'
-        run: |
-          cd build/Radium-Engine
-          cmake --build . --parallel --config Release --target check
+#      - name: Configure Radium
+#        run: |
+#          cd build/Radium-Engine
+#          cmake ../../src/Radium-Engine -GNinja -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../install/ -DRADIUM_IO_ASSIMP=${{ matrix.config.assimp }} -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DRADIUM_UPDATE_VERSION=OFF -DRADIUM_EXTERNAL_CMAKE_INSTALL_MESSAGE=LAZY
+#      - name: Build Radium
+#        run: |
+#          cd build/Radium-Engine
+#          cmake --build . --parallel --config Release --target install
+#      - name: Run unit tests
+#        if: runner.os != 'Windows'
+#        run: |
+#          cd build/Radium-Engine
+#          cmake --build . --parallel --config Release --target check
       - name: Store failure status
         shell: bash
         if: ${{ failure() }}
