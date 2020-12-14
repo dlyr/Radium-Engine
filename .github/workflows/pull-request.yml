@@ -149,7 +149,8 @@ jobs:
             echo 
 
       - name: Badge
- #       if: ${{ failure() && github.event.pull_request.merged }}
+        #       if: ${{ failure() && github.event.pull_request.merged }}
+        uses: schneegans/dynamic-badges-action@v1.0.0
         if: ${{ failure() }}
         with:
           auth: ${{ secrets.GIST_BADGES_SECRET }}
