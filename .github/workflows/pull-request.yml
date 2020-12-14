@@ -148,7 +148,7 @@ jobs:
             echo git push
             echo 
 
-     - name: Badge
+      - name: Badge
  #       if: ${{ failure() && github.event.pull_request.merged }}
         if: ${{ failure() }}
         with:
