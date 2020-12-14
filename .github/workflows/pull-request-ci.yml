@@ -16,53 +16,43 @@ jobs:
           - { name: "Windows MSVC", os: windows-latest, cc: "cl.exe", cxx: "cl.exe", assimp: "OFF" }
           - { name: "Ubuntu gcc", os: ubuntu-latest, cc: "gcc", cxx: "g++", assimp: "ON" }
           - { name: "MacOS clang", os: macos-latest, cc: "clang", cxx: "clang++", assimp: "ON" }
-
     steps:
       - uses: seanmiddleditch/gha-setup-ninja@master
- 
       - name: Add msbuild to PATH
         uses: seanmiddleditch/gha-setup-vsdevenv@master
         if: runner.os == 'Windows'
- 
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
         with:
           cached: false
- 
       - name: Prepare directories
         run: |
           mkdir -p install/
           mkdir -p src/Radium-Engine
           mkdir -p build/Radium-Engine
-          
       - name: Checkout remote head
         uses: actions/checkout@master
         with:
           path: src/Radium-Engine
- 
       - name: Configure Radium
         run: |
           cd build/Radium-Engine
           cmake ../../src/Radium-Engine -GNinja -DCMAKE_CXX_COMPILER=${{ matrix.config.cxx }} -DCMAKE_C_COMPILER=${{ matrix.config.cc }} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=../../install/ -DRADIUM_IO_ASSIMP=${{ matrix.config.assimp }} -DCMAKE_EXECUTE_PROCESS_COMMAND_ECHO=STDOUT -DRADIUM_UPDATE_VERSION=OFF -DRADIUM_EXTERNAL_CMAKE_INSTALL_MESSAGE=LAZY
- 
       - name: Build Radium
         run: |
           cd build/Radium-Engine
           cmake --build . --parallel --config Release --target install
- 
       - name: Run unit tests
         if: runner.os != 'Windows'
         run: |
           cd build/Radium-Engine
           cmake --build . --parallel --config Release --target check
- 
-
-      - name: Store status
+      - name: Store failure status
         shell: bash
         if: ${{ failure() }}
         run: |
           echo "failing" > ${{ matrix.config.os }}.txt
-      - name: Store status
+      - name: Store success status
         shell: bash
         if: ${{ success() }}
         run: |
@@ -73,8 +63,20 @@ jobs:
         with:
           name: status
           path: ${{ matrix.config.os }}.txt
-          
-    
+      - name: Badge test
+        if: ${{ always() }}
+        uses: schneegans/dynamic-badges-action@v1.0.0
+        with:
+          auth: ${{ secrets.GIST_BADGES_SECRET }}
+          gistID: 41fbddac0a090d541dac83c587681892
+          filename: "test-${{ matrix.config.os }}.json"
+          label: CI
+          message: 'passing'
+          namedLogo: ${{ matrix.config.icon }}
+          logoColor: white
+          color: 1BCC1B
+              
+
   badges:
     name: Updage badges
     needs: build
@@ -108,6 +110,7 @@ jobs:
           label: CI
           message: 'falling'
           namedLogo: ${{ matrix.config.icon }}
+          logoColor: white
           color: CC1B1B
       - name: Badge
 #        if: ${{ success() && github.event.pull_request.merged }}
@@ -120,5 +123,6 @@ jobs:
           label: CI
           message: 'passing'
           namedLogo: ${{ matrix.config.icon }}
+          logoColor: white
           color: 1BCC1B
           
