@@ -161,7 +161,7 @@ jobs:
           namedLogo: C++
           color: CC1B1B
       - name: Badge
-#        if: ${{ success() && github.event.pull_request.merged }}
+        #        if: ${{ success() && github.event.pull_request.merged }}
         if: ${{ success() }}
         uses: schneegans/dynamic-badges-action@v1.0.0
         with:
