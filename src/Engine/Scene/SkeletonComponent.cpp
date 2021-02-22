@@ -15,10 +15,10 @@
 #include <Engine/Data/BlinnPhongMaterial.hpp>
 #include <Engine/Data/Mesh.hpp>
 #include <Engine/Data/ShaderConfigFactory.hpp>
-#include <Engine/Scene/ComponentMessenger.hpp>
 #include <Engine/Rendering/RenderObject.hpp>
 #include <Engine/Rendering/RenderObjectManager.hpp>
 #include <Engine/Rendering/RenderTechnique.hpp>
+#include <Engine/Scene/ComponentMessenger.hpp>
 
 using KeyFramedValue = Ra::Core::Animation::KeyFramedValue<Ra::Core::Transform>;
 
@@ -34,9 +34,9 @@ namespace Ra {
 namespace Engine {
 namespace Scene {
 
-std::shared_ptr<Data::Mesh> SkeletonComponent::s_boneMesh{nullptr};
-std::shared_ptr<Data::BlinnPhongMaterial> SkeletonComponent::s_boneMaterial{nullptr};
-std::shared_ptr<Rendering::RenderTechnique> SkeletonComponent::s_boneRenderTechnique{nullptr};
+std::shared_ptr<Data::Mesh> SkeletonComponent::s_boneMesh {nullptr};
+std::shared_ptr<Data::BlinnPhongMaterial> SkeletonComponent::s_boneMaterial {nullptr};
+std::shared_ptr<Rendering::RenderTechnique> SkeletonComponent::s_boneRenderTechnique {nullptr};
 
 SkeletonComponent::SkeletonComponent( const std::string& name, Entity* entity ) :
     Component( name, entity ) {}
@@ -65,8 +65,8 @@ void SkeletonComponent::setTransform( const Ra::Core::Utils::Index& roIdx,
     const Ra::Core::Transform& TBoneLocal =
         m_skel.getTransform( boneIdx, Ra::Core::Animation::HandleArray::SpaceType::LOCAL );
     auto diff = TBoneModel.inverse() * transform;
-    m_skel.setTransform( boneIdx, TBoneLocal * diff,
-                         Ra::Core::Animation::HandleArray::SpaceType::LOCAL );
+    m_skel.setTransform(
+        boneIdx, TBoneLocal * diff, Ra::Core::Animation::HandleArray::SpaceType::LOCAL );
 }
 
 // Build from fileData
@@ -84,7 +84,8 @@ void SkeletonComponent::handleSkeletonLoading( const Ra::Core::Asset::HandleData
     setupIO();
 }
 
-void SkeletonComponent::handleAnimationLoading( const std::vector<Ra::Core::Asset::AnimationData*>& data ) {
+void SkeletonComponent::handleAnimationLoading(
+    const std::vector<Ra::Core::Asset::AnimationData*>& data ) {
     CORE_ASSERT( ( m_skel.size() != 0 ), "A Skeleton should be loaded first." );
     m_animations.clear();
     m_animations.reserve( data.size() );
@@ -97,16 +98,14 @@ void SkeletonComponent::handleAnimationLoading( const std::vector<Ra::Core::Asse
         auto handleAnim = data[n]->getHandleData();
         for ( uint i = 0; i < m_skel.size(); ++i )
         {
-            auto it = std::find_if( handleAnim.cbegin(), handleAnim.cend(),
-                [this, i](const auto& ha){ return m_skel.getLabel( i ) == ha.m_name; } );
+            auto it =
+                std::find_if( handleAnim.cbegin(), handleAnim.cend(), [this, i]( const auto& ha ) {
+                    return m_skel.getLabel( i ) == ha.m_name;
+                } );
             if ( it == handleAnim.cend() )
-            {
-                m_animations.back().push_back( KeyFramedValue( pose[i], 0_ra ) );
-            }
+            { m_animations.back().push_back( KeyFramedValue( pose[i], 0_ra ) ); }
             else
-            {
-                m_animations.back().push_back( it->m_anim );
-            }
+            { m_animations.back().push_back( it->m_anim ); }
         }
 
         m_dt.push_back( data[n]->getTimeStep() );
@@ -218,8 +217,8 @@ Scalar SkeletonComponent::getAnimationDuration() const {
     for ( auto boneAnim : m_animations[m_animationID] )
     {
         const auto& times = boneAnim.getTimes();
-        startTime = std::min( startTime, *times.begin() );
-        endTime   = std::max( endTime, *times.rbegin() );
+        startTime         = std::min( startTime, *times.begin() );
+        endTime           = std::max( endTime, *times.rbegin() );
     }
     return endTime - startTime;
 }
@@ -329,22 +328,22 @@ void SkeletonComponent::setupSkeletonDisplay() {
     }
     for ( uint i = 0; i < m_skel.size(); ++i )
     {
-       if ( !m_skel.m_graph.isLeaf( i ) && !m_skel.m_graph.isRoot( i ) &&
-            m_skel.getLabel( i ).find( "_$AssimpFbx$_" ) == std::string::npos )
-       {
-           std::string name = m_skel.getLabel( i ) + "_" + std::to_string( i );
-           auto ro          = new Engine::Rendering::RenderObject(
-               name, this, Rendering::RenderObjectType::Geometry );
-           ro->setRenderTechnique( s_boneRenderTechnique );
-           ro->setMesh( s_boneMesh );
-           ro->setMaterial( s_boneMaterial );
-           ro->setXRay( false );
-           addRenderObject( ro );
-           m_boneMap[m_renderObjects.back()] = i;
-           m_boneDrawables.push_back( ro );
-       }
-       else
-       { LOG( logDEBUG ) << "Bone " << m_skel.getLabel( i ) << " not displayed."; }
+        if ( !m_skel.m_graph.isLeaf( i ) && !m_skel.m_graph.isRoot( i ) &&
+             m_skel.getLabel( i ).find( "_$AssimpFbx$_" ) == std::string::npos )
+        {
+            std::string name = m_skel.getLabel( i ) + "_" + std::to_string( i );
+            auto ro          = new Engine::Rendering::RenderObject(
+                name, this, Rendering::RenderObjectType::Geometry );
+            ro->setRenderTechnique( s_boneRenderTechnique );
+            ro->setMesh( s_boneMesh );
+            ro->setMaterial( s_boneMaterial );
+            ro->setXRay( false );
+            addRenderObject( ro );
+            m_boneMap[m_renderObjects.back()] = i;
+            m_boneDrawables.push_back( ro );
+        }
+        else
+        { LOG( logDEBUG ) << "Bone " << m_skel.getLabel( i ) << " not displayed."; }
     }
     updateDisplay();
 }
@@ -401,12 +400,14 @@ void SkeletonComponent::updateDisplay() {
 void SkeletonComponent::setupIO() {
     ComponentMessenger::CallbackTypes<Skeleton>::Getter skelOut =
         std::bind( &SkeletonComponent::getSkeleton, this );
-    ComponentMessenger::getInstance()->registerOutput<Skeleton>( getEntity(), this, m_skelName, skelOut );
+    ComponentMessenger::getInstance()->registerOutput<Skeleton>(
+        getEntity(), this, m_skelName, skelOut );
 
     using BoneMap = std::map<Ra::Core::Utils::Index, uint>;
     ComponentMessenger::CallbackTypes<BoneMap>::Getter boneMapOut =
         std::bind( &SkeletonComponent::getBoneRO2idx, this );
-    ComponentMessenger::getInstance()->registerOutput<BoneMap>( getEntity(), this, m_skelName, boneMapOut );
+    ComponentMessenger::getInstance()->registerOutput<BoneMap>(
+        getEntity(), this, m_skelName, boneMapOut );
 
     ComponentMessenger::CallbackTypes<Ra::Core::Animation::RefPose>::Getter refpOut =
         std::bind( &SkeletonComponent::getRefPoseOutput, this );
@@ -415,15 +416,18 @@ void SkeletonComponent::setupIO() {
 
     ComponentMessenger::CallbackTypes<Animation>::Getter animOut =
         std::bind( &SkeletonComponent::getAnimationOutput, this );
-    ComponentMessenger::getInstance()->registerOutput<Animation>( getEntity(), this, m_skelName, animOut );
+    ComponentMessenger::getInstance()->registerOutput<Animation>(
+        getEntity(), this, m_skelName, animOut );
 
     ComponentMessenger::CallbackTypes<Scalar>::Getter timeOut =
         std::bind( &SkeletonComponent::getTimeOutput, this );
-    ComponentMessenger::getInstance()->registerOutput<Scalar>( getEntity(), this, m_skelName, timeOut );
+    ComponentMessenger::getInstance()->registerOutput<Scalar>(
+        getEntity(), this, m_skelName, timeOut );
 
     ComponentMessenger::CallbackTypes<bool>::Getter resetOut =
         std::bind( &SkeletonComponent::getWasReset, this );
-    ComponentMessenger::getInstance()->registerOutput<bool>( getEntity(), this, m_skelName, resetOut );
+    ComponentMessenger::getInstance()->registerOutput<bool>(
+        getEntity(), this, m_skelName, resetOut );
 }
 
 const std::map<Ra::Core::Utils::Index, uint>* SkeletonComponent::getBoneRO2idx() const {

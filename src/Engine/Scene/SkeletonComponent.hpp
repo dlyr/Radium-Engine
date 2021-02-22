@@ -24,7 +24,7 @@ namespace Scene {
 class SkeletonBoneRenderObject;
 class SkeletonBasedAnimationSystem;
 
-/** 
+/**
  * The SkeletonComponent is responsible for the management of skeleton-based
  * character animations. It stores the animation Skeleton and the animation
  * data and is responsible for drawing the skeleton.
@@ -38,7 +38,7 @@ class SkeletonBasedAnimationSystem;
  *    - the current Animation;
  *    - the current animation time;
  *    - whether the animation time has been reset.
-  */
+ */
 class RA_ENGINE_API SkeletonComponent : public Component
 {
   public:
@@ -283,28 +283,28 @@ class RA_ENGINE_API SkeletonComponent : public Component
     std::map<Ra::Core::Utils::Index, uint> m_boneMap;
 
     /// Current animation ID.
-    size_t m_animationID{0};
+    size_t m_animationID {0};
 
     /// Wheither to use the animation's timestep (if available) or the app's.
-    bool m_animationTimeStep{false};
+    bool m_animationTimeStep {false};
 
     /// Time step of each animation.
     std::vector<Scalar> m_dt;
 
     /// Current animation time (might be different from the app time -- see below).
-    Scalar m_animationTime{0_ra};
+    Scalar m_animationTime {0_ra};
 
     /// Animation Play speed.
-    Scalar m_speed{1_ra};
+    Scalar m_speed {1_ra};
 
     /// Whether animation auto repeat mode in on.
-    bool m_autoRepeat{false};
+    bool m_autoRepeat {false};
 
     /// Whether animation ping-pong mode is on.
-    bool m_pingPong{false};
+    bool m_pingPong {false};
 
     /// Was the animation reset?
-    bool m_wasReset{false};
+    bool m_wasReset {false};
 
     /// Mesh for bone display.
     static std::shared_ptr<Data::Mesh> s_boneMesh;
@@ -319,4 +319,3 @@ class RA_ENGINE_API SkeletonComponent : public Component
 } // namespace Scene
 } // namespace Engine
 } // namespace Ra
-

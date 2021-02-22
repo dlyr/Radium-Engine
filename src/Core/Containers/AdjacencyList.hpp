@@ -41,6 +41,17 @@ class RA_CORE_API AdjacencyList
     //////////////////////////////////////////////////////////////////////////////
     ~AdjacencyList();
 
+    AdjacencyList& operator=( const AdjacencyList& rhs ) {
+        auto tmp = rhs;
+        swap( tmp );
+        return *this;
+    }
+    void swap( AdjacencyList& rhs ) {
+        m_child.swap( rhs.m_child );
+        m_parent.swap( rhs.m_parent );
+        m_level.swap( rhs.m_level );
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // NODE
     //////////////////////////////////////////////////////////////////////////////

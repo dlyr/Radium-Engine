@@ -4,8 +4,8 @@
 #include <Core/Animation/Pose.hpp>
 #include <Core/Animation/SkinningData.hpp>
 #include <Core/Asset/HandleData.hpp>
-#include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
+#include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Math/DualQuaternion.hpp>
 #include <Core/Utils/Index.hpp>
 
@@ -31,13 +31,19 @@ class RA_ENGINE_API SkinningComponent : public Component
         STBS_DQS  ///< Stretchable Twistable Bone Skinning with DQS
     };
 
+    /// The skinning weight type.
+    enum WeightType {
+        STANDARD = 0, ///< Standard geometric skinning weights
+        STBS          ///< Stretchable Twistable Bone Skinning weights
+    };
+
     SkinningComponent( const std::string& name, SkinningType type, Entity* entity ) :
         Component( name, entity ),
         m_skinningType( type ),
         m_isReady( false ),
         m_forceUpdate( false ),
         m_weightBone( 0 ),
-        m_weightType( 0 ),
+        m_weightType( STANDARD ),
         m_showingWeights( false ) {}
 
     ~SkinningComponent() override {}
@@ -78,15 +84,21 @@ class RA_ENGINE_API SkinningComponent : public Component
     void setSmartStretch( bool on );
 
     /// @returns whether smart stretch is active or not.
-    bool getSmartStretch() const { return m_smartStretch; }
+    bool isSmartStretchOn() const { return m_smartStretch; }
 
     /// Toggles display of skinning weights.
     void showWeights( bool on );
 
+    /// Returns whether the skinning weights are displayed or not.
+    bool isShowingWeights();
+
     /// Set the type of skinning weight to display:
     ///  - 0 for standard skinning weights
     ///  - 1 for stbs weights
-    void showWeightsType( int type );
+    void showWeightsType( WeightType type );
+
+    /// Returns the type of skinning weights displayed.
+    WeightType getWeightsType();
 
     /// Set the bone to show the weights of.
     void setWeightBone( uint bone );
@@ -115,10 +127,10 @@ class RA_ENGINE_API SkinningComponent : public Component
     void applyBindMatrices( Ra::Core::Animation::Pose& pose ) const;
 
   private:
-    template<typename T>
+    template <typename T>
     using Getter = typename ComponentMessenger::CallbackTypes<T>::Getter;
 
-    template<typename T>
+    template <typename T>
     using ReadWrite = typename ComponentMessenger::CallbackTypes<T>::ReadWrite;
 
     /// The mesh name for Component communication.
@@ -172,7 +184,7 @@ class RA_ENGINE_API SkinningComponent : public Component
     Ra::Core::Animation::WeightMatrix m_weightSTBS;
 
     /// stretch mode: false = standard, true = smart.
-    bool m_smartStretch { true };
+    bool m_smartStretch {true};
 
     /// Initial RO Material when not showing skinning weights.
     std::shared_ptr<Data::Material> m_baseMaterial;
@@ -181,11 +193,10 @@ class RA_ENGINE_API SkinningComponent : public Component
     Ra::Core::Vector3Array m_baseUV;
     Ra::Core::Vector3Array m_weightsUV;
     uint m_weightBone;
-    uint m_weightType;
+    WeightType m_weightType;
     bool m_showingWeights;
 };
 
 } // namespace Scene
 } // namespace Engine
 } // namespace Ra
-

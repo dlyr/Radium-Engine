@@ -2,7 +2,6 @@
 
 #include <Core/Animation/PoseOperation.hpp>
 #include <Core/Geometry/Normal.hpp>
-#include <Core/Geometry/TopologicalMesh.hpp>
 
 #include <Core/Animation/DualQuaternionSkinning.hpp>
 #include <Core/Animation/HandleWeightOperation.hpp>
@@ -26,48 +25,41 @@
 
 #include <Core/Utils/Timer.hpp>
 
-using Ra::Core::DualQuaternion;
-using Ra::Core::Quaternion;
-using Ra::Core::Transform;
+using namespace Ra::Core;
 
-using Ra::Core::Animation::Pose;
-using Ra::Core::Animation::RefPose;
-using Ra::Core::Animation::relativePose;
-using Ra::Core::Animation::Skeleton;
-using Ra::Core::Animation::WeightMatrix;
-using Ra::Core::Geometry::PolyMesh;
-using Ra::Core::Geometry::TriangleMesh;
+using Geometry::AttribArrayGeometry;
+using Geometry::PolyMesh;
+using Geometry::TriangleMesh;
 
-using SpaceType = Ra::Core::Animation::HandleArray::SpaceType;
+using namespace Animation;
+using SpaceType = HandleArray::SpaceType;
 
-using Ra::Core::Skinning::FrameData;
-using Ra::Core::Skinning::RefData;
+using namespace Skinning;
 
-using namespace Ra::Core::Utils;
+using namespace Utils;
 
 namespace Ra {
 namespace Engine {
 namespace Scene {
 
-bool findDuplicates( const TriangleMesh& mesh,
-                     std::vector<Ra::Core::Utils::Index>& duplicatesMap ) {
+bool findDuplicates( const TriangleMesh& mesh, std::vector<Index>& duplicatesMap ) {
     bool hasDuplicates = false;
     duplicatesMap.clear();
     const uint numVerts = mesh.vertices().size();
-    duplicatesMap.resize( numVerts, Ra::Core::Utils::Index::Invalid() );
+    duplicatesMap.resize( numVerts, Index::Invalid() );
 
-    Ra::Core::Vector3Array::const_iterator vertPos;
-    Ra::Core::Vector3Array::const_iterator duplicatePos;
-    std::vector<std::pair<Ra::Core::Vector3, Ra::Core::Utils::Index>> vertices;
+    Vector3Array::const_iterator vertPos;
+    Vector3Array::const_iterator duplicatePos;
+    std::vector<std::pair<Vector3, Index>> vertices;
 
     for ( uint i = 0; i < numVerts; ++i )
     {
-        vertices.push_back( std::make_pair( mesh.vertices()[i], Ra::Core::Utils::Index( i ) ) );
+        vertices.push_back( std::make_pair( mesh.vertices()[i], Index( i ) ) );
     }
 
     std::sort( vertices.begin(),
                vertices.end(),
-               []( std::pair<Ra::Core::Vector3, int> a, std::pair<Ra::Core::Vector3, int> b ) {
+               []( std::pair<Vector3, int> a, std::pair<Vector3, int> b ) {
                    if ( a.first.x() == b.first.x() )
                    {
                        if ( a.first.y() == b.first.y() )
@@ -103,7 +95,7 @@ TriangleMesh triangulate( const PolyMesh& polyMesh ) {
     TriangleMesh res;
     res.setVertices( polyMesh.vertices() );
     res.setNormals( polyMesh.normals() );
-    Ra::Core::AlignedStdVector<Ra::Core::Vector3ui> indices;
+    AlignedStdVector<Vector3ui> indices;
     // using the same triangulation as in Ra::Engine::PolyMesh::triangulate
     for ( const auto& face : polyMesh.getIndices() )
     {
@@ -141,9 +133,8 @@ void SkinningComponent::initialize() {
 
     if ( hasSkel && hasRefPose && ( hasTriMesh || m_meshIsPoly ) )
     {
-        m_renderObjectReader =
-            compMsg->getterCallback<Ra::Core::Utils::Index>( getEntity(), m_meshName );
-        m_skeletonGetter = compMsg->getterCallback<Skeleton>( getEntity(), m_skelName );
+        m_renderObjectReader = compMsg->getterCallback<Index>( getEntity(), m_meshName );
+        m_skeletonGetter     = compMsg->getterCallback<Skeleton>( getEntity(), m_skelName );
         if ( !m_meshIsPoly )
         { m_triMeshWriter = compMsg->rwCallback<TriangleMesh>( getEntity(), m_meshName ); }
         else
@@ -198,28 +189,27 @@ void SkinningComponent::initialize() {
         m_baseMaterial = ro->getMaterial();
 
         auto attrUV = Data::Mesh::getAttribName( Data::Mesh::VERTEX_TEXCOORD );
-        Ra::Core::Geometry::AttribArrayGeometry* geom;
+        AttribArrayGeometry* geom;
         if ( !m_meshIsPoly ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
         else
         { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
         if ( geom->hasAttrib( attrUV ) )
         {
-            auto handle = geom->getAttribHandle<Ra::Core::Vector3>( attrUV );
+            auto handle = geom->getAttribHandle<Vector3>( attrUV );
             m_baseUV    = geom->getAttrib( handle ).data();
         }
 
         auto mat  = new Data::BlinnPhongMaterial( "SkinningWeights_Mat" );
-        mat->m_kd = Ra::Core::Utils::Color::Skin();
-        mat->m_ks = Ra::Core::Utils::Color::White();
+        mat->m_kd = Color::Skin();
+        mat->m_ks = Color::White();
         // assign texture
         Data::TextureParameters texParam;
-        texParam.name = ":/Resources/Textures/Influence0.png";
-        auto tex = Ra::Engine::RadiumEngine::getInstance()->getTextureManager()->getOrLoadTexture(
-            texParam );
+        texParam.name = ":/Textures/Influence0.png";
+        auto tex = RadiumEngine::getInstance()->getTextureManager()->getOrLoadTexture( texParam );
         mat->addTexture( Data::BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE, tex );
         m_weightMaterial.reset( mat );
         // compute default weights uv
-        showWeightsType( 0 );
+        showWeightsType( STANDARD );
     }
 }
 
@@ -237,88 +227,83 @@ void SkinningComponent::skin() {
         m_frameData.m_frameCounter = 0;
         m_forceUpdate              = true;
     }
+    m_frameData.m_currentPose = skel->getPose( SpaceType::MODEL );
+    if ( m_smartStretch ) { applySmartStretch(); }
+    applyBindMatrices( m_frameData.m_currentPose );
+    if ( !areEqual( m_frameData.m_currentPose, m_frameData.m_previousPose ) || m_forceUpdate )
     {
-        m_frameData.m_currentPose = skel->getPose( SpaceType::MODEL );
-        if ( m_smartStretch ) { applySmartStretch(); }
-        applyBindMatrices( m_frameData.m_currentPose );
-        if ( !Ra::Core::Animation::areEqual( m_frameData.m_currentPose,
-                                             m_frameData.m_previousPose ) ||
-             m_forceUpdate )
-        {
-            m_forceUpdate            = false;
-            m_frameData.m_doSkinning = true;
-            m_frameData.m_frameCounter++;
-            m_frameData.m_refToCurrentRelPose =
-                relativePose( m_frameData.m_currentPose, m_refData.m_refPose );
-            m_frameData.m_prevToCurrentRelPose =
-                relativePose( m_frameData.m_currentPose, m_frameData.m_previousPose );
+        m_forceUpdate            = false;
+        m_frameData.m_doSkinning = true;
+        m_frameData.m_frameCounter++;
+        m_frameData.m_refToCurrentRelPose =
+            relativePose( m_frameData.m_currentPose, m_refData.m_refPose );
+        m_frameData.m_prevToCurrentRelPose =
+            relativePose( m_frameData.m_currentPose, m_frameData.m_previousPose );
 
-            switch ( m_skinningType )
-            {
-            case LBS: {
-                Ra::Core::Animation::linearBlendSkinning( m_refData.m_referenceMesh.vertices(),
-                                                          m_frameData.m_currentPose,
-                                                          m_refData.m_weights,
-                                                          m_frameData.m_currentPos );
-                break;
-            }
-            case DQS: {
-                Ra::Core::AlignedStdVector<DualQuaternion> DQ;
-                Ra::Core::Animation::computeDQ(
-                    m_frameData.m_currentPose, m_refData.m_weights, DQ );
-                Ra::Core::Animation::dualQuaternionSkinning(
-                    m_refData.m_referenceMesh.vertices(), DQ, m_frameData.m_currentPos );
-                break;
-            }
-            case COR: {
-                Ra::Core::Animation::corSkinning( m_refData.m_referenceMesh.vertices(),
-                                                  m_frameData.m_currentPose,
-                                                  m_refData.m_weights,
-                                                  m_refData.m_CoR,
-                                                  m_frameData.m_currentPos );
-                break;
-            }
-            case STBS_LBS: {
-                Ra::Core::Animation::linearBlendSkinningSTBS( m_refData.m_referenceMesh.vertices(),
-                                                              m_frameData.m_refToCurrentRelPose,
-                                                              *skel,
-                                                              m_refData.m_skeleton,
-                                                              m_refData.m_weights,
-                                                              m_weightSTBS,
-                                                              m_frameData.m_currentPos );
-                break;
-            }
-            case STBS_DQS: {
-                Ra::Core::AlignedStdVector<DualQuaternion> DQ;
-                Ra::Core::Animation::computeDQSTBS( m_frameData.m_refToCurrentRelPose,
-                                                    *skel,
-                                                    m_refData.m_skeleton,
-                                                    m_refData.m_weights,
-                                                    m_weightSTBS,
-                                                    DQ );
-                Ra::Core::Animation::dualQuaternionSkinning(
-                    m_refData.m_referenceMesh.vertices(), DQ, m_frameData.m_currentPos );
-                break;
-            }
-            }
+        switch ( m_skinningType )
+        {
+        case LBS: {
+            linearBlendSkinning( m_refData.m_referenceMesh.vertices(),
+                                 m_frameData.m_currentPose,
+                                 m_refData.m_weights,
+                                 m_frameData.m_currentPos );
+            break;
+        }
+        case DQS: {
+            AlignedStdVector<DualQuaternion> DQ;
+            computeDQ( m_frameData.m_currentPose, m_refData.m_weights, DQ );
+            dualQuaternionSkinning(
+                m_refData.m_referenceMesh.vertices(), DQ, m_frameData.m_currentPos );
+            break;
+        }
+        case COR: {
+            corSkinning( m_refData.m_referenceMesh.vertices(),
+                         m_frameData.m_currentPose,
+                         m_refData.m_weights,
+                         m_refData.m_CoR,
+                         m_frameData.m_currentPos );
+            break;
+        }
+        case STBS_LBS: {
+            linearBlendSkinningSTBS( m_refData.m_referenceMesh.vertices(),
+                                     m_frameData.m_refToCurrentRelPose,
+                                     *skel,
+                                     m_refData.m_skeleton,
+                                     m_refData.m_weights,
+                                     m_weightSTBS,
+                                     m_frameData.m_currentPos );
+            break;
+        }
+        case STBS_DQS: {
+            AlignedStdVector<DualQuaternion> DQ;
+            computeDQSTBS( m_frameData.m_refToCurrentRelPose,
+                           *skel,
+                           m_refData.m_skeleton,
+                           m_refData.m_weights,
+                           m_weightSTBS,
+                           DQ );
+            dualQuaternionSkinning(
+                m_refData.m_referenceMesh.vertices(), DQ, m_frameData.m_currentPos );
+            break;
+        }
         }
     }
 }
 
-void uniformNormal( const Ra::Core::Vector3Array& p,
-                    const Ra::Core::AlignedStdVector<Ra::Core::Vector3ui>& T,
-                    const std::vector<Ra::Core::Utils::Index>& duplicateTable,
-                    Ra::Core::Vector3Array& normal ) {
+void uniformNormal( const Vector3Array& p,
+                    const AlignedStdVector<Vector3ui>& T,
+                    const std::vector<Index>& duplicateTable,
+                    Vector3Array& normal ) {
     const uint N = p.size();
     normal.clear();
-    normal.resize( N, Ra::Core::Vector3::Zero() );
+    normal.resize( N, Vector3::Zero() );
 
     for ( const auto& t : T )
     {
-        const Ra::Core::Utils::Index i = duplicateTable.at( t( 0 ) );
-        const Ra::Core::Utils::Index j = duplicateTable.at( t( 1 ) );
-        const Ra::Core::Utils::Index k = duplicateTable.at( t( 2 ) );
-        const Ra::Core::Vector3 triN   = Ra::Core::Geometry::triangleNormal( p[i], p[j], p[k] );
+        const Index& i     = duplicateTable.at( t( 0 ) );
+        const Index& j     = duplicateTable.at( t( 1 ) );
+        const Index& k     = duplicateTable.at( t( 2 ) );
+        const Vector3 triN = Geometry::triangleNormal( p[i], p[j], p[k] );
         if ( !triN.allFinite() ) { continue; }
         normal[i] += triN;
         normal[j] += triN;
@@ -328,7 +313,7 @@ void uniformNormal( const Ra::Core::Vector3Array& p,
 #pragma omp parallel for
     for ( uint i = 0; i < N; ++i )
     {
-        if ( !normal[i].isApprox( Ra::Core::Vector3::Zero() ) ) { normal[i].normalize(); }
+        if ( !normal[i].isApprox( Vector3::Zero() ) ) { normal[i].normalize(); }
     }
 
 #pragma omp parallel for
@@ -341,16 +326,18 @@ void uniformNormal( const Ra::Core::Vector3Array& p,
 void SkinningComponent::endSkinning() {
     if ( m_frameData.m_doSkinning )
     {
-        Ra::Core::Geometry::AttribArrayGeometry* geom;
+        AttribArrayGeometry* geom;
         if ( !m_meshIsPoly ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
         else
         { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
-        Ra::Core::Vector3Array& vertices = geom->verticesWithLock();
-        Ra::Core::Vector3Array& normals  = geom->normalsWithLock();
+        Vector3Array& vertices = geom->verticesWithLock();
+        Vector3Array& normals  = geom->normalsWithLock();
 
         vertices = m_frameData.m_currentPos;
 
         // FIXME: normals should be computed by the Skinning method!
+
+        // test switch computation type each frame to compare
         static bool odd = false;
         if ( odd )
         {
@@ -371,7 +358,7 @@ void SkinningComponent::endSkinning() {
             auto step2 = Clock::now();
             m_topoMesh.updateTriangleMeshNormals( normals );
             auto step3 = Clock::now();
-            std::cout << "Steps Polymesh: \n"
+            std::cout << "Steps topomesh: \n"
                       << getIntervalMicro( step0, step1 ) << std::endl
                       << getIntervalMicro( step1, step2 ) << std::endl
                       << getIntervalMicro( step2, step3 ) << std::endl;
@@ -392,9 +379,9 @@ void SkinningComponent::endSkinning() {
     }
 }
 
-void SkinningComponent::handleSkinDataLoading( const Ra::Core::Asset::HandleData* data,
+void SkinningComponent::handleSkinDataLoading( const Asset::HandleData* data,
                                                const std::string& meshName,
-                                               const Ra::Core::Transform& meshFrame ) {
+                                               const Transform& meshFrame ) {
     m_skelName = data->getName();
     m_meshName = meshName;
     setupIO( meshName );
@@ -412,7 +399,7 @@ void SkinningComponent::handleSkinDataLoading( const Ra::Core::Asset::HandleData
             {
                 LOG( logWARNING ) << "Bone " << bone.m_name
                                   << " has skinning weights but no bind matrix. Using Identity.";
-                m_loadedBindMatrices[bone.m_name] = Ra::Core::Transform::Identity();
+                m_loadedBindMatrices[bone.m_name] = Transform::Identity();
             }
         }
     }
@@ -442,9 +429,9 @@ void SkinningComponent::createWeightMatrix() {
     }
     m_refData.m_weights.setFromTriplets( triplets.begin(), triplets.end() );
 
-    Ra::Core::Animation::checkWeightMatrix( m_refData.m_weights, false, true );
+    checkWeightMatrix( m_refData.m_weights, false, true );
 
-    if ( Ra::Core::Animation::normalizeWeights( m_refData.m_weights, true ) )
+    if ( normalizeWeights( m_refData.m_weights, true ) )
     { LOG( logINFO ) << "Skinning weights have been normalized"; }
 }
 
@@ -470,13 +457,13 @@ void SkinningComponent::applySmartStretch() {
         }
 
         // rotate parent to align with bone
-        Ra::Core::Vector3 A;
-        Ra::Core::Vector3 B;
+        Vector3 A;
+        Vector3 B;
         refSkel.getBonePoints( parent, A, B );
-        B                    = parentT * B;
-        Ra::Core::Vector3 B_ = boneModel.translation();
-        auto q               = Ra::Core::Quaternion::FromTwoVectors( ( B - A ), ( B_ - A ) );
-        Ra::Core::Transform R( q );
+        B          = parentT * B;
+        Vector3 B_ = boneModel.translation();
+        auto q     = Quaternion::FromTwoVectors( ( B - A ), ( B_ - A ) );
+        Transform R( q );
         R.pretranslate( A );
         R.translate( -A );
         refSkel.setTransform( parent, R * parentModel, SpaceType::MODEL );
@@ -484,7 +471,7 @@ void SkinningComponent::applySmartStretch() {
     m_frameData.m_currentPose = refSkel.getPose( SpaceType::MODEL );
 }
 
-void SkinningComponent::applyBindMatrices( Ra::Core::Animation::Pose& pose ) const {
+void SkinningComponent::applyBindMatrices( Pose& pose ) const {
     for ( const auto& bM : m_refData.m_bindMatrices )
     {
         pose[bM.first] = m_meshFrameInv * pose[bM.first] * bM.second;
@@ -494,10 +481,10 @@ void SkinningComponent::applyBindMatrices( Ra::Core::Animation::Pose& pose ) con
 void SkinningComponent::setupIO( const std::string& id ) {
     auto compMsg = ComponentMessenger::getInstance();
     auto wOut    = std::bind( &SkinningComponent::getWeightsOutput, this );
-    compMsg->registerOutput<Ra::Core::Animation::WeightMatrix>( getEntity(), this, id, wOut );
+    compMsg->registerOutput<WeightMatrix>( getEntity(), this, id, wOut );
 
     auto refData = std::bind( &SkinningComponent::getRefData, this );
-    compMsg->registerOutput<Ra::Core::Skinning::RefData>( getEntity(), this, id, refData );
+    compMsg->registerOutput<RefData>( getEntity(), this, id, refData );
 
     auto frameData = std::bind( &SkinningComponent::getFrameData, this );
     compMsg->registerOutput<FrameData>( getEntity(), this, id, frameData );
@@ -512,7 +499,7 @@ void SkinningComponent::setSkinningType( SkinningType type ) {
     }
 }
 
-const Ra::Core::Animation::WeightMatrix* SkinningComponent::getWeightsOutput() const {
+const WeightMatrix* SkinningComponent::getWeightsOutput() const {
     return &m_refData.m_weights;
 }
 
@@ -533,7 +520,7 @@ void SkinningComponent::setupSkinningType( SkinningType type ) {
     case DQS:
         break;
     case COR: {
-        if ( m_refData.m_CoR.empty() ) { Ra::Core::Animation::computeCoR( m_refData ); }
+        if ( m_refData.m_CoR.empty() ) { computeCoR( m_refData ); }
         break;
     }
     case STBS_DQS:
@@ -541,7 +528,7 @@ void SkinningComponent::setupSkinningType( SkinningType type ) {
     case STBS_LBS: {
         if ( m_weightSTBS.size() == 0 )
         {
-            Ra::Core::Animation::computeSTBS_weights(
+            computeSTBS_weights(
                 m_refData.m_referenceMesh.vertices(), m_refData.m_skeleton, m_weightSTBS );
         }
     }
@@ -556,28 +543,51 @@ void SkinningComponent::showWeights( bool on ) {
     m_showingWeights = on;
     auto ro          = getRoMgr()->getRenderObject( *m_renderObjectReader() );
     auto attrUV      = Data::Mesh::getAttribName( Data::Mesh::VERTEX_TEXCOORD );
-    Ra::Core::Utils::AttribHandle<Ra::Core::Vector3> handle;
+    AttribHandle<Vector3> handle;
 
-    Ra::Core::Geometry::AttribArrayGeometry* geom;
+    AttribArrayGeometry* geom;
     if ( !m_meshIsPoly ) { geom = const_cast<TriangleMesh*>( m_triMeshWriter() ); }
     else
     { geom = const_cast<PolyMesh*>( m_polyMeshWriter() ); }
 
     if ( m_showingWeights )
     {
+        // update the displayed weights
+        const auto size = m_frameData.m_currentPos.size();
+        m_weightsUV.resize( size, Vector3::Zero() );
+        switch ( m_weightType )
+        {
+        case STANDARD: {
+#pragma omp parallel for
+            for ( int i = 0; i < int( size ); ++i )
+            {
+                m_weightsUV[i][0] = m_refData.m_weights.coeff( i, m_weightBone );
+            }
+        }
+        break;
+        case STBS: {
+#pragma omp parallel for
+            for ( int i = 0; i < int( size ); ++i )
+            {
+                m_weightsUV[i][0] = m_weightSTBS.coeff( i, m_weightBone );
+            }
+        }
+        break;
+        }
+        // change the material
         ro->setMaterial( m_weightMaterial );
         ro->getRenderTechnique()->setParametersProvider( m_weightMaterial );
         // get the UV attrib handle, will create it if not there.
-        handle = geom->addAttrib<Ra::Core::Vector3>( attrUV );
+        handle = geom->addAttrib<Vector3>( attrUV );
         geom->getAttrib( handle ).setData( m_weightsUV );
     }
     else
     {
+        // change the material
         ro->setMaterial( m_baseMaterial );
         ro->getRenderTechnique()->setParametersProvider( m_baseMaterial );
-
-        handle = geom->getAttribHandle<Ra::Core::Vector3>( attrUV );
         // if the UV attrib existed before, reset it, otherwise remove it.
+        handle = geom->getAttribHandle<Vector3>( attrUV );
         if ( m_baseUV.size() > 0 ) { geom->getAttrib( handle ).setData( m_baseUV ); }
         else
         { geom->removeAttrib( handle ); }
@@ -585,33 +595,22 @@ void SkinningComponent::showWeights( bool on ) {
     m_forceUpdate = true;
 }
 
-void SkinningComponent::showWeightsType( int type ) {
-    if ( !m_showingWeights ) return;
-    const uint size = m_frameData.m_currentPos.size();
-    m_weightsUV.resize( size, Ra::Core::Vector3::Zero() );
+bool SkinningComponent::isShowingWeights() {
+    return m_showingWeights;
+}
+
+void SkinningComponent::showWeightsType( WeightType type ) {
     m_weightType = type;
-    if ( type == 0 )
-    {
-#pragma omp parallel for
-        for ( int i = 0; i < int( size ); ++i )
-        {
-            m_weightsUV[i][0] = m_refData.m_weights.coeff( i, m_weightBone );
-        }
-    }
-    else
-    {
-#pragma omp parallel for
-        for ( int i = 0; i < int( size ); ++i )
-        {
-            m_weightsUV[i][0] = m_weightSTBS.coeff( i, m_weightBone );
-        }
-    }
-    showWeights( true );
+    if ( m_showingWeights ) { showWeights( true ); }
+}
+
+SkinningComponent::WeightType SkinningComponent::getWeightsType() {
+    return m_weightType;
 }
 
 void SkinningComponent::setWeightBone( uint bone ) {
     m_weightBone = bone;
-    showWeightsType( m_weightType );
+    if ( m_showingWeights ) { showWeights( true ); }
 }
 
 } // namespace Scene
