@@ -489,7 +489,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
   private:
     // internal function to build TriangleMesh attribs correspondance to wedge attribs.
     template <typename T>
-    class RA_CORE_API InitWedgeProps
+    class InitWedgeProps
     {
       public:
         InitWedgeProps( TopologicalMesh* topo,
