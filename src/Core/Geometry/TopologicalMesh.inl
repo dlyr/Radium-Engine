@@ -329,14 +329,15 @@ void TopologicalMesh::initWithWedge( const TriangleMesh& triMesh, NonManifoldFac
     command.postProcess( *this );
     m_normalsIndex = m_wedges.getWedgeAttribIndex<Normal>( "in_normal" );
 
-    m_faceVertexNormalWedges.clear();
+    m_vertexFaceWedgesWithSameNormals.clear();
+    m_vertexFaceWedgesWithSameNormals.resize( n_vertices() );
 
     for ( auto itr = vertices_begin(), stop = vertices_end(); itr != stop; ++itr )
     {
         std::unordered_map<TopologicalMesh::Normal,
                            std::pair<std::set<FaceHandle>, std::set<WedgeIndex>>,
                            hash_vec>
-            newNormals;
+            normalSharedByWedges;
 
         auto vh = *itr;
 
@@ -346,16 +347,16 @@ void TopologicalMesh::initWithWedge( const TriangleMesh& triMesh, NonManifoldFac
             if ( widx.isValid() && !m_wedges.getWedge( widx ).isDeleted() )
             {
                 auto oldNormal = m_wedges.getWedgeData<Normal>( widx, m_normalsIndex );
-                newNormals[oldNormal].first.insert( face_handle( *vh_it ) );
-                newNormals[oldNormal].second.insert( widx );
+                normalSharedByWedges[oldNormal].first.insert( face_handle( *vh_it ) );
+                normalSharedByWedges[oldNormal].second.insert( widx );
             }
         }
 
-        for ( const auto& pair : newNormals )
+        for ( const auto& pair : normalSharedByWedges )
         {
             for ( const auto& fh : pair.second.first )
             {
-                auto& v = m_faceVertexNormalWedges[std::make_pair( fh, vh )];
+                auto& v = m_vertexFaceWedgesWithSameNormals[vh.idx()][fh.idx()];
                 v.insert( v.end(), pair.second.second.begin(), pair.second.second.end() );
             }
         }
@@ -520,7 +521,7 @@ inline void TopologicalMesh::updateWedgeNormals() {
     {
         for ( ConstVertexFaceIter f_itr = cvf_iter( *v_itr ); f_itr.is_valid(); ++f_itr )
         {
-            for ( const auto& widx : m_faceVertexNormalWedges[std::make_pair( *f_itr, *v_itr )] )
+            for ( const auto& widx : m_vertexFaceWedgesWithSameNormals[v_itr->idx()][f_itr->idx()] )
             {
                 m_wedges.m_data[widx].getWedgeData().m_vector3Attrib[m_normalsIndex] +=
                     normal( *f_itr );
