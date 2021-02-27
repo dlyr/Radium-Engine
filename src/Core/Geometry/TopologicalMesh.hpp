@@ -133,7 +133,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * Return the half-edge associated with a given vertex and face.
      * \note Asserts if vh is not a member of fh.
      */
-    inline HalfedgeHandle halfedge_handle( VertexHandle vh, FaceHandle fh ) const;
+    [[deprecated]] inline HalfedgeHandle halfedge_handle( VertexHandle vh, FaceHandle fh ) const;
 
     /**
      * Get normal of the vertex vh, when member of fh.
@@ -186,35 +186,36 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note This new property will have to be propagated onto the newly created
      * halfedges with copyNormal().
      */
-    inline void createNormalPropOnFaces( OpenMesh::FPropHandleT<Normal>& fProp );
+    [[deprecated]] inline void createNormalPropOnFaces( OpenMesh::FPropHandleT<Normal>& fProp );
 
     /**
      * Remove face property \a prop from \a mesh.
      * \note Invalidates the property handle.
      */
-    inline void clearProp( OpenMesh::FPropHandleT<Normal>& fProp );
+    [[deprecated]] inline void clearProp( OpenMesh::FPropHandleT<Normal>& fProp );
 
     /**
      * Copy the normal property from \a input_heh to \a copy_heh.
      */
-    inline void copyNormal( HalfedgeHandle input_heh, HalfedgeHandle copy_heh );
+    [[deprecated]] inline void copyNormal( HalfedgeHandle input_heh, HalfedgeHandle copy_heh );
 
     /** Copy the face normal property \a fProp from \a fh to \a heh.
      * \note \a fProp must have been previously created through createNormalPropOnFaces().
      */
-    inline void
+    [[deprecated]] inline void
     copyNormalFromFace( FaceHandle fh, HalfedgeHandle heh, OpenMesh::FPropHandleT<Normal> fProp );
 
     /**
      * Interpolate normal property on edge center (after edge split).
      */
-    inline void
+    [[deprecated]] inline void
     interpolateNormal( HalfedgeHandle in_a, HalfedgeHandle in_b, HalfedgeHandle out, Scalar f );
 
     /** Interpolate normal property on face center.
      * \note \a fProp must have been previously created through createNormalPropOnFaces().
      */
-    inline void interpolateNormalOnFaces( FaceHandle fh, OpenMesh::FPropHandleT<Normal> fProp );
+    [[deprecated]] inline void interpolateNormalOnFaces( FaceHandle fh,
+                                                         OpenMesh::FPropHandleT<Normal> fProp );
     ///@}
 
     /**
