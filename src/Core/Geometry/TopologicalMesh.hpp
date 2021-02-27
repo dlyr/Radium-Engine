@@ -578,13 +578,15 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
         /// \see TopologicalMesh::setWedgeData
         inline void setWedgeData( const WedgeIndex& idx, const WedgeData& wd );
 
-        /// \see TopologicalMesh::setWedgeData<T>
+        /// \deprecated use setWedgeAttrib instead
         template <typename T>
-        inline bool setWedgeData( const WedgeIndex& idx, const std::string& name, const T& value );
+        [[deprecated]] inline bool
+        setWedgeData( const WedgeIndex& idx, const std::string& name, const T& value );
+        /// \deprecated use setWedgeAttrib instead
         template <typename T>
-        inline void setWedgeData( const TopologicalMesh::WedgeIndex& idx,
-                                  const int& attribIndex,
-                                  const T& value );
+        [[deprecated]] inline void setWedgeData( const TopologicalMesh::WedgeIndex& idx,
+                                                 const int& attribIndex,
+                                                 const T& value );
 
         /// change WedgeData member name to value.
         /// wd is moidified accordingly.
@@ -593,6 +595,13 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
         template <typename T>
         inline bool
         setWedgeAttrib( TopologicalMesh::WedgeData& wd, const std::string& name, const T& value );
+        template <typename T>
+        inline bool
+        setWedgeAttrib( const WedgeIndex& idx, const std::string& name, const T& value );
+        template <typename T>
+        inline void setWedgeAttrib( const TopologicalMesh::WedgeIndex& idx,
+                                    const int& attribIndex,
+                                    const T& value );
 
         template <typename T>
         inline int getWedgeAttribIndex( const std::string& name );
