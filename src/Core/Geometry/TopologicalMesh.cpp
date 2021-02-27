@@ -163,11 +163,6 @@ void copyAttribToCore( TriangleMesh& triMesh, const HandleAndValueVector<T>& dat
     }
 }
 
-TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) :
-    TopologicalMesh(
-        triMesh,
-        DefaultNonManifoldFaceCommand<TriangleMesh::IndexType>( "[default ctor (props)]" ) ) {}
-
 TopologicalMesh::TopologicalMesh() {
     add_property( m_inputTriangleMeshIndexPph );
     add_property( m_wedgeIndexPph );
