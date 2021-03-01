@@ -458,7 +458,7 @@ void test_split( TopologicalMesh& topo, TopologicalMesh::EdgeHandle eh, float f 
     float f0 = topo.getWedgeData( *( topo.getVertexWedges( v0 ) ).begin() ).m_floatAttrib[0];
     auto p1  = topo.point( v1 );
     float f1 = topo.getWedgeData( *( topo.getVertexWedges( v1 ) ).begin() ).m_floatAttrib[0];
-    topo.splitEdgeWedge( eh, f );
+    topo.splitEdge( eh, f );
 
     // check validity
     REQUIRE( topo.is_valid_handle( he0 ) );
