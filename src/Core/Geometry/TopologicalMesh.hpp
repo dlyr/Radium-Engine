@@ -154,8 +154,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
     ///@}
 
     /**
-     * Set the normal n to all the halfedges that points to vh (i.e. incomming
-     * halfedges) .
+     * Set the normal n to all the wedges that share to vh.
      * If you work with vertex normals, please call this function on all vertex
      * handles before convertion with toTriangleMesh.
      */
@@ -578,16 +577,6 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
 
         /// \see TopologicalMesh::setWedgeData
         inline void setWedgeData( const WedgeIndex& idx, const WedgeData& wd );
-
-        /// \deprecated use setWedgeAttrib instead
-        template <typename T>
-        [[deprecated]] inline bool
-        setWedgeData( const WedgeIndex& idx, const std::string& name, const T& value );
-        /// \deprecated use setWedgeAttrib instead
-        template <typename T>
-        [[deprecated]] inline void setWedgeData( const TopologicalMesh::WedgeIndex& idx,
-                                                 const int& attribIndex,
-                                                 const T& value );
 
         /// change WedgeData member name to value.
         /// wd is moidified accordingly.
