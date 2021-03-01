@@ -183,20 +183,6 @@ inline void TopologicalMesh::WedgeCollection::setWedgeData( const TopologicalMes
 }
 
 template <typename T>
-inline bool TopologicalMesh::WedgeCollection::setWedgeData( const TopologicalMesh::WedgeIndex& idx,
-                                                            const std::string& name,
-                                                            const T& value ) {
-    return setWedgeAttrib( idx, name, value );
-}
-
-template <typename T>
-inline void TopologicalMesh::WedgeCollection::setWedgeData( const TopologicalMesh::WedgeIndex& idx,
-                                                            const int& attrIndex,
-                                                            const T& value ) {
-    setWedgeAttrib( idx, attrIndex, value );
-}
-
-template <typename T>
 inline bool TopologicalMesh::WedgeCollection::setWedgeAttrib( TopologicalMesh::WedgeData& wd,
                                                               const std::string& name,
                                                               const T& value ) {
@@ -949,7 +935,7 @@ template <typename T>
 inline bool TopologicalMesh::setWedgeData( const TopologicalMesh::WedgeIndex& idx,
                                            const std::string& name,
                                            const T& value ) {
-    return m_wedges.setWedgeData( idx, name, value );
+    return m_wedges.setWedgeAttrib( idx, name, value );
 }
 
 inline void TopologicalMesh::setWedgeData( TopologicalMesh::WedgeIndex widx,
