@@ -866,3 +866,74 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/MergeWedges", "[Core][Core/Geometry][T
     REQUIRE( wedgesIndices.size() == 8 );
     REQUIRE( topo.checkIntegrity() );
 }
+
+TEST_CASE( "Core/Geometry/TopologicalMesh/Triangulate", "[Core][Core/Geometry][TopologicalMesh]" ) {
+    TopologicalMesh topo {};
+    TopologicalMesh::VertexHandle vhandle[4];
+    TopologicalMesh::FaceHandle fhandle;
+
+    vhandle[0] = topo.add_vertex( TopologicalMesh::Point( -1, -1, 1 ) );
+    vhandle[1] = topo.add_vertex( TopologicalMesh::Point( 1, -1, 1 ) );
+    vhandle[2] = topo.add_vertex( TopologicalMesh::Point( 1, 1, 1 ) );
+    vhandle[3] = topo.add_vertex( TopologicalMesh::Point( -1, 1, 1 ) );
+
+    std::vector<TopologicalMesh::VertexHandle> face_vhandles;
+    face_vhandles.push_back( vhandle[0] );
+    face_vhandles.push_back( vhandle[1] );
+    face_vhandles.push_back( vhandle[2] );
+    face_vhandles.push_back( vhandle[3] );
+    fhandle = topo.add_face( face_vhandles );
+
+    REQUIRE( topo.n_faces() == 1 );
+
+    auto index1 = topo.addWedgeAttrib<float>( "test1", 1.f );
+    REQUIRE( index1 == 0 );
+    REQUIRE( topo.getFloatAttribNames().size() == 1 );
+    REQUIRE( topo.getFloatAttribNames()[0] == "test1" );
+
+    for ( const auto& he : topo.halfedges() )
+    {
+        if ( topo.is_boundary( he ) ) continue;
+
+        auto wd = topo.newWedgeData();
+
+        // need to set position and vertex handle for new wedges
+        wd.m_vertexHandle = topo.to_vertex_handle( he );
+        wd.m_position     = topo.point( wd.m_vertexHandle );
+
+        REQUIRE( wd.m_floatAttrib.size() == 1 );
+        wd.m_floatAttrib[index1] = 2.f;
+        topo.replaceWedge( he, wd );
+    }
+    REQUIRE( topo.checkIntegrity() );
+
+    auto index2 = topo.addWedgeAttrib<float>( "test2", 2.f );
+    REQUIRE( index2 == 1 );
+    for ( const auto& he : topo.halfedges() )
+    {
+        if ( topo.is_boundary( he ) ) continue;
+        auto wd = topo.newWedgeData();
+        // need to set position and vertex handle for new wedges
+        wd.m_vertexHandle = topo.to_vertex_handle( he );
+        wd.m_position     = topo.point( wd.m_vertexHandle );
+
+        REQUIRE( wd.m_floatAttrib.size() == 2 );
+        wd.m_floatAttrib[index2] = 3.f;
+        topo.replaceWedge( he, wd );
+    }
+
+    auto index3 = topo.addWedgeAttrib<float>( "test3", 3.f );
+    REQUIRE( index3 == 2 );
+    for ( const auto& he : topo.halfedges() )
+    {
+        if ( topo.is_boundary( he ) ) continue;
+
+        auto wedgeIndex = topo.getWedgeIndex( he );
+        REQUIRE( topo.getWedgeRefCount( wedgeIndex ) == 1 );
+        auto wedgeData = topo.getWedgeData( wedgeIndex );
+
+        REQUIRE( wedgeData.m_floatAttrib[index1] == 0.f );
+        REQUIRE( wedgeData.m_floatAttrib[index2] == 3.f );
+        REQUIRE( wedgeData.m_floatAttrib[index3] == 3.f );
+    }
+}
