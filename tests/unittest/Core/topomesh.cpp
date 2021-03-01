@@ -796,39 +796,33 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Manifold", "[Core][Core/Geometry][Topo
 
 TEST_CASE( "Core/Geometry/TopologicalMesh/Initialization",
            "[Core][Core/Geometry][TopologicalMesh]" ) {
-    Ra::Core::Geometry::TopologicalMesh topologicalMesh;
-    Ra::Core::Geometry::TopologicalMesh::VertexHandle vhandle[3];
-    Ra::Core::Geometry::TopologicalMesh::FaceHandle fhandle;
+    TopologicalMesh topo;
+    TopologicalMesh::VertexHandle vhandle[3];
+    TopologicalMesh::FaceHandle fhandle;
 
-    vhandle[0] =
-        topologicalMesh.add_vertex( Ra::Core::Geometry::TopologicalMesh::Point( 1, -1, -1 ) );
-    vhandle[1] =
-        topologicalMesh.add_vertex( Ra::Core::Geometry::TopologicalMesh::Point( 1, -1, 1 ) );
-    vhandle[2] =
-        topologicalMesh.add_vertex( Ra::Core::Geometry::TopologicalMesh::Point( -1, -1, 1 ) );
+    vhandle[0] = topo.add_vertex( TopologicalMesh::Point( 1, -1, -1 ) );
+    vhandle[1] = topo.add_vertex( TopologicalMesh::Point( 1, -1, 1 ) );
+    vhandle[2] = topo.add_vertex( TopologicalMesh::Point( -1, -1, 1 ) );
 
-    std::vector<Ra::Core::Geometry::TopologicalMesh::VertexHandle> face_vhandles;
+    std::vector<TopologicalMesh::VertexHandle> face_vhandles;
     face_vhandles.push_back( vhandle[0] );
     face_vhandles.push_back( vhandle[1] );
     face_vhandles.push_back( vhandle[2] );
-    fhandle = topologicalMesh.add_face( face_vhandles );
+    fhandle = topo.add_face( face_vhandles );
 
     // newly created face have invalid wedges on halfedges
-    auto heh = topologicalMesh.halfedge_handle( fhandle );
-    REQUIRE( topologicalMesh.property( topologicalMesh.getWedgeIndexPph(), heh ).isInvalid() );
-    heh = topologicalMesh.next_halfedge_handle( heh );
-    REQUIRE( topologicalMesh.property( topologicalMesh.getWedgeIndexPph(), heh ).isInvalid() );
-    heh = topologicalMesh.next_halfedge_handle( heh );
-    REQUIRE( topologicalMesh.property( topologicalMesh.getWedgeIndexPph(), heh ).isInvalid() );
+    auto heh = topo.halfedge_handle( fhandle );
+    REQUIRE( topo.property( topo.getWedgeIndexPph(), heh ).isInvalid() );
+    heh = topo.next_halfedge_handle( heh );
+    REQUIRE( topo.property( topo.getWedgeIndexPph(), heh ).isInvalid() );
+    heh = topo.next_halfedge_handle( heh );
+    REQUIRE( topo.property( topo.getWedgeIndexPph(), heh ).isInvalid() );
+    REQUIRE( topo.n_faces() == 1 );
 
-    std::cout << "faces: " << topologicalMesh.n_faces() << std::endl;
-    REQUIRE( topologicalMesh.n_faces() == 1 );
-
-    topologicalMesh.request_face_status();
-    topologicalMesh.delete_face( fhandle, false );
-    topologicalMesh.garbage_collection();
-    std::cout << "faces: " << topologicalMesh.n_faces() << std::endl;
-    REQUIRE( topologicalMesh.n_faces() == 0 );
+    topo.request_face_status();
+    topo.delete_face( fhandle, false );
+    topo.garbage_collection();
+    REQUIRE( topo.n_faces() == 0 );
 }
 
 TEST_CASE( "Core/Geometry/TopologicalMesh/MergeWedges", "[Core][Core/Geometry][TopologicalMesh]" ) {
