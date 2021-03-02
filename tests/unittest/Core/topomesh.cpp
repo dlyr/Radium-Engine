@@ -867,6 +867,18 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/MergeWedges", "[Core][Core/Geometry][T
     REQUIRE( topo.checkIntegrity() );
 }
 
+template <typename T>
+void testAttrib( const IndexedGeometry<T>& mesh, const std::string& name, float value ) {
+
+    auto attribHandle = mesh.template getAttribHandle<float>( name );
+    REQUIRE( attribHandle.idx().isValid() );
+    auto& attrib = mesh.getAttrib( attribHandle );
+    for ( const auto& v : attrib.data() )
+    {
+        REQUIRE( v == value );
+    }
+}
+
 TEST_CASE( "Core/Geometry/TopologicalMesh/Triangulate", "[Core][Core/Geometry][TopologicalMesh]" ) {
     TopologicalMesh topo {};
     TopologicalMesh::VertexHandle vhandle[4];
@@ -936,4 +948,22 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Triangulate", "[Core][Core/Geometry][T
         REQUIRE( wedgeData.m_floatAttrib[index2] == 3.f );
         REQUIRE( wedgeData.m_floatAttrib[index3] == 3.f );
     }
+
+    auto poly = topo.toPolyMesh();
+    REQUIRE( poly.vertices().size() == 4 );
+    REQUIRE( poly.getIndices().size() == 1 );
+    REQUIRE( poly.getIndices()[0].size() == 4 );
+    testAttrib( poly, "test1", 0.f );
+    testAttrib( poly, "test2", 3.f );
+    testAttrib( poly, "test3", 3.f );
+
+    topo.triangulate();
+    auto tri = topo.toTriangleMesh();
+    REQUIRE( tri.vertices().size() == 4 );
+    REQUIRE( tri.getIndices().size() == 2 );
+    REQUIRE( tri.getIndices()[0].size() == 3 );
+    REQUIRE( tri.getIndices()[1].size() == 3 );
+    testAttrib( tri, "test1", 0.f );
+    testAttrib( tri, "test2", 3.f );
+    testAttrib( tri, "test3", 3.f );
 }
