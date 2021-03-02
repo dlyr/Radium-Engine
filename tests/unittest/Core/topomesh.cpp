@@ -924,10 +924,11 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Triangulate", "[Core][Core/Geometry][T
     for ( const auto& he : topo.halfedges() )
     {
         if ( topo.is_boundary( he ) ) continue;
-        auto wd = topo.newWedgeData();
-        // need to set position and vertex handle for new wedges
-        wd.m_vertexHandle = topo.to_vertex_handle( he );
-        wd.m_position     = topo.point( wd.m_vertexHandle );
+        // our we require the wedge to be already set for this he
+        auto wd = topo.newWedgeData( he );
+
+        REQUIRE( wd.m_vertexHandle == topo.to_vertex_handle( he ) );
+        REQUIRE( wd.m_position == topo.point( wd.m_vertexHandle ) );
 
         REQUIRE( wd.m_floatAttrib.size() == 2 );
         wd.m_floatAttrib[index2] = 3.f;
