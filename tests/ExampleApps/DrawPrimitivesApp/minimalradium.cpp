@@ -113,6 +113,13 @@ void updateCellCorner( Vector3& cellCorner, const Scalar cellSize, const int nCe
 /// This function is called when the component is properly
 /// setup, i.e. it has an entity.
 void MinimalComponent::initialize() {
+
+    using namespace Ra::Core;
+    using namespace Ra::Engine;
+    using namespace Ra::Engine::Rendering;
+    using namespace Ra::Engine::Data;
+    using namespace Ra::Engine::Scene;
+
     ///
     // basic render technique associated with all object here, they use per vertex kd.
     RenderTechnique shadedRt;
@@ -731,19 +738,19 @@ void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalCompone
 
     //// POLYMESH FROM FILEDATA ////
     /*  {
-          using Ra::Core::Asset::GeometryData;
+        using Ra::Core::Asset::GeometryData;
 
-          GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
-          Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
-                                    Eigen::UniformScaling<Scalar>( 0.06_ra )};
-          geometry.setFrame( tr );
-          geometry.setVertices( internal::getPolyMeshVertices() );
-          geometry.setFaces( internal::getPolyMeshFaces() );
+        GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
+        Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
+                                  Eigen::UniformScaling<Scalar>( 0.06_ra )};
+        geometry.setFrame( tr );
+        geometry.setVertices( internal::getPolyMeshVertices() );
+        geometry.setFaces( internal::getPolyMeshFaces() );
 
-          auto comp2 =
-              new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
-          registerComponent( ent, comp2 );
-          comp2->initialize();
-      }
+        auto comp2 =
+            new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
+        registerComponent( ent, comp2 );
+        comp2->initialize();
+    }
   */
 }
