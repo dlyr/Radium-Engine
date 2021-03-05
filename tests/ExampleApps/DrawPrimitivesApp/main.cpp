@@ -1,10 +1,11 @@
 #include <Engine/RaEngine.hpp>
+#include <Engine/Scene/EntityManager.hpp>
+#include <Gui/BaseApplication.hpp>
+#include <Gui/RadiumWindow/SimpleWindowFactory.hpp>
 
 #include <QApplication>
 
 #include <QOpenGLContext>
-
-#include <Engine/Scene/EntityManager.hpp>
 
 #include <minimalapp.hpp>
 #include <minimalradium.hpp>
@@ -46,4 +47,21 @@ int main( int argc, char* argv[] ) {
     // Start the app.
     app.m_frame_timer->start();
     return app.exec();
+    /*
+        // Create app and show viewer window
+        Ra::Gui::BaseApplication app( argc, argv );
+        app.initialize( Ra::Gui::SimpleWindowFactory {} );
+
+        // Create one system
+        MinimalSystem* sys = new MinimalSystem;
+        app.m_engine->registerSystem( "Minimal system", sys );
+
+        // Create and initialize entity and component
+        auto e = app.m_engine->getEntityManager()->createEntity( "Cube" );
+        auto c = new MinimalComponent( e );
+        sys->addComponent( e, c );
+        c->initialize();
+
+        app.m_mainWindow->postLoadFile( "Primitives" );
+        return app.exec();*/
 }
