@@ -41,13 +41,26 @@ const bool ENABLE_NORMALS   = true;
 const bool ENABLE_POLYS     = true;
 const bool ENABLE_LOGO      = true;
 
-using namespace Ra;
 using namespace Ra::Core;
 using namespace Ra::Engine;
 using namespace Ra::Engine::Rendering;
 using namespace Ra::Engine::Data;
 using namespace Ra::Engine::Scene;
 
+const bool ENABLE_GRID      = true;
+const bool ENABLE_CUBES     = true;
+const bool ENABLE_POINTS    = true;
+const bool ENABLE_LINES     = true;
+const bool ENABLE_VECTORS   = true;
+const bool ENABLE_RAYS      = true;
+const bool ENABLE_TRIANGLES = true;
+const bool ENABLE_CIRCLES   = true;
+const bool ENABLE_ARCS      = true;
+const bool ENABLE_SPHERES   = true;
+const bool ENABLE_CAPSULES  = true;
+const bool ENABLE_DISKS     = true;
+const bool ENABLE_NORMALS   = true;
+const bool ENABLE_POLYS     = true;
 /**
  * This file contains a minimal radium/qt application which shows the geometrical primitives
  * supported by Radium
@@ -57,28 +70,28 @@ namespace internal {
 Ra::Core::Vector3Array getPolyMeshVertices() {
     return Ra::Core::Vector3Array( {
         // quad
-        {-1.1_ra, -0_ra, 0_ra},
-        {1.1_ra, -0_ra, 0_ra},
-        {1_ra, 1_ra, 0_ra},
-        {-1_ra, 1_ra, 0_ra},
+        /*0*/ {-1.1_ra, -0_ra, 0_ra},
+        /*1*/ {1.1_ra, -0_ra, 0_ra},
+        /*2*/ {1_ra, 1_ra, 0_ra},
+        /*3*/ {-1_ra, 1_ra, 0_ra},
         // hepta
-        {2_ra, 2_ra, 0_ra},
-        {2_ra, 3_ra, 0_ra},
-        {0_ra, 4_ra, 0_ra},
-        {-2_ra, 3_ra, 0_ra},
-        {-2_ra, 2_ra, 0_ra},
+        /*4*/ {2_ra, 2_ra, 0_ra},
+        /*5*/ {2_ra, 3_ra, 0_ra},
+        /*6*/ {0_ra, 4_ra, 0_ra},
+        /*7*/ {-2_ra, 3_ra, 0_ra},
+        /*8*/ {-2_ra, 2_ra, 0_ra},
         // degen
-        {-1.1_ra, -2_ra, 0_ra},
-        {-0.5_ra, -2_ra, 0_ra},
-        {-0.3_ra, -2_ra, 0_ra},
-        {0.0_ra, -2_ra, 0_ra},
-        {0.0_ra, -2_ra, 0_ra},
-        {0.3_ra, -2_ra, 0_ra},
-        {0.5_ra, -2_ra, 0_ra},
-        {1.1_ra, -2_ra, 0_ra},
+        /*9*/ {-1.1_ra, -2_ra, 0_ra},
+        /*10*/ {-0.5_ra, -2_ra, 0_ra},
+        /*11*/ {-0.3_ra, -2_ra, 0_ra},
+        /*12*/ {0.0_ra, -2_ra, 0_ra},
+        /*13*/ {0.0_ra, -2_ra, 0_ra},
+        /*14*/ {0.3_ra, -2_ra, 0_ra},
+        /*15*/ {0.5_ra, -2_ra, 0_ra},
+        /*16*/ {1.1_ra, -2_ra, 0_ra},
         // degen2
-        {-1_ra, -3_ra, 0_ra},
-        {1_ra, -3_ra, 0_ra},
+        /*17*/ {-1_ra, -3_ra, 0_ra},
+        /*18*/ {1_ra, -3_ra, 0_ra},
     } );
 }
 
@@ -88,12 +101,13 @@ Ra::Core::VectorNuArray getPolyMeshFaces() {
     quad << 0, 1, 2, 3;
     auto hepta = VectorType( 7 );
     hepta << 3, 2, 4, 5, 6, 7, 8;
-    auto degen = VectorType( 10 );
-    degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
-    auto degen2 = VectorType( 10 );
-    degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
+    //   auto degen = VectorType( 10 );
+    // degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
+    // auto degen2 = VectorType( 10 );
+    // degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
 
-    return Ra::Core::VectorNuArray( {quad, hepta, degen, degen2} );
+    //    return Ra::Core::VectorNuArray( {quad, hepta, degen, degen2} );
+    return Ra::Core::VectorNuArray( {quad, hepta} );
 }
 } // namespace internal
 
@@ -113,13 +127,6 @@ void updateCellCorner( Vector3& cellCorner, const Scalar cellSize, const int nCe
 /// This function is called when the component is properly
 /// setup, i.e. it has an entity.
 void MinimalComponent::initialize() {
-
-    using namespace Ra::Core;
-    using namespace Ra::Engine;
-    using namespace Ra::Engine::Rendering;
-    using namespace Ra::Engine::Data;
-    using namespace Ra::Engine::Scene;
-
     ///
     // basic render technique associated with all object here, they use per vertex kd.
     RenderTechnique shadedRt;
@@ -740,17 +747,20 @@ void MinimalComponent::initialize() {
 
 /// This system will be added to the engine. Every frame it will
 /// add a task to be executed, calling the spin function of the component.
-void MinimalSystem::generateTasks( Ra::Core::TaskQueue*, const Ra::Engine::FrameInfo& ) {
+void MinimalSystem::generateTasks( Ra::Core::TaskQueue* q, const Ra::Engine::FrameInfo& info ) {
+    CORE_UNUSED( info );
+    CORE_UNUSED( q );
 
     // We check that our component is here.
-    CORE_ASSERT( m_components.size() == 1, "System incorrectly initialized" );
+    //    CORE_ASSERT( m_components.size() == 2, "System incorrectly initialized" );
+    //    MinimalComponent* c = static_cast<MinimalComponent*>( m_components[0].second );
 }
 
 void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalComponent* comp ) {
     registerComponent( ent, comp );
-
+    /*
     //// POLYMESH FROM FILEDATA ////
-    /*  {
+        {
         using Ra::Core::Asset::GeometryData;
 
         GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
@@ -758,12 +768,21 @@ void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalCompone
                                   Eigen::UniformScaling<Scalar>( 0.06_ra )};
         geometry.setFrame( tr );
         geometry.setVertices( internal::getPolyMeshVertices() );
+
+            Ra::Core::Vector3Array normals;
+            normals.resize( geometry.getVertices().size() );
+            std::transform(
+                geometry.getVertices().cbegin(),
+                geometry.getVertices().cend(),
+                normals.begin(),
+                []( const Ra::Core::Vector3& v ) { return ( v + Ra::Core::Vector3( 0_ra, 0_ra, 1_ra
+       ) ).normalized(); } ); geometry.setNormals( normals );
+
         geometry.setFaces( internal::getPolyMeshFaces() );
 
         auto comp2 =
             new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
         registerComponent( ent, comp2 );
         comp2->initialize();
-    }
-  */
+        }*/
 }
