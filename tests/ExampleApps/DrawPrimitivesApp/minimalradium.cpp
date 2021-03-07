@@ -47,20 +47,6 @@ using namespace Ra::Engine::Rendering;
 using namespace Ra::Engine::Data;
 using namespace Ra::Engine::Scene;
 
-const bool ENABLE_GRID      = true;
-const bool ENABLE_CUBES     = true;
-const bool ENABLE_POINTS    = true;
-const bool ENABLE_LINES     = true;
-const bool ENABLE_VECTORS   = true;
-const bool ENABLE_RAYS      = true;
-const bool ENABLE_TRIANGLES = true;
-const bool ENABLE_CIRCLES   = true;
-const bool ENABLE_ARCS      = true;
-const bool ENABLE_SPHERES   = true;
-const bool ENABLE_CAPSULES  = true;
-const bool ENABLE_DISKS     = true;
-const bool ENABLE_NORMALS   = true;
-const bool ENABLE_POLYS     = true;
 /**
  * This file contains a minimal radium/qt application which shows the geometrical primitives
  * supported by Radium
@@ -95,19 +81,23 @@ Ra::Core::Vector3Array getPolyMeshVertices() {
     } );
 }
 
-Ra::Core::VectorNuArray getPolyMeshFaces() {
-    using VectorType = Eigen::Matrix<uint, Eigen::Dynamic, 1>;
+Ra::Core::AlignedStdVector<VectorNui>
+// Ra::Core::VectorNuArray
+getPolyMeshFaces() {
+    //    using VectorType = Eigen::Matrix<uint, Eigen::Dynamic, 1>;
+    using VectorType = VectorNui;
     auto quad        = VectorType( 4 );
     quad << 0, 1, 2, 3;
     auto hepta = VectorType( 7 );
     hepta << 3, 2, 4, 5, 6, 7, 8;
-    //   auto degen = VectorType( 10 );
-    // degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
-    // auto degen2 = VectorType( 10 );
-    // degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
+    auto degen = VectorType( 10 );
+    degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
+    auto degen2 = VectorType( 10 );
+    degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
 
-    //    return Ra::Core::VectorNuArray( {quad, hepta, degen, degen2} );
-    return Ra::Core::VectorNuArray( {quad, hepta} );
+    return Ra::Core::AlignedStdVector<VectorType> {quad, hepta, degen, degen2};
+    //    return Ra::Core::VectorNuArray {quad, hepta, degen, degen2};
+    //    return Ra::Core::VectorNuArray( {quad, hepta} );
 }
 } // namespace internal
 
@@ -628,6 +618,23 @@ void MinimalComponent::initialize() {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
 
+        /// \todo may have an alignement issue
+        /*
+                Ra::Core::Geometry::PolyMesh polyMesh;
+                polyMesh.setVertices( internal::getPolyMeshVertices() );
+
+                Vector3Array normals;
+                normals.resize( polyMesh.vertices().size() );
+                std::transform(
+                    polyMesh.vertices().cbegin(),
+                    polyMesh.vertices().cend(),
+                    normals.begin(),
+                    []( const Vector3& v ) { return ( v + Vector3( 0_ra, 0_ra, 1_ra )
+           ).normalized(); } ); polyMesh.setNormals( normals );
+
+                polyMesh.setIndices( internal::getPolyMeshFaces() );
+        */
+
         Ra::Core::Geometry::PolyMesh polyMesh;
         polyMesh.setVertices( {
             // quad
@@ -657,6 +664,7 @@ void MinimalComponent::initialize() {
         auto hepta = VectorNui( 7 );
         hepta << 3, 2, 4, 5, 6, 7, 8;
         polyMesh.setIndices( {quad, hepta} );
+        // polyMesh.setIndices( {quad} );
 
         std::shared_ptr<PolyMesh> poly1( new PolyMesh( "Poly", std::move( polyMesh ) ) );
         poly1->getCoreGeometry().addAttrib(
@@ -670,6 +678,24 @@ void MinimalComponent::initialize() {
                                                      Eigen::UniformScaling<Scalar>( 0.06_ra )} );
 
         addRenderObject( renderObject1 );
+
+        Ra::Core::Geometry::TopologicalMesh topo {poly1->getCoreGeometry()};
+        topo.triangulate();
+        topo.checkIntegrity();
+        auto triangulated = topo.toTriangleMesh();
+        std::shared_ptr<Mesh> poly2( new Mesh( "Poly", std::move( triangulated ) ) );
+        poly2->getCoreGeometry().addAttrib(
+            "in_color",
+            Vector4Array {poly2->getNumVertices(),
+                          colorBoost * Utils::Color {0_ra, 0.6_ra, 0.1_ra}} );
+
+        auto renderObject2 = RenderObject::createRenderObject(
+            "triangulated", this, RenderObjectType::Geometry, poly2, shadedRt );
+        renderObject2->setLocalTransform(
+            Transform {Translation( Vector3( cellCorner ) + toCellCenter ) *
+                       Eigen::UniformScaling<Scalar>( 0.03_ra )} );
+
+        addRenderObject( renderObject2 );
     }
 
     if ( ENABLE_LOGO )
@@ -759,15 +785,15 @@ void MinimalSystem::generateTasks( Ra::Core::TaskQueue* q, const Ra::Engine::Fra
 void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalComponent* comp ) {
     registerComponent( ent, comp );
     /*
-    //// POLYMESH FROM FILEDATA ////
+        //// POLYMESH FROM FILEDATA ////
         {
-        using Ra::Core::Asset::GeometryData;
+            using Ra::Core::Asset::GeometryData;
 
-        GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
-        Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
-                                  Eigen::UniformScaling<Scalar>( 0.06_ra )};
-        geometry.setFrame( tr );
-        geometry.setVertices( internal::getPolyMeshVertices() );
+            GeometryData geometry( "Geometry", GeometryData::POLY_MESH );
+            Ra::Core::Transform tr = {Ra::Core::Translation( Ra::Core::Vector3( 2, 0_ra, 2 ) ) *
+                                      Eigen::UniformScaling<Scalar>( 0.06_ra )};
+            geometry.setFrame( tr );
+            geometry.setVertices( internal::getPolyMeshVertices() );
 
             Ra::Core::Vector3Array normals;
             normals.resize( geometry.getVertices().size() );
@@ -778,11 +804,11 @@ void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalCompone
                 []( const Ra::Core::Vector3& v ) { return ( v + Ra::Core::Vector3( 0_ra, 0_ra, 1_ra
        ) ).normalized(); } ); geometry.setNormals( normals );
 
-        geometry.setFaces( internal::getPolyMeshFaces() );
+            geometry.setFaces( internal::getPolyMeshFaces() );
 
-        auto comp2 =
-            new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
-        registerComponent( ent, comp2 );
-        comp2->initialize();
+            auto comp2 =
+                new Ra::Engine::Scene::PolyMeshComponent( "GeometryComponent", ent, &geometry );
+            registerComponent( ent, comp2 );
+            comp2->initialize();
         }*/
 }
