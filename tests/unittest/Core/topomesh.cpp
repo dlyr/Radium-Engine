@@ -959,6 +959,7 @@ TEST_CASE( "Core/Geometry/TopologicalMesh/Triangulate", "[Core][Core/Geometry][T
     testAttrib( poly, "test3", 3.f );
 
     topo.triangulate();
+    topo.checkIntegrity();
     auto tri = topo.toTriangleMesh();
     REQUIRE( tri.vertices().size() == 4 );
     REQUIRE( tri.getIndices().size() == 2 );
