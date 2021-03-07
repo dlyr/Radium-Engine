@@ -3,6 +3,7 @@
 
 #include <Core/Containers/MakeShared.hpp>
 #include <Core/Geometry/MeshPrimitives.hpp>
+#include <Core/Geometry/TopologicalMesh.hpp>
 #include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
 #include <Core/Utils/Timer.hpp>
@@ -38,10 +39,11 @@ using namespace Ra::Engine::Rendering;
 using namespace Ra::Engine::Data;
 using namespace Ra::Engine::Scene;
 
-/* This file contains a minimal radium/qt application which shows the
-classic "Spinning Cube" demo. */
+/**
+ * This file contains a minimal radium/qt application which shows the geometrical primitives
+ * supported by Radium
+ */
 
-/// This is a very basic component which holds a spinning cube.
 
 MinimalComponent::MinimalComponent( Ra::Engine::Scene::Entity* entity ) :
     Ra::Engine::Scene::Component( "Minimal Component", entity ) {}
@@ -97,6 +99,7 @@ void MinimalComponent::initialize() {
     int nCellX        = 5;
     int nCellY        = 5;
     Vector3 cellCorner {-nCellX * cellSize / 2_ra, 0_ra, -nCellY * cellSize / 2_ra};
+    Vector3 toCellCenter {cellSize / 2_ra, cellSize / 2_ra, cellSize / 2_ra};
     Scalar offset {0.05_ra};
     Vector3 offsetVec {offset, offset, offset};
     std::random_device rd;    // Will be used to obtain a seed for the random number engine
@@ -167,24 +170,24 @@ void MinimalComponent::initialize() {
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_point",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Point( cellCorner, colorBoost * Utils::Color {0_ra, 1_ra, 0.3_ra} ),
-        plainRt ) );
-    for ( int i = 0; i < 10; ++i )
-    {
-        Vector3 randomVec {cellCorner + offsetVec +
-                           Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
-        Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
         addRenderObject( RenderObject::createRenderObject(
             "test_point",
             this,
             RenderObjectType::Geometry,
-            DrawPrimitives::Point( randomVec, colorBoost * randomCol, 0.03_ra ),
+            DrawPrimitives::Point( cellCorner, colorBoost * Utils::Color {0_ra, 1_ra, 0.3_ra} ),
             plainRt ) );
-    }
+        for ( int i = 0; i < 10; ++i )
+        {
+            Vector3 randomVec {cellCorner + offsetVec +
+                               Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
+            Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
+            addRenderObject( RenderObject::createRenderObject(
+                "test_point",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Point( randomVec, colorBoost * randomCol, 0.03_ra ),
+                plainRt ) );
+        }
     }
     //// LINES ////
     if ( ENABLE_LINES )
@@ -192,121 +195,121 @@ void MinimalComponent::initialize() {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
 
-    addRenderObject( RenderObject::createRenderObject(
-        "test_line",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Line( cellCorner,
-                              cellCorner + Vector3 {0_ra, 0.4_ra, 0_ra},
-                              colorBoost * Utils::Color::Red() ),
-        plainRt ) );
-    for ( int i = 0; i < 20; ++i )
-    {
-        Vector3 randomVec1 {cellCorner + offsetVec +
-                            Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
-        Vector3 randomVec2 {cellCorner + offsetVec +
-                            Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
-        Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
-
         addRenderObject( RenderObject::createRenderObject(
             "test_line",
             this,
             RenderObjectType::Geometry,
-            DrawPrimitives::Line( randomVec1, randomVec2, colorBoost * randomCol ),
+            DrawPrimitives::Line( cellCorner,
+                                  cellCorner + Vector3 {0_ra, 0.4_ra, 0_ra},
+                                  colorBoost * Utils::Color::Red() ),
             plainRt ) );
-    }
+        for ( int i = 0; i < 20; ++i )
+        {
+            Vector3 randomVec1 {cellCorner + offsetVec +
+                                Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
+            Vector3 randomVec2 {cellCorner + offsetVec +
+                                Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
+            Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
+
+            addRenderObject( RenderObject::createRenderObject(
+                "test_line",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Line( randomVec1, randomVec2, colorBoost * randomCol ),
+                plainRt ) );
+        }
     }
     //// VECTOR ////
     if ( ENABLE_VECTORS )
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_vector",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Vector(
-            cellCorner, Vector3 {0_ra, 0.5_ra, 0_ra}, colorBoost * Utils::Color::Blue() ),
-        plainRt ) );
-
-    for ( int i = 0; i < 10; ++i )
-    {
-        Vector3 randomVec1 {cellCorner + offsetVec +
-                            Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
-        Vector3 randomVec2 {cellCorner + offsetVec +
-                            Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
-        Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
-
         addRenderObject( RenderObject::createRenderObject(
             "test_vector",
             this,
             RenderObjectType::Geometry,
+            DrawPrimitives::Vector(
+                cellCorner, Vector3 {0_ra, 0.5_ra, 0_ra}, colorBoost * Utils::Color::Blue() ),
+            plainRt ) );
+
+        for ( int i = 0; i < 10; ++i )
+        {
+            Vector3 randomVec1 {cellCorner + offsetVec +
+                                Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
+            Vector3 randomVec2 {cellCorner + offsetVec +
+                                Vector3 {dis015( gen ), dis015( gen ), dis015( gen )}};
+            Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
+
+            addRenderObject( RenderObject::createRenderObject(
+                "test_vector",
+                this,
+                RenderObjectType::Geometry,
                 DrawPrimitives::Vector(
                     randomVec1, randomVec2 - randomVec1, colorBoost * randomCol ),
-            plainRt ) );
-    }
+                plainRt ) );
+        }
     }
     if ( ENABLE_RAYS )
     {
-    /// RAY ////
+        /// RAY ////
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_ray",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Ray(
-            {cellCorner, {0_ra, 1_ra, 0_ra}}, colorBoost * Utils::Color::Yellow(), cellSize ),
-        plainRt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_ray",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Ray(
+                {cellCorner, {0_ra, 1_ra, 0_ra}}, colorBoost * Utils::Color::Yellow(), cellSize ),
+            plainRt ) );
     }
     //// TRIANGLES ////
     if ( ENABLE_TRIANGLES )
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_triangle",
-        this,
-        RenderObjectType::Geometry,
+        addRenderObject( RenderObject::createRenderObject(
+            "test_triangle",
+            this,
+            RenderObjectType::Geometry,
             DrawPrimitives::Triangle( cellCorner + 4_ra * Vector3 {-0.01_ra, 0.0_ra, 0.0_ra},
                                       cellCorner + 4_ra * Vector3 {+0.01_ra, 0.0_ra, 0.0_ra},
                                       cellCorner + 4_ra * Vector3 {+0.0_ra, 0.02_ra, 0.0_ra},
-                                  colorBoost * Utils::Color::White(),
-                                  true ),
-        shadedRt ) );
+                                      colorBoost * Utils::Color::White(),
+                                      true ),
+            shadedRt ) );
 
-    addRenderObject( RenderObject::createRenderObject(
-        "test_triangle",
-        this,
-        RenderObjectType::Geometry,
+        addRenderObject( RenderObject::createRenderObject(
+            "test_triangle",
+            this,
+            RenderObjectType::Geometry,
             DrawPrimitives::Triangle( cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                                           Vector3 {-0.071_ra, 0.0_ra, 0.0_ra},
                                       cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                                           Vector3 {+0.071_ra, 0.0_ra, 0.0_ra},
                                       cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                                           Vector3 {+0.0_ra, 0.2_ra, 0.0_ra},
-                                  colorBoost * Utils::Color::Green(),
-                                  true ),
-        shadedRt ) );
+                                      colorBoost * Utils::Color::Green(),
+                                      true ),
+            shadedRt ) );
 
-    for ( int i = 0; i < 10; ++i )
-    {
+        for ( int i = 0; i < 10; ++i )
+        {
 
-        addRenderObject( RenderObject::createRenderObject(
-            "test_triangle_wire",
-            this,
-            RenderObjectType::Geometry,
-            DrawPrimitives::Triangle(
+            addRenderObject( RenderObject::createRenderObject(
+                "test_triangle_wire",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Triangle(
                     cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                         Vector3 {-0.071_ra, 0.0_ra, Scalar( i ) / 20_ra * cellSize},
                     cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                         Vector3 {+0.071_ra, 0.0_ra, Scalar( i ) / 20_ra * cellSize},
                     cellCorner + Vector3 {cellSize / 2_ra, 0_ra, 0_ra} +
                         Vector3 {+0.0_ra, 0.2_ra, Scalar( i ) / 20_ra * cellSize},
-                colorBoost * Utils::Color::White() * Scalar( i ) / 10_ra,
-                false ),
-            plainRt ) );
-    }
+                    colorBoost * Utils::Color::White() * Scalar( i ) / 10_ra,
+                    false ),
+                plainRt ) );
+        }
     }
     /*
     addRenderObject(
@@ -325,83 +328,83 @@ void MinimalComponent::initialize() {
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_circle",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Circle( cellCorner,
-                                {0_ra, 0_ra, 1_ra},
-                                cellSize / 8_ra,
-                                64,
-                                colorBoost * Utils::Color::White() ),
-        plainRt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_circle",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Circle( cellCorner,
+                                    {0_ra, 0_ra, 1_ra},
+                                    cellSize / 8_ra,
+                                    64,
+                                    colorBoost * Utils::Color::White() ),
+            plainRt ) );
 
-    for ( uint j = 0; j < end; ++j )
-        for ( uint i = 0; i < end; ++i )
-        {
-            Vector3 circleCenter {cellCorner + offsetVec +
-                                  Vector3 {Scalar( j ) / end * ( cellSize - 2 * offset ),
-                                           offset,
-                                           Scalar( i ) / end * ( cellSize - 2 * offset )}};
-            Vector3 circleNormal {Vector3 {Scalar( i ), Scalar( j ), 10_ra}};
-            circleNormal.normalize();
-            Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
-            Scalar circleRadius {Scalar( end / 2 + i ) / Scalar( 2 * end ) * cellSize / 8_ra};
-            uint circleSubdiv {3 + j * end + i};
+        for ( uint j = 0; j < end; ++j )
+            for ( uint i = 0; i < end; ++i )
+            {
+                Vector3 circleCenter {cellCorner + offsetVec +
+                                      Vector3 {Scalar( j ) / end * ( cellSize - 2 * offset ),
+                                               offset,
+                                               Scalar( i ) / end * ( cellSize - 2 * offset )}};
+                Vector3 circleNormal {Vector3 {Scalar( i ), Scalar( j ), 10_ra}};
+                circleNormal.normalize();
+                Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
+                Scalar circleRadius {Scalar( end / 2 + i ) / Scalar( 2 * end ) * cellSize / 8_ra};
+                uint circleSubdiv {3 + j * end + i};
 
                 addRenderObject( RenderObject::createRenderObject(
                     "test_circle",
-                                                  this,
-                                                  RenderObjectType::Geometry,
-                                                  DrawPrimitives::Circle( circleCenter,
-                                                                          circleNormal,
-                                                                          circleRadius,
-                                                                          circleSubdiv,
-                                                                          colorBoost * randomCol ),
-                                                  plainRt ) );
-        }
+                    this,
+                    RenderObjectType::Geometry,
+                    DrawPrimitives::Circle( circleCenter,
+                                            circleNormal,
+                                            circleRadius,
+                                            circleSubdiv,
+                                            colorBoost * randomCol ),
+                    plainRt ) );
+            }
     }
     //// CIRCLE ARC ////
     if ( ENABLE_ARCS )
     {
-    addRenderObject( RenderObject::createRenderObject(
-        "test_circle",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::CircleArc( cellCorner + Vector3 {0_ra, 2_ra * offset, 0_ra},
-                                   {0_ra, 0_ra, 1_ra},
-                                   cellSize / 8_ra,
-                                   1_ra,
-                                   64,
-                                   colorBoost * Utils::Color::White() ),
-        plainRt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_circle",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::CircleArc( cellCorner + Vector3 {0_ra, 2_ra * offset, 0_ra},
+                                       {0_ra, 0_ra, 1_ra},
+                                       cellSize / 8_ra,
+                                       1_ra,
+                                       64,
+                                       colorBoost * Utils::Color::White() ),
+            plainRt ) );
 
-    for ( uint j = 0; j < end; ++j )
-        for ( uint i = 0; i < end; ++i )
-        {
-            Vector3 circleCenter {cellCorner + offsetVec +
-                                  Vector3 {Scalar( j ) / end * ( cellSize - 2 * offset ),
-                                           2 * offset,
-                                           Scalar( i ) / end * ( cellSize - 2 * offset )}};
-            Vector3 circleNormal {0_ra, 0_ra, 1_ra};
-            circleNormal.normalize();
-            Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
-            Scalar circleRadius {( cellSize - 2_ra * offset ) / 20_ra};
-            Scalar circleArc {Scalar( i ) / Scalar( end ) * 2_ra};
-            uint circleSubdiv {2 + j};
+        for ( uint j = 0; j < end; ++j )
+            for ( uint i = 0; i < end; ++i )
+            {
+                Vector3 circleCenter {cellCorner + offsetVec +
+                                      Vector3 {Scalar( j ) / end * ( cellSize - 2 * offset ),
+                                               2 * offset,
+                                               Scalar( i ) / end * ( cellSize - 2 * offset )}};
+                Vector3 circleNormal {0_ra, 0_ra, 1_ra};
+                circleNormal.normalize();
+                Color randomCol {dis01( gen ), dis01( gen ), dis01( gen )};
+                Scalar circleRadius {( cellSize - 2_ra * offset ) / 20_ra};
+                Scalar circleArc {Scalar( i ) / Scalar( end ) * 2_ra};
+                uint circleSubdiv {2 + j};
 
-            addRenderObject( RenderObject::createRenderObject(
-                "test_circle",
-                this,
-                RenderObjectType::Geometry,
-                DrawPrimitives::CircleArc( circleCenter,
-                                           circleNormal,
-                                           circleRadius,
-                                           circleArc,
-                                           circleSubdiv,
-                                           colorBoost * randomCol ),
-                plainRt ) );
-        }
+                addRenderObject( RenderObject::createRenderObject(
+                    "test_circle",
+                    this,
+                    RenderObjectType::Geometry,
+                    DrawPrimitives::CircleArc( circleCenter,
+                                               circleNormal,
+                                               circleRadius,
+                                               circleArc,
+                                               circleSubdiv,
+                                               colorBoost * randomCol ),
+                    plainRt ) );
+            }
     }
     //// SPHERE /////
 
@@ -409,58 +412,58 @@ void MinimalComponent::initialize() {
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_sphere",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Sphere( cellCorner, 0.02_ra, Utils::Color::White() ),
-        shadedRt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_sphere",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Sphere( cellCorner, 0.02_ra, Utils::Color::White() ),
+            shadedRt ) );
 
-    end = 32;
-    for ( uint i = 0; i < end; ++i )
-    {
-        Scalar angle {Scalar( i ) / Scalar( end ) * 7_ra};
-        Scalar ratio {Scalar( i ) / Scalar( end - 1 )};
-        Vector3 center {cellCorner + Vector3 {cellSize / 2_ra, ratio * .1_ra, cellSize / 2_ra}};
-        Vector3 center1 {center + Vector3 {ratio * cellSize * .4_ra * std::cos( angle ),
-                                           0_ra,
-                                           ratio * cellSize * .4_ra * std::sin( angle )}};
-        Vector3 center2 {
+        end = 32;
+        for ( uint i = 0; i < end; ++i )
+        {
+            Scalar angle {Scalar( i ) / Scalar( end ) * 7_ra};
+            Scalar ratio {Scalar( i ) / Scalar( end - 1 )};
+            Vector3 center {cellCorner + Vector3 {cellSize / 2_ra, ratio * .1_ra, cellSize / 2_ra}};
+            Vector3 center1 {center + Vector3 {ratio * cellSize * .4_ra * std::cos( angle ),
+                                               0_ra,
+                                               ratio * cellSize * .4_ra * std::sin( angle )}};
+            Vector3 center2 {
                 center +
                 Vector3 {ratio * cellSize * .4_ra * std::cos( angle + Math::PiDiv3 * 2_ra ),
-                              0_ra,
-                              ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 2_ra )}};
+                         0_ra,
+                         ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 2_ra )}};
 
-        Vector3 center3 {
+            Vector3 center3 {
                 center +
                 Vector3 {ratio * cellSize * .4_ra * std::cos( angle + Math::PiDiv3 * 4_ra ),
-                              0_ra,
-                              ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 4_ra )}};
+                         0_ra,
+                         ratio * cellSize * .4_ra * std::sin( angle + Math::PiDiv3 * 4_ra )}};
 
-        Color color1 {Utils::Color::Green() * ratio};
-        Color color2 {Utils::Color::Red() * ratio};
-        Color color3 {Utils::Color::Blue() * ratio};
+            Color color1 {Utils::Color::Green() * ratio};
+            Color color2 {Utils::Color::Red() * ratio};
+            Color color3 {Utils::Color::Blue() * ratio};
 
-        addRenderObject( RenderObject::createRenderObject(
-            "test_sphere",
-            this,
-            RenderObjectType::Geometry,
-            DrawPrimitives::Sphere( center1, 0.005_ra + ratio * 0.01_ra, color1 ),
-            shadedRt ) );
-        addRenderObject( RenderObject::createRenderObject(
-            "test_sphere",
-            this,
-            RenderObjectType::Geometry,
-            DrawPrimitives::Sphere( center2, 0.005_ra + ratio * 0.01_ra, color2 ),
-            shadedRt ) );
+            addRenderObject( RenderObject::createRenderObject(
+                "test_sphere",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Sphere( center1, 0.005_ra + ratio * 0.01_ra, color1 ),
+                shadedRt ) );
+            addRenderObject( RenderObject::createRenderObject(
+                "test_sphere",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Sphere( center2, 0.005_ra + ratio * 0.01_ra, color2 ),
+                shadedRt ) );
 
-        addRenderObject( RenderObject::createRenderObject(
-            "test_sphere",
-            this,
-            RenderObjectType::Geometry,
-            DrawPrimitives::Sphere( center3, 0.01_ra + ratio * 0.01_ra, color3 ),
-            shadedRt ) );
-    }
+            addRenderObject( RenderObject::createRenderObject(
+                "test_sphere",
+                this,
+                RenderObjectType::Geometry,
+                DrawPrimitives::Sphere( center3, 0.01_ra + ratio * 0.01_ra, color3 ),
+                shadedRt ) );
+        }
     }
     //// CAPSULE ////
     if ( ENABLE_CAPSULES )
@@ -468,15 +471,15 @@ void MinimalComponent::initialize() {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
 
-    addRenderObject( RenderObject::createRenderObject(
-        "test_capsule",
-        this,
-        RenderObjectType::Geometry,
+        addRenderObject( RenderObject::createRenderObject(
+            "test_capsule",
+            this,
+            RenderObjectType::Geometry,
             DrawPrimitives::Capsule( cellCorner,
                                      cellCorner + Vector3 {0_ra, 0.1_ra, 0_ra},
                                      0.02_ra,
                                      Utils::Color::White() ),
-        shadedRt ) );
+            shadedRt ) );
     }
     //// DISK ////
     if ( ENABLE_DISKS )
@@ -484,16 +487,16 @@ void MinimalComponent::initialize() {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
 
-    addRenderObject( RenderObject::createRenderObject(
-        "test_disk",
-        this,
-        RenderObjectType::Geometry,
-        DrawPrimitives::Disk( cellCorner,
-                              Vector3 {0_ra, 0_ra, 1_ra},
-                              0.05_ra,
-                              32,
-                              colorBoost * Utils::Color::White() ),
-        shadedRt ) );
+        addRenderObject( RenderObject::createRenderObject(
+            "test_disk",
+            this,
+            RenderObjectType::Geometry,
+            DrawPrimitives::Disk( cellCorner,
+                                  Vector3 {0_ra, 0_ra, 1_ra},
+                                  0.05_ra,
+                                  32,
+                                  colorBoost * Utils::Color::White() ),
+            shadedRt ) );
     }
 
     /// NORMAL
@@ -501,15 +504,15 @@ void MinimalComponent::initialize() {
     {
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
         updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
-    addRenderObject( RenderObject::createRenderObject(
-        "test_normal",
-        this,
-        RenderObjectType::Geometry,
+        addRenderObject( RenderObject::createRenderObject(
+            "test_normal",
+            this,
+            RenderObjectType::Geometry,
             DrawPrimitives::Normal( cellCorner + Vector3 {0_ra, 0.1_ra, 0_ra},
                                     Vector3 {0_ra, 0_ra, 1_ra},
                                     colorBoost * Utils::Color::White(),
                                     0.01_ra ),
-        plainRt ) );
+            plainRt ) );
     }
     /*
         addRenderObject( RenderObject::createRenderObject(
@@ -572,19 +575,6 @@ void MinimalComponent::initialize() {
             {0_ra, 4_ra, 0_ra},
             {-2_ra, 3_ra, 0_ra},
             {-2_ra, 2_ra, 0_ra},
-            // degen
-            {-1.1_ra, -2_ra, 0_ra},
-            {-0.5_ra, -2_ra, 0_ra},
-            {-0.3_ra, -2_ra, 0_ra},
-            {0.0_ra, -2_ra, 0_ra},
-            {0.0_ra, -2_ra, 0_ra},
-            {0.3_ra, -2_ra, 0_ra},
-            {0.5_ra, -2_ra, 0_ra},
-            {1.1_ra, -2_ra, 0_ra},
-            // degen2
-            {-1_ra, -3_ra, 0_ra},
-            {1_ra, -3_ra, 0_ra},
-
         } );
 
         Vector3Array normals;
@@ -600,11 +590,7 @@ void MinimalComponent::initialize() {
         quad << 0, 1, 2, 3;
         auto hepta = VectorNui( 7 );
         hepta << 3, 2, 4, 5, 6, 7, 8;
-        auto degen = VectorNui( 10 );
-        degen << 1, 0, 9, 10, 11, 12, 13, 14, 15, 16;
-        auto degen2 = VectorNui( 10 );
-        degen2 << 14, 13, 12, 11, 10, 9, 17, 18, 16, 15;
-        polyMesh.setIndices( {quad, hepta, degen, degen2} );
+        polyMesh.setIndices( {quad, hepta} );
 
         std::shared_ptr<PolyMesh> poly1( new PolyMesh( "Poly", std::move( polyMesh ) ) );
         poly1->getCoreGeometry().addAttrib(
@@ -613,9 +599,9 @@ void MinimalComponent::initialize() {
                           colorBoost * Utils::Color {1_ra, 0.6_ra, 0.1_ra}} );
 
         auto renderObject1 = RenderObject::createRenderObject(
-            "CubeRO_1", this, RenderObjectType::Geometry, poly1, shadedRt );
+            "polymesh", this, RenderObjectType::Geometry, poly1, shadedRt );
         renderObject1->setLocalTransform( Transform {Translation( Vector3( cellCorner ) ) *
-                       Eigen::UniformScaling<Scalar>( 0.06_ra )} );
+                                                     Eigen::UniformScaling<Scalar>( 0.06_ra )} );
 
         addRenderObject( renderObject1 );
     }
@@ -623,13 +609,10 @@ void MinimalComponent::initialize() {
 
 /// This system will be added to the engine. Every frame it will
 /// add a task to be executed, calling the spin function of the component.
-void MinimalSystem::generateTasks( Ra::Core::TaskQueue* q, const Ra::Engine::FrameInfo& info ) {
-    CORE_UNUSED( info );
-    CORE_UNUSED( q );
+void MinimalSystem::generateTasks( Ra::Core::TaskQueue*, const Ra::Engine::FrameInfo& ) {
 
     // We check that our component is here.
     CORE_ASSERT( m_components.size() == 1, "System incorrectly initialized" );
-    //    MinimalComponent* c = static_cast<MinimalComponent*>( m_components[0].second );
 }
 
 void MinimalSystem::addComponent( Ra::Engine::Scene::Entity* ent, MinimalComponent* comp ) {
