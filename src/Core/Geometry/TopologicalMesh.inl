@@ -409,9 +409,7 @@ struct hash_vec {
 
 template <typename MeshIndex>
 TopologicalMesh::TopologicalMesh( const Ra::Core::Geometry::IndexedGeometry<MeshIndex>& mesh ) :
-    TopologicalMesh(
-        mesh,
-        DefaultNonManifoldFaceCommand<TriangleMesh::IndexType>( "[default ctor (props)]" ) ) {}
+    TopologicalMesh( mesh, DefaultNonManifoldFaceCommand<MeshIndex>( "[default ctor (props)]" ) ) {}
 
 template <typename MeshIndex, typename NonManifoldFaceCommand>
 TopologicalMesh::TopologicalMesh( const IndexedGeometry<MeshIndex>& mesh,
