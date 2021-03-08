@@ -111,8 +111,15 @@ inline TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh,
             face_wedges[j] = m_wedges.add( wd );
         }
 
+        // then remove duplicates
+        face_vhandles.erase( std::unique( face_vhandles.begin(), face_vhandles.end() ),
+                             face_vhandles.end() );
+
         // Add the face, then add attribs to vh
-        auto fh = add_face( face_vhandles );
+        TopologicalMesh::FaceHandle fh;
+        // skip 2 vertex face
+        if ( face_vhandles.size() > 2 ) fh = add_face( face_vhandles );
+
         // In case of topological inconsistancy, face will be invalid ...
         if ( fh.is_valid() )
         {
@@ -224,8 +231,31 @@ void TopologicalMesh::initWithWedge( const TriangleMesh& triMesh, NonManifoldFac
             face_wedges[j] = WedgeIndex {inMeshVertexIndex};
         }
 
-        // Add the face, then add attribs to vh
-        TopologicalMesh::FaceHandle fh = add_face( face_vhandles );
+        // remove consecutive equal vertex
+        // first take care of "loop" if begine == *end-1
+        {
+            auto itr = face_vhandles.begin();
+            if ( face_vhandles.size() > 2 )
+            {
+                auto end = face_vhandles.end() - 1;
+
+                while ( itr != end && *itr == *end )
+                    end--;
+                face_vhandles.erase( end + 1, face_vhandles.end() );
+            }
+        }
+        // then remove duplicates
+        face_vhandles.erase( std::unique( face_vhandles.begin(), face_vhandles.end() ),
+                             face_vhandles.end() );
+
+        ///\todo and "cross face ?"
+        // unique sort size == vhadles size, if not split ...
+
+        TopologicalMesh::FaceHandle fh;
+        // skip 2 vertex face
+        if ( face_vhandles.size() > 2 ) fh = add_face( face_vhandles );
+        // In case of topological inconsistancy, face will be invalid ...
+
         if ( fh.is_valid() )
         {
             for ( size_t vindex = 0; vindex < face_vhandles.size(); vindex++ )
