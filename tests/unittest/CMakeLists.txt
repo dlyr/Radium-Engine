@@ -18,6 +18,7 @@ add_executable(
     Core/indexmap.cpp
     Core/indexview.cpp
     Core/mapiterators.cpp
+    Core/mesh.cpp
     Core/observer.cpp
     Core/obb.cpp
     Core/polyline.cpp
@@ -69,4 +70,24 @@ add_custom_target(
 add_custom_target(
     run_unittests_verbose WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     COMMAND $<TARGET_FILE:unittests> -s -a -r=compact DEPENDS unittests
+)
+
+find_program(XSLTPROC_BIN xsltproc)
+if(XSLTPROC_BIN)
+    add_custom_target(
+        save_unittests_report
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND $<TARGET_FILE:unittests> --order lex -r xml -o
+                ${CMAKE_CURRENT_BINARY_DIR}/report.xml || exit 0
+        COMMAND ${XSLTPROC_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/catch2html.xslt
+                ${CMAKE_CURRENT_BINARY_DIR}/report.xml > ${CMAKE_CURRENT_BINARY_DIR}/report.html
+        VERBATIM
+        BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/report.xml ${CMAKE_CURRENT_BINARY_DIR}/report.html
+        DEPENDS unittests
+    )
+endif()
+
+# Add unit test to CTest suite as one of the tests
+add_test(NAME "catch_unit_tests" COMMAND $<TARGET_FILE:unittests>
+         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
