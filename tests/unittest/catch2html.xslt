@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
+<!-- https://www.programmersought.com/article/21196208617/ -->
 <xsl:stylesheet version="1.0"
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
         <xsl:output method="html" version="4.0" encoding="UTF-8" indent="yes"/>
@@ -7,19 +9,18 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
         <head>
                 <title>Unit Test Results</title>
                 <style type="text/css">
-                        td#passed {
+                        td.passed {
                                 color: green;
                                 font-weight: bold;
                         }
-                        td#failed {
-                                color: red;
+                        td.failed {
+                                background: red;
                                 font-weight: bold;
                         }
                         <!-- borrowod from here http://red-team-design.com/practical-css3-tables-with-rounded-corners/ -->
                         body {
                                 width: 80%;
                                 margin: 40px auto;
-                                font-family: 'trebuchet MS', 'Lucida sans', Arial;
                                 font-size: 14px;
                                 color: #444;
                         }
@@ -30,11 +31,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                         }
                         .bordered {
                                 border: solid #ccc 1px;
-                                -moz-border-radius: 6px;
-                                -webkit-border-radius: 6px;
-                                border-radius: 6px;
-                                -webkit-box-shadow: 0 1px 1px #ccc; 
-                                -moz-box-shadow: 0 1px 1px #ccc; 
                                 box-shadow: 0 1px 1px #ccc;         
                         }
                         .bordered tr:hover {
@@ -53,12 +49,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                         }
                         .bordered th {
                                 background-color: #dce9f9;
-                                background-image: -webkit-gradient(linear, left top, left bottom, from(#ebf3fc), to(#dce9f9));
-                                background-image: -webkit-linear-gradient(top, #ebf3fc, #dce9f9);
-                                background-image:    -moz-linear-gradient(top, #ebf3fc, #dce9f9);
-                                background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
-                                background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
-                                background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
                                 -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
                                 -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
                                 box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
@@ -67,31 +57,6 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                         }
                         .bordered td:first-child, .bordered th:first-child {
                                 border-left: none;
-                        }
-                        .bordered th:first-child {
-                                -moz-border-radius: 6px 0 0 0;
-                                -webkit-border-radius: 6px 0 0 0;
-                                border-radius: 6px 0 0 0;
-                        }
-                        .bordered th:last-child {
-                                -moz-border-radius: 0 6px 0 0;
-                                -webkit-border-radius: 0 6px 0 0;
-                                border-radius: 0 6px 0 0;
-                        }
-                        .bordered th:only-child{
-                                -moz-border-radius: 6px 6px 0 0;
-                                -webkit-border-radius: 6px 6px 0 0;
-                                border-radius: 6px 6px 0 0;
-                        }
-                        .bordered tr:last-child td:first-child {
-                                -moz-border-radius: 0 0 0 6px;
-                                -webkit-border-radius: 0 0 0 6px;
-                                border-radius: 0 0 0 6px;
-                        }
-                        .bordered tr:last-child td:last-child {
-                                -moz-border-radius: 0 0 6px 0;
-                                -webkit-border-radius: 0 0 6px 0;
-                                border-radius: 0 0 6px 0;
                         }
                 </style>
         </head>
@@ -116,7 +81,17 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
         <h2><xsl:value-of select="@name"/></h2>
  
         <table class="bordered">
-                <tr><th style="width:30%">SectionName(result:<xsl:value-of select="OverallResult/@success"/>) </th>
+          <tr><th style="width:30%">SectionName
+	  <xsl:choose>
+	    <xsl:when test="OverallResult/@success = 'true'">
+	      SUCCES
+	    </xsl:when>
+	    <xsl:otherwise>
+              FAILURE         
+	    </xsl:otherwise>
+	  </xsl:choose>
+
+	</th>
                         <th>Successes</th>
                         <th>Failures</th>
                 </tr>
@@ -124,7 +99,14 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <tr>
                         <td><xsl:value-of select="@name"/></td>
                         <td><xsl:value-of select="OverallResults/@successes"/></td>
-                        <td><xsl:value-of select="OverallResults/@failures"/></td>
+			<xsl:choose>
+			  <xsl:when test="OverallResults/@failures>0">
+                            <td class="failed"><xsl:value-of select="OverallResults/@failures"/></td>
+			  </xsl:when>
+			  <xsl:otherwise>
+                            <td><xsl:value-of select="OverallResults/@failures"/></td>
+			  </xsl:otherwise>
+			</xsl:choose>
                 </tr>
                 </xsl:for-each>
         </table>
