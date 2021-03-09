@@ -114,10 +114,10 @@
 	<td colspan="2" class="result">	  <xsl:choose>
 
 	  <xsl:when test="OverallResult/@success = 'true'">
-	    <span class="passed"> SUCCESS</span>
+	    <span class="passed">SUCCESS</span>
 	  </xsl:when>
 	  <xsl:otherwise>
-            <span class="failed"> FAILED</span>         
+            <span class="failed">FAILED</span>         
 	  </xsl:otherwise>
 	</xsl:choose>
 	</td>
