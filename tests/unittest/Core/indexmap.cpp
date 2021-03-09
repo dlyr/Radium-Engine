@@ -136,29 +136,31 @@ void testType() {
     }
 }
 
-TEST_CASE( "Core/Utils/Index/Ctor", "[Core][Core/Utils][Index]" ) {
+TEST_CASE( "Core/Utils/Index", "[Core][Core/Utils][Index]" ) {
+    SECTION( "Constructor" ) {
+        Index idxInvalid;
+        REQUIRE( idxInvalid.isInvalid() );
+        // testing everything is too long
+        const int step = std::numeric_limits<Index::IntegerType>::max() / 1000;
+        for ( Index::IntegerType i = 0;
+              i < std::numeric_limits<Index::IntegerType>::max() - 2 * step;
+              i += step ) {
+            Index idx { i };
+            REQUIRE( idx.isValid() );
+            auto idxUl = Index { static_cast<unsigned long int>( i ) };
+            auto idxL  = Index { static_cast<long int>( i ) };
+            auto idxU  = Index { static_cast<unsigned int>( i ) };
+            REQUIRE( idxUl.isValid() );
+            REQUIRE( idxU.isValid() );
+            REQUIRE( idxL.isValid() );
+            REQUIRE( idx == idxUl );
+            REQUIRE( idx == idxU );
+            REQUIRE( idx == idxL );
+        }
 
-    Index idxInvalid;
-    REQUIRE( idxInvalid.isInvalid() );
-    // testing everything is too long
-    const int step = std::numeric_limits<Index::IntegerType>::max() / 1000;
-    for ( Index::IntegerType i = 0; i < std::numeric_limits<Index::IntegerType>::max() - 2 * step;
-          i += step ) {
-        Index idx { i };
-        REQUIRE( idx.isValid() );
-        auto idxUl = Index { static_cast<unsigned long int>( i ) };
-        auto idxL  = Index { static_cast<long int>( i ) };
-        auto idxU  = Index { static_cast<unsigned int>( i ) };
-        REQUIRE( idxUl.isValid() );
-        REQUIRE( idxU.isValid() );
-        REQUIRE( idxL.isValid() );
-        REQUIRE( idx == idxUl );
-        REQUIRE( idx == idxU );
-        REQUIRE( idx == idxL );
+        testType<unsigned long int>();
+        testType<long int>();
+        testType<unsigned int>();
+        testType<size_t>();
     }
-
-    testType<unsigned long int>();
-    testType<long int>();
-    testType<unsigned int>();
-    testType<size_t>();
 }
