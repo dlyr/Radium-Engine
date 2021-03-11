@@ -840,11 +840,30 @@ void TopologicalMesh::collapseWedge( TopologicalMesh::HalfedgeHandle heh ) {
     VertexHandle vh = to_vertex_handle( h );
     VertexHandle vo = to_vertex_handle( o );
 
-    auto position = m_wedges.getWedgeData( property( m_wedgeIndexPph, heh ) ).m_position;
-    auto widx     = property( m_wedgeIndexPph, heh );
+    auto widx     = getWedgeIndex( heh );
+    auto position = getWedgeData( widx ).m_position;
 
     CORE_ASSERT( widx.isValid(), "try to collapse onto an invalid wedge" );
-    CORE_ASSERT( !isFeatureVertex( vo ), "try to collapse a feature vertex" );
+    //    CORE_ASSERT( !isFeatureVertex( vo ), "try to collapse a feature vertex" );
+
+    {
+        bool searchFeatureEdge  = getWedgeIndex( op ) != getWedgeIndex( h );
+        auto owidx              = getWedgeIndex( op );
+        auto nwidx              = widx;
+        HalfedgeHandle ring_itr = hp;
+        hp                      = prev_halfedge_handle( opposite_halfedge_handle( hp ) );
+        while ( ring_itr != o )
+        {
+            auto rwidx = getWedgeIndex( ring_itr );
+            replaceWedgeIndex( ring_itr, nwidx );
+            ring_itr = prev_halfedge_handle( opposite_halfedge_handle( ring_itr ) );
+            if ( searchFeatureEdge && rwidx != getWedgeIndex( ring_itr ) )
+            {
+                searchFeatureEdge = false;
+                nwidx             = owidx;
+            }
+        }
+    }
 
     for ( VertexIHalfedgeIter vih_it( vih_iter( vo ) ); vih_it.is_valid(); ++vih_it )
     {
