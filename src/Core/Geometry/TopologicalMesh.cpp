@@ -864,13 +864,13 @@ void TopologicalMesh::collapseWedge( TopologicalMesh::HalfedgeHandle heh ) {
             }
         }
     }
-
-    for ( VertexIHalfedgeIter vih_it( vih_iter( vo ) ); vih_it.is_valid(); ++vih_it )
-    {
-        // delete and set to new widx
-        m_wedges.del( property( m_wedgeIndexPph, *vih_it ) );
-        property( m_wedgeIndexPph, *vih_it ) = m_wedges.newReference( widx );
-    }
+    //
+    //    for ( VertexIHalfedgeIter vih_it( vih_iter( vo ) ); vih_it.is_valid(); ++vih_it )
+    //    {
+    //        // delete and set to new widx
+    //        m_wedges.del( property( m_wedgeIndexPph, *vih_it ) );
+    //        property( m_wedgeIndexPph, *vih_it ) = m_wedges.newReference( widx );
+    //    }
     // but remove one ref for the deleted opposite he
     m_wedges.del( property( m_wedgeIndexPph, o ) );
 
