@@ -410,7 +410,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * For detailed topological modifications see \ref develmeshes.
      * \param he halfedge's hangle to collapse.
      */
-    void collapseWedge( TopologicalMesh::HalfedgeHandle he );
+    void collapseWedge( TopologicalMesh::HalfedgeHandle he, bool keepFromVertex = false );
     ///@}
 
     /**
