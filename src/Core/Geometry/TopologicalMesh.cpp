@@ -843,25 +843,32 @@ void TopologicalMesh::collapseWedge( TopologicalMesh::HalfedgeHandle heh ) {
     auto widx     = getWedgeIndex( heh );
     auto position = getWedgeData( widx ).m_position;
 
-    CORE_ASSERT( widx.isValid(), "try to collapse onto an invalid wedge" );
+ //   CORE_ASSERT( widx.isValid(), "try to collapse onto an invalid wedge" );
     //    CORE_ASSERT( !isFeatureVertex( vo ), "try to collapse a feature vertex" );
 
     {
-        bool searchFeatureEdge  = getWedgeIndex( op ) != getWedgeIndex( h );
-        auto owidx              = getWedgeIndex( op );
-        auto nwidx              = widx;
+      //  bool searchFeatureEdge  = getWedgeIndex( op ) != getWedgeIndex( h );
+        auto rwidx              = getWedgeIndex( op );
+        auto lwidx              = widx;
+        auto olwidx              = getWedgeIndex( hp );
+        auto orwidx              = getWedgeIndex( o );
         HalfedgeHandle ring_itr = hp;
-        hp                      = prev_halfedge_handle( opposite_halfedge_handle( hp ) );
+     //   hp                      = prev_halfedge_handle( opposite_halfedge_handle( hp ) );
         while ( ring_itr != o )
         {
-            auto rwidx = getWedgeIndex( ring_itr );
-            replaceWedgeIndex( ring_itr, nwidx );
-            ring_itr = prev_halfedge_handle( opposite_halfedge_handle( ring_itr ) );
-            if ( searchFeatureEdge && rwidx != getWedgeIndex( ring_itr ) )
-            {
-                searchFeatureEdge = false;
-                nwidx             = owidx;
+            auto twidx = getWedgeIndex( ring_itr );
+            if(twidx == orwidx){
+                replaceWedgeIndex( ring_itr, rwidx );
             }
+             if(twidx == olwidx){
+                replaceWedgeIndex( ring_itr, lwidx );
+            }
+            ring_itr = prev_halfedge_handle( opposite_halfedge_handle( ring_itr ) );
+            //if ( searchFeatureEdge && rwidx != getWedgeIndex( ring_itr ) )
+            //{
+            //    searchFeatureEdge = false;
+            //    nwidx             = owidx;
+            //}
         }
     }
     //
@@ -872,41 +879,43 @@ void TopologicalMesh::collapseWedge( TopologicalMesh::HalfedgeHandle heh ) {
     //        property( m_wedgeIndexPph, *vih_it ) = m_wedges.newReference( widx );
     //    }
     // but remove one ref for the deleted opposite he
-    m_wedges.del( property( m_wedgeIndexPph, o ) );
+    //m_wedges.del( property( m_wedgeIndexPph, o ) );
+    //m_wedges.del( property( m_wedgeIndexPph, h ) );
 
     // and delete wedge of the remove he
     // first if h is not boundary, copy the wedgeIndex of hn to hp to it
-    if ( !is_boundary( h ) )
-    {
-        property( m_wedgeIndexPph, hp ) =
-            m_wedges.newReference( property( m_wedgeIndexPph, opposite_halfedge_handle( hn ) ) );
-    }
-    m_wedges.del( property( m_wedgeIndexPph, hn ) );
-    m_wedges.del( property( m_wedgeIndexPph, opposite_halfedge_handle( hn ) ) );
-
-    if ( !is_boundary( o ) )
-    {
-        property( m_wedgeIndexPph, on ) =
-            m_wedges.newReference( property( m_wedgeIndexPph, opposite_halfedge_handle( op ) ) );
-    }
-    m_wedges.del( property( m_wedgeIndexPph, op ) );
-    m_wedges.del( property( m_wedgeIndexPph, opposite_halfedge_handle( op ) ) );
+    //if ( !is_boundary( h ) )
+    //{
+    //    property( m_wedgeIndexPph, hp ) =
+    //        m_wedges.newReference( property( m_wedgeIndexPph, opposite_halfedge_handle( hn ) ) );
+    //}
+    //m_wedges.del( property( m_wedgeIndexPph, hn ) );
+    //m_wedges.del( property( m_wedgeIndexPph, opposite_halfedge_handle( hn ) ) );
+    //
+    //if ( !is_boundary( o ) )
+    //{
+    //    property( m_wedgeIndexPph, on ) =
+    //        m_wedges.newReference( property( m_wedgeIndexPph, opposite_halfedge_handle( op ) ) );
+    //}
+    //m_wedges.del( property( m_wedgeIndexPph, op ) );
+    //m_wedges.del( property( m_wedgeIndexPph, opposite_halfedge_handle( op ) ) );
 
     base::collapse( h );
 
     for ( VertexIHalfedgeIter vih_it( vih_iter( vh ) ); vih_it.is_valid(); ++vih_it )
     {
         // delete and set to new widx
+         if ( !status( *vih_it ).deleted() ) {
         m_wedges.setWedgePosition( property( m_wedgeIndexPph, *vih_it ), position );
+        }
     }
 }
-
 void TopologicalMesh::garbage_collection() {
     for ( HalfedgeIter he_it = halfedges_begin(); he_it != halfedges_end(); ++he_it )
     {
-        // already done in collapseWedge
-        // if ( status( *he_it ).deleted() ) { m_wedges.del(property(
-        // m_wedgeIndexPph, *he_it )); }
+       
+         if ( status( *he_it ).deleted() ) { m_wedges.del(property(
+         m_wedgeIndexPph, *he_it )); }
     }
 
     auto offset = m_wedges.computeCleanupOffset();
