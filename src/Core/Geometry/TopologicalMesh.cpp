@@ -1039,12 +1039,9 @@ void TopologicalMesh::collapse_loop( HalfedgeHandle _hh ) {
 }
 
 void TopologicalMesh::collapseWedge( TopologicalMesh::HalfedgeHandle heh, bool keepFromWedges ) {
-    LOG( logINFO ) << "ain " << keepFromWedges;
-    checkIntegrity();
     collapse( heh, keepFromWedges );
-    LOG( logINFO ) << "out";
+    ///\todo remove when seems to work
     checkIntegrity();
-    LOG( logINFO ) << "done";
 }
 
 void TopologicalMesh::collapseWedge2( TopologicalMesh::HalfedgeHandle heh, bool keepFromWedges ) {
