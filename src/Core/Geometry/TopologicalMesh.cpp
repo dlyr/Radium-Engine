@@ -147,8 +147,8 @@ void TopologicalMesh::triangulate() {
         std::cout << "process " << f_it->idx() << "\n";
         // save original halfedge of the face
         std::vector<HalfedgeHandle> old_heh;
-        ConstFaceHalfedgeIter fh_itr = cfh_iter( f_it );
-        for ( ; fh_itr; ++fh_itr )
+        ConstFaceHalfedgeIter fh_itr = cfh_iter( *f_it );
+        for ( ; fh_itr.is_valid(); ++fh_itr )
         {
             old_heh.push_back( *fh_itr );
         }
