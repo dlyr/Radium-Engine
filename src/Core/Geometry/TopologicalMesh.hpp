@@ -356,12 +356,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * For detailed topological modifications see \ref develmeshes.
      * \param he halfedge's hangle to collapse.
      */
-    void collapse( HalfedgeHandle, bool );
-    void collapse_edge( HalfedgeHandle, bool );
-    void collapse_loop( HalfedgeHandle );
-
     void collapseWedge( TopologicalMesh::HalfedgeHandle he, bool keepFromVertex = false );
-    void collapseWedge2( TopologicalMesh::HalfedgeHandle he, bool keepFromVertex = false );
     ///@}
 
     /**
@@ -513,6 +508,13 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
     };
 
   private:
+    // base on openmesh version
+    void collapse( HalfedgeHandle, bool );
+    void collapse_edge( HalfedgeHandle, bool );
+    void collapse_loop( HalfedgeHandle );
+    // old version
+    void collapseWedge2( TopologicalMesh::HalfedgeHandle he, bool keepFromVertex = false );
+
     /**
      * This private class manage wedge data and refcount, to maintain deleted status
      *
