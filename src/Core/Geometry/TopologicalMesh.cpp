@@ -968,6 +968,7 @@ void TopologicalMesh::collapse_loop( HalfedgeHandle _hh ) {
 
     // halfedge -> halfedge
     set_next_halfedge_handle( h1, next_halfedge_handle( o0 ) );
+    replaceWedgeIndex( h1, getWedgeIndex( o0 ) );
     set_next_halfedge_handle( prev_halfedge_handle( o0 ), h1 );
 
     // halfedge -> face
