@@ -909,40 +909,18 @@ void TopologicalMesh::collapse_edge( HalfedgeHandle _hh, bool keepFrom ) {
     auto ringWidx    = widx;
     int phase        = 0;
 
-    HalfedgeHandle vih = ono;
-    set_vertex_handle( o, vh );
-    if ( !is_boundary( ono ) )
-    {
-        phase    = 1;
-        ringWidx = getWedgeIndex( ono );
-    }
-
-    while ( vih != o )
+    HalfedgeHandle vih = hp;
+    do
     {
         set_vertex_handle( vih, vh );
-
         if ( !is_boundary( vih ) )
         {
-            if ( phase == 0 )
-            {
-                phase    = 1;
-                ringWidx = getWedgeIndex( vih );
-            }
-            if ( phase == 1 )
-            {
-                if ( getWedgeIndex( vih ) != ringWidx )
-                {
-                    phase       = 2;
-                    currentWidx = getWedgeIndex( op );
-                }
-            }
-            if ( !keepFrom ) { replaceWedgeIndex( vih, currentWidx ); }
+            if ( !keepFrom ) { replaceWedgeIndex( vih, widx ); }
             else
             { m_wedges.setWedgePosition( getWedgeIndex( vih ), point( vh ) ); }
         }
-
         vih = prev_halfedge_handle( opposite_halfedge_handle( vih ) );
-    }
+    } while ( vih != hp );
 #else
     // auto version from openmesh
     for ( VertexIHalfedgeIter vih_it( vih_iter( vo ) ); vih_it.is_valid(); ++vih_it )
