@@ -34,8 +34,8 @@ void main() {
     vec4 scss1 = css1 * css0.w;
 
     vec3 dir           = ( scss1 - scss0 ).xyz;
-    float pixelWidth   = 1.8;
-    const float border = 4.;
+    float pixelWidth   = 2.8;
+    const float border = 2.;
     vec3 slope         = normalize( vec3( -dir.y, dir.x, 0 ) );
     vec4 n             = vec4( vec3( pixelWidth + border ) / vp * slope, 0 );
 
