@@ -909,7 +909,7 @@ void TopologicalMesh::collapse_edge( HalfedgeHandle _hh, bool keepFrom ) {
 // manual iter for from fixup
 #if 1
     auto currentWidx     = widx;
-    auto ringWidx        = widx;
+    auto ringWidx        = WedgeIndex {};
     int phase            = 0;
     HalfedgeHandle start = prev_halfedge_handle( opposite_halfedge_handle( hp ) );
     HalfedgeHandle vih   = start;
@@ -922,11 +922,14 @@ void TopologicalMesh::collapse_edge( HalfedgeHandle _hh, bool keepFrom ) {
             {
                 if ( phase == 0 )
                 {
+                    CORE_ASSERT( ringWidx.isInvalid(), "" );
                     phase    = 1;
                     ringWidx = getWedgeIndex( vih );
                 }
                 if ( phase == 1 && ringWidx != getWedgeIndex( vih ) )
                 {
+                    CORE_ASSERT( ringWidx.isValid(), "" );
+                    CORE_ASSERT( getWedgeIndex( vih ).isValid(), "" );
                     phase       = 2;
                     currentWidx = otherWidx;
                 }
