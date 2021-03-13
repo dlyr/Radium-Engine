@@ -900,27 +900,43 @@ void TopologicalMesh::collapse_edge( HalfedgeHandle _hh, bool keepFrom ) {
     auto widx = getWedgeIndex( h );
     if ( widx.isInvalid() ) // i.e. h is boundary
         widx = getWedgeIndex( op );
+    auto otherWidx = getWedgeIndex( op );
+    if ( otherWidx.isInvalid() ) // i.e. h is boundary
+        otherWidx = getWedgeIndex( h );
 
 // halfedge -> vertex
 
 // manual iter for from fixup
 #if 1
-    auto currentWidx = widx;
-    auto ringWidx    = widx;
-    int phase        = 0;
-
-    HalfedgeHandle vih = hp;
+    auto currentWidx     = widx;
+    auto ringWidx        = widx;
+    int phase            = 0;
+    HalfedgeHandle start = prev_halfedge_handle( opposite_halfedge_handle( hp ) );
+    HalfedgeHandle vih   = start;
     do
     {
         set_vertex_handle( vih, vh );
         if ( !is_boundary( vih ) )
         {
-            if ( !keepFrom ) { replaceWedgeIndex( vih, widx ); }
+            if ( !keepFrom )
+            {
+                if ( phase == 0 )
+                {
+                    phase    = 1;
+                    ringWidx = getWedgeIndex( vih );
+                }
+                if ( phase == 1 && ringWidx != getWedgeIndex( vih ) )
+                {
+                    phase       = 2;
+                    currentWidx = otherWidx;
+                }
+                replaceWedgeIndex( vih, currentWidx );
+            }
             else
             { m_wedges.setWedgePosition( getWedgeIndex( vih ), point( vh ) ); }
         }
         vih = prev_halfedge_handle( opposite_halfedge_handle( vih ) );
-    } while ( vih != hp );
+    } while ( vih != start );
 #else
     // auto version from openmesh
     for ( VertexIHalfedgeIter vih_it( vih_iter( vo ) ); vih_it.is_valid(); ++vih_it )
