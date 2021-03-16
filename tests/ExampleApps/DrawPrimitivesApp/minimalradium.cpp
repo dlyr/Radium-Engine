@@ -634,11 +634,13 @@ void MinimalComponent::initialize() {
                 switch ( gd->getType() )
                 {
                 case Ra::Core::Asset::GeometryData::TRI_MESH:
-                    mesh = std::shared_ptr<Mesh> {TriangleMeshComponent::meshFactory( "logo", gd )};
+                    mesh =
+                        std::shared_ptr<Mesh> {meshFactory<Geometry::TriangleMesh>( "logo", gd )};
                     break;
                 case Ra::Core::Asset::GeometryData::QUAD_MESH:
                 case Ra::Core::Asset::GeometryData::POLY_MESH:
-                    mesh = std::shared_ptr<PolyMesh> {PolyMeshComponent::meshFactory( "logo", gd )};
+                    mesh =
+                        std::shared_ptr<PolyMesh> {meshFactory<Geometry::PolyMesh>( "logo", gd )};
                     break;
                 default:
                     break;
