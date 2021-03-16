@@ -664,12 +664,23 @@ void MinimalComponent::initialize() {
                     roMaterial.reset( mat );
                 }
 
+                // Create the RenderObject
                 auto renderObject = RenderObject::createRenderObject(
-                    "logo", this, RenderObjectType::Geometry, mesh, shadedRt );
+                    "logo", this, RenderObjectType::Geometry, mesh, Rendering::RenderTechnique {} );
                 renderObject->setLocalTransform(
                     Transform {Translation( Vector3( cellCorner ) + toCellCenter ) *
                                Eigen::UniformScaling<Scalar>( cellSize * 0.02_ra )} );
                 renderObject->setMaterial( roMaterial );
+
+                // Build the renderTechnique from the loaded material
+                auto builder =
+                    EngineRenderTechniques::getDefaultTechnique( roMaterial->getMaterialName() );
+                auto logoRt = Core::make_shared<RenderTechnique>();
+                builder.second( *logoRt, false );
+                logoRt->setParametersProvider( roMaterial );
+                // associate the renderTechnique to the RenderObject
+                renderObject->setRenderTechnique( logoRt );
+
                 addRenderObject( renderObject );
             }
         }
