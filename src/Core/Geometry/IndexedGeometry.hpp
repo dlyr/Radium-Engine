@@ -5,6 +5,12 @@
 #include <Core/Utils/ObjectWithSemantic.hpp>
 #include <unordered_map>
 
+#define MULTI_INDEX_MIMIC_TRIANGLE_MESH
+
+#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
+#    pragma message( "You are compiling MultiIndexedGeometry with deprecate compatibility mode" )
+#endif
+
 namespace Ra {
 namespace Core {
 namespace Geometry {
@@ -31,6 +37,8 @@ class RA_CORE_API GeometryIndexLayerBase : public Utils::ObservableVoid,
         return *this;
     }
 
+    virtual bool append( const GeometryIndexLayerBase& other ) = 0;
+
   protected:
     template <class... SemanticNames>
     inline GeometryIndexLayerBase( SemanticNames... names ) : ObjectWithSemantic( names... ) {}
@@ -44,6 +52,18 @@ struct GeometryIndexLayer : public GeometryIndexLayerBase {
 
     inline IndexContainerType& collection() { return _collection; };
     const IndexContainerType& collection() const { return _collection; };
+
+    inline bool append( const GeometryIndexLayerBase& other ) final {
+        if ( shareSemantic( other ) )
+        {
+            const auto& othercasted = static_cast<const GeometryIndexLayer<T>&>( other );
+            _collection.insert( _collection.end(),
+                                othercasted.collection().begin(),
+                                othercasted.collection().end() );
+            return true;
+        }
+        return false;
+    }
 
   protected:
     template <class... SemanticNames>
@@ -105,6 +125,18 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
     using LayerSemantic           = Utils::ObjectWithSemantic::SemanticName;
     using LayerKeyType            = std::pair<LayerSemanticCollection, std::string>;
 
+    using PointAttribHandle  = AttribArrayGeometry::PointAttribHandle;
+    using NormalAttribHandle = AttribArrayGeometry::NormalAttribHandle;
+    using FloatAttribHandle  = AttribArrayGeometry::FloatAttribHandle;
+    using Vec2AttribHandle   = AttribArrayGeometry::Vec2AttribHandle;
+    using Vec3AttribHandle   = AttribArrayGeometry::Vec3AttribHandle;
+    using Vec4AttribHandle   = AttribArrayGeometry::Vec4AttribHandle;
+
+#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
+    using IndexType          = Vector3ui;
+    using IndexContainerType = VectorArray<IndexType>;
+#endif
+
     inline MultiIndexedGeometry() = default;
     explicit MultiIndexedGeometry( const MultiIndexedGeometry& other );
     explicit MultiIndexedGeometry( MultiIndexedGeometry&& other );
@@ -122,6 +154,35 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
     /// \brief Check that the MultiIndexedGeometry is well built, asserting when it is not.
     /// \note Only compiles to something when in debug mode.
     void checkConsistency() const;
+
+    /// Append another MultiIndexedGeometry to this one. Layers with same
+    /// name/semantics are concatenated, and other layers are added to this one
+#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
+    bool
+#else
+    void
+#endif
+    append( const MultiIndexedGeometry& other );
+    /// name/semantics are concatenated, and other layers are ignored
+    /// \return true if all fields have been copied
+
+#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
+    /// read only access to indices
+    inline const IndexContainerType& getIndices() const;
+
+    /// read write access to indices.
+    /// Cause indices to be "lock" for the caller
+    /// need to be unlock by the caller before any one can ask for write access.
+    inline IndexContainerType& getIndicesWithLock();
+
+    /// unlock previously read write acces, notify observers of the update.
+    inline void indicesUnlock();
+
+    /// set indices. Indices must be unlock, i.e. no one should have write
+    /// access to it.
+    /// Notify observers of the update.
+    inline void setIndices( IndexContainerType&& indices );
+#endif
 
     //////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////
@@ -351,23 +412,27 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
 };
 
 struct RA_CORE_API PointCloudIndexLayer : public GeometryIndexLayer<Vector1ui> {
-    inline PointCloudIndexLayer() : GeometryIndexLayer( "IndexPointCloud" ) {}
+    inline PointCloudIndexLayer() : GeometryIndexLayer( staticSemanticName ) {}
     /// \brief Generate linearly spaced indices with same size as \p attr vertex buffer
     void generateIndicesFromAttributes( const AttribArrayGeometry& attr );
+
+    static constexpr const char* staticSemanticName = "PointCloud";
 
   protected:
     template <class... SemanticNames>
     inline PointCloudIndexLayer( SemanticNames... names ) :
-        GeometryIndexLayer( "IndexPointCloud", names... ) {}
+        GeometryIndexLayer( staticSemanticName, names... ) {}
 };
 
 struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
-    inline TriangleIndexLayer() : GeometryIndexLayer( "TriangleMesh" ) {}
+    inline TriangleIndexLayer() : GeometryIndexLayer( staticSemanticName ) {}
+
+    static constexpr const char* staticSemanticName = "TriangleMesh";
 
   protected:
     template <class... SemanticNames>
     inline TriangleIndexLayer( SemanticNames... names ) :
-        GeometryIndexLayer( "TriangleMesh", names... ) {}
+        GeometryIndexLayer( staticSemanticName, names... ) {}
 };
 
 class RA_CORE_API PolyIndexLayer : public GeometryIndexLayer<VectorNui>
@@ -387,6 +452,32 @@ class RA_CORE_API LineIndexLayer : public GeometryIndexLayer<Vector2ui>
     template <class... SemanticNames>
     inline LineIndexLayer( SemanticNames... names ) : GeometryIndexLayer( "LineMesh", names... ) {}
 };
+
+#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
+const MultiIndexedGeometry::IndexContainerType& MultiIndexedGeometry::getIndices() const {
+    const auto& abstractLayer = getFirstLayerOccurrence( "TriangleMesh" );
+    return static_cast<const TriangleIndexLayer&>( abstractLayer ).collection();
+}
+
+MultiIndexedGeometry::IndexContainerType& MultiIndexedGeometry::getIndicesWithLock() {
+    auto& abstractLayer = getFirstLayerOccurrenceWithLock( "TriangleMesh" );
+    return static_cast<TriangleIndexLayer&>( abstractLayer ).collection();
+}
+
+void MultiIndexedGeometry::indicesUnlock() {
+    unlockFirstLayerOccurrence( "TriangleMesh" );
+}
+
+void MultiIndexedGeometry::setIndices( IndexContainerType&& indices ) {
+    auto l          = std::make_unique<TriangleIndexLayer>();
+    l->collection() = std::move( indices );
+    addLayer( std::move( l ) );
+}
+
+class RA_CORE_API TriangleMesh : public MultiIndexedGeometry
+{};
+
+#endif
 
 } // namespace Geometry
 } // namespace Core
