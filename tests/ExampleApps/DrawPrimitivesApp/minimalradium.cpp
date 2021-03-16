@@ -774,6 +774,8 @@ void MinimalComponent::initialize() {
 
     if ( ENABLE_COLLAPSE )
     {
+        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
 
         using namespace Ra::Core;
         using namespace Ra::Core::Utils;
@@ -806,7 +808,7 @@ void MinimalComponent::initialize() {
             auto renderObject2 = RenderObject::createRenderObject(
                 "TEST", this, RenderObjectType::Geometry, poly, plainRt );
             renderObject2->setLocalTransform( Transform {
-                Translation( Vector3( pos ) ) * Eigen::UniformScaling<Scalar>( 0.02_ra )} );
+                Translation( Vector3( pos ) ) * Eigen::UniformScaling<Scalar>( 0.003_ra )} );
 
             addRenderObject( renderObject2 );
         };
@@ -842,21 +844,21 @@ void MinimalComponent::initialize() {
             c = colorBoost * Vector4 {dis01( gen ), dis01( gen ), dis01( gen ), 1_ra};
         }
 
-        VectorArray<Vector3ui> indices1 {
+        Vector3uArray indices1 {
             {0, 2, 1}, {0, 3, 2}, {1, 2, 5}, {2, 3, 5}, {1, 5, 4}, {3, 6, 5}, {5, 6, 7}, {4, 5, 7}};
         Vector3uArray indices3 = {{0, 2, 1}, {1, 2, 5}, {1, 5, 4}, {3, 6, 5}, {5, 6, 7}, {4, 5, 7}};
 
         Vector3uArray indices4 = {
             {0, 2, 5}, {3, 14, 6}, {4, 12, 15}, {11, 18, 20}, {17, 22, 21}, {16, 13, 23}};
 
-        VectorArray<Vector3ui> indices2 {{0, 5, 2},
-                                         {1, 9, 8},
-                                         {3, 6, 14},
-                                         {7, 10, 19},
-                                         {4, 15, 12},
-                                         {11, 20, 18},
-                                         {17, 21, 22},
-                                         {16, 23, 13}};
+        Vector3uArray indices2 {{0, 5, 2},
+                                {1, 9, 8},
+                                {3, 6, 14},
+                                {7, 10, 19},
+                                {4, 15, 12},
+                                {11, 20, 18},
+                                {17, 21, 22},
+                                {16, 23, 13}};
         Vector4Array colors2 {24, Color::White()};
         for ( const auto& face : indices2 )
         {
@@ -913,6 +915,7 @@ void MinimalComponent::initialize() {
 
         auto addMergeScene =
             [findHalfedge, addMesh, &cellCorner, toCellCenter, cellSize, nCellX, nCellY](
+                Vector3 pos,
                 const Vector3Array& points,
                 const Vector4Array& colors,
                 const Vector3uArray& indices1,
@@ -921,9 +924,7 @@ void MinimalComponent::initialize() {
                 TriangleMesh mesh1;
                 TopologicalMesh topo1;
                 optional<TopologicalMesh::HalfedgeHandle> optHe;
-                Vector3 pos;
-                pos = cellCorner + toCellCenter;
-                Vector3 up {0_ra, .25_ra, 0_ra};
+                Vector3 up {0_ra, .05_ra, 0_ra};
 
                 mesh1.setVertices( points );
                 mesh1.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
@@ -963,38 +964,39 @@ void MinimalComponent::initialize() {
                 topo1.collapseWedge( *optHe, true );
                 addMesh( pos, topo1 );
             };
-
+        Vector3 dx  = Vector3( cellSize / 8_ra, 0_ra, 0_ra );
+        Vector3 pos = cellCorner;
+        pos[2] += toCellCenter[2];
         // With "continuous" wedges.
-        addMergeScene( points, colors, indices1, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points, colors, indices1, points[5], points[2] );
 
         // with "top/bottom" wedges
-        addMergeScene( points2, colors3, indices2, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points2, colors3, indices2, points[5], points[2] );
+        pos += dx;
 
         // with continuous"top/bottom" wedges
-        addMergeScene( points2, colors4, indices2, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points2, colors4, indices2, points[5], points[2] );
+        pos += dx;
 
         // with "flat face" wedges
-        addMergeScene( points2, colors2, indices2, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points2, colors2, indices2, points[5], points[2] );
+        pos += dx;
 
         // boundary
         // With "continuous" wedges.
-        addMergeScene( points, colors, indices3, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points, colors, indices3, points[5], points[2] );
+        pos += dx;
 
         // with "top/bottom" wedges
-        addMergeScene( points2, colors3, indices4, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points2, colors3, indices4, points[5], points[2] );
+        pos += dx;
 
         // with continuous"top/bottom" wedges
-        addMergeScene( points2, colors4, indices4, points[5], points[2] );
-        updateCellCorner( cellCorner, cellSize, nCellX, nCellY );
+        addMergeScene( pos, points2, colors4, indices4, points[5], points[2] );
+        pos += dx;
 
         // with "flat face" wedges
-        addMergeScene( points2, colors2, indices4, points[5], points[2] );
+        addMergeScene( pos, points2, colors2, indices4, points[5], points[2] );
     }
 }
 
