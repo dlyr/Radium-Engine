@@ -187,36 +187,39 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * \note This new property will have to be propagated onto the newly created
      * halfedges with copyNormal().
      */
-    [[deprecated]] inline void createNormalPropOnFaces( OpenMesh::FPropHandleT<Normal>& fProp );
+    [[deprecated( "use add_property() directly" )]] inline void
+    createNormalPropOnFaces( OpenMesh::FPropHandleT<Normal>& fProp );
 
     /**
      * Remove face property \a prop from \a mesh.
      * \note Invalidates the property handle.
      */
-    [[deprecated]] inline void clearProp( OpenMesh::FPropHandleT<Normal>& fProp );
+    [[deprecated( "use del_property() directly" )]] inline void
+    clearProp( OpenMesh::FPropHandleT<Normal>& fProp );
 
     /**
      * Copy the normal property from \a input_heh to \a copy_heh.
      */
-    [[deprecated]] inline void copyNormal( HalfedgeHandle input_heh, HalfedgeHandle copy_heh );
+    [[deprecated( "use wedgeData" )]] inline void copyNormal( HalfedgeHandle input_heh,
+                                                              HalfedgeHandle copy_heh );
 
     /** Copy the face normal property \a fProp from \a fh to \a heh.
      * \note \a fProp must have been previously created through createNormalPropOnFaces().
      */
-    [[deprecated]] inline void
+    [[deprecated( "use wedgeData" )]] inline void
     copyNormalFromFace( FaceHandle fh, HalfedgeHandle heh, OpenMesh::FPropHandleT<Normal> fProp );
 
     /**
      * Interpolate normal property on edge center (after edge split).
      */
-    [[deprecated]] inline void
+    [[deprecated( "use wedgeData" )]] inline void
     interpolateNormal( HalfedgeHandle in_a, HalfedgeHandle in_b, HalfedgeHandle out, Scalar f );
 
     /** Interpolate normal property on face center.
      * \note \a fProp must have been previously created through createNormalPropOnFaces().
      */
-    [[deprecated]] inline void interpolateNormalOnFaces( FaceHandle fh,
-                                                         OpenMesh::FPropHandleT<Normal> fProp );
+    [[deprecated( "do it on your side" )]] inline void
+    interpolateNormalOnFaces( FaceHandle fh, OpenMesh::FPropHandleT<Normal> fProp );
     ///@}
 
     /**
@@ -231,8 +234,9 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
      * halfedges with copyProps().
      */
     template <typename T>
-    [[deprecated]] void createPropsOnFaces( const std::vector<OpenMesh::HPropHandleT<T>>& input,
-                                            std::vector<OpenMesh::FPropHandleT<T>>& output );
+    [[deprecated( "use wedge instead ... don't get the point of this one" )]] void
+    createPropsOnFaces( const std::vector<OpenMesh::HPropHandleT<T>>& input,
+                        std::vector<OpenMesh::FPropHandleT<T>>& output );
 
     /**
      * Remove \a props from \a mesh.
