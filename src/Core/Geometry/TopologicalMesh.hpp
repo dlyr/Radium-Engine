@@ -382,7 +382,7 @@ class RA_CORE_API TopologicalMesh : public OpenMesh::PolyMesh_ArrayKernelT<Topol
     inline const WedgeData& getWedgeData( const WedgeIndex& idx ) const;
     template <typename T>
     [[deprecated( "use getWedgeAttrib() instead." )]] const T&
-    getedgeData( const WedgeIndex& idx, const std::string& name ) const;
+    getWedgeData( const WedgeIndex& idx, const std::string& name ) const;
     template <typename T>
     const T& getWedgeAttrib( const WedgeIndex& idx, const std::string& name ) const;
 
