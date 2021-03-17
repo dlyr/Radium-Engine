@@ -156,15 +156,9 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
     void checkConsistency() const;
 
     /// Append another MultiIndexedGeometry to this one. Layers with same
-    /// name/semantics are concatenated, and other layers are added to this one
-#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
-    bool
-#else
-    void
-#endif
-    append( const MultiIndexedGeometry& other );
     /// name/semantics are concatenated, and other layers are ignored
     /// \return true if all fields have been copied
+    bool append( const MultiIndexedGeometry& other );
 
 #ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
     /// read only access to indices
@@ -455,27 +449,40 @@ class RA_CORE_API LineIndexLayer : public GeometryIndexLayer<Vector2ui>
 
 #ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
 const MultiIndexedGeometry::IndexContainerType& MultiIndexedGeometry::getIndices() const {
-    const auto& abstractLayer = getFirstLayerOccurrence( "TriangleMesh" );
+    const auto& abstractLayer = getFirstLayerOccurrence( TriangleIndexLayer::staticSemanticName );
     return static_cast<const TriangleIndexLayer&>( abstractLayer ).collection();
 }
 
 MultiIndexedGeometry::IndexContainerType& MultiIndexedGeometry::getIndicesWithLock() {
-    auto& abstractLayer = getFirstLayerOccurrenceWithLock( "TriangleMesh" );
+    auto& abstractLayer = getFirstLayerOccurrenceWithLock( TriangleIndexLayer::staticSemanticName );
     return static_cast<TriangleIndexLayer&>( abstractLayer ).collection();
 }
 
 void MultiIndexedGeometry::indicesUnlock() {
-    unlockFirstLayerOccurrence( "TriangleMesh" );
+    unlockFirstLayerOccurrence( TriangleIndexLayer::staticSemanticName );
 }
 
 void MultiIndexedGeometry::setIndices( IndexContainerType&& indices ) {
-    auto l          = std::make_unique<TriangleIndexLayer>();
-    l->collection() = std::move( indices );
-    addLayer( std::move( l ) );
+
+    auto l           = std::make_unique<TriangleIndexLayer>();
+    LayerKeyType key = std::make_pair( l->semantics(), "" );
+
+    auto it = m_indices.find( key );
+    CORE_ASSERT( it != m_indices.end(), "TriangleIndex should be inserted already" );
+
+    static_cast<TriangleIndexLayer&>( *( it->second.second ) ).collection() = std::move( indices );
+
+    notify();
 }
 
 class RA_CORE_API TriangleMesh : public MultiIndexedGeometry
-{};
+{
+  public:
+    inline TriangleMesh() : MultiIndexedGeometry() {
+        auto l = std::make_unique<TriangleIndexLayer>();
+        addLayer( std::move( l ) );
+    }
+};
 
 #endif
 

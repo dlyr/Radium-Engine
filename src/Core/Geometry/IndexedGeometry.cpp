@@ -61,11 +61,7 @@ void MultiIndexedGeometry::checkConsistency() const {
 #endif
 }
 
-#ifdef MULTI_INDEX_MIMIC_TRIANGLE_MESH
 bool
-#else
-void
-#endif
 /// \todo Implement MultiIndexedGeometry::append
 MultiIndexedGeometry::append( const MultiIndexedGeometry& other ) {
     bool isCopyComplete = true;
