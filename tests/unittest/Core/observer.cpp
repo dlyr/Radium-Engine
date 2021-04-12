@@ -9,6 +9,9 @@ class ObservableTest : public Observable<>
 class ObservableTest2 : public Observable<int>
 {};
 
+class ObservableTest3 : public Observable<int, float>
+{};
+
 class A
 {
   public:
@@ -63,6 +66,7 @@ TEST_CASE( "Core/Utils/Observable", "[Core][Core/Utils][Observable]" ) {
     test.attach( A::g );
     test.attach( bf );
     test.attach( [&c]() { c++; } );
+    test.attachMember( &a, &A::f );
     test.notify();
 
     REQUIRE( c == 4 );
