@@ -53,6 +53,7 @@ define_property(TARGET
 #   configure_cmdline_Radium_app(
 #         NAME theTargetName # <- this must be an executable
 #         RESOURCES ResourceDir1 ResourceDir2 # <- accept a list of directories
+#         [PREFIX prefix] # <- add prefix to resrouces see installTargetResources doc
 # )
 function(configure_cmdline_Radium_app)
     # "declare" and parse parameters
@@ -61,6 +62,7 @@ function(configure_cmdline_Radium_app)
         ""
         "NAME"
         "RESOURCES" # list of directories containing the resources to install - optional
+        "PREFIX"
         ${ARGN}
     )
     if (NOT ARGS_NAME)
@@ -106,6 +108,7 @@ function(configure_cmdline_Radium_app)
             installTargetResources(
                 TARGET ${ARGS_NAME}
                 DIRECTORY ${resLocation}
+                PREFIX ${ARGS_PREFIX}
                 BUILD_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/Resources
             )
         endforeach ()
@@ -137,6 +140,7 @@ endmacro()
 #         NAME theTargetName # <- this must be an executable
 #         RESOURCES ResourceDir1 ResourceDir2 # <- accept a list of directories
 #         [USE_PLUGIN] # set this option if Plugins from Radium bundle must be imported in the application bundle
+#         [PREFIX prefix] # <- add prefix to resrouces see installTargetResources doc
 # )
 function(configure_bundled_Radium_app)
     # "declare" and parse parameters
@@ -144,6 +148,7 @@ function(configure_bundled_Radium_app)
         ARGS
         "USE_PLUGINS"
         "NAME"
+        "PREFIX"
         "RESOURCES" # list of directories containing the resources to install - optional
         ${ARGN}
     )
@@ -244,6 +249,7 @@ function(configure_bundled_Radium_app)
             installTargetResources(
                 TARGET ${ARGS_NAME}
                 DIRECTORY ${resLocation}
+                PREFIX ${ARGS_PREFIX}
                 BUILD_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${ARGS_NAME}.app/Contents/Resources
             )
         endforeach ()
@@ -528,6 +534,7 @@ endfunction()
 #         NAME theTargetName # <- this must be an executable
 #         [USE_PLUGINS] # <- The application uses Radium Plugins : install available plugins into the bundle if it is one
 #         [RESOURCES ResourceDir1 ResourceDir2] # <- accept a list of directories
+#         [PREFIX prefix] # <- add prefix to resrouces see installTargetResources doc
 # )
 function(configure_radium_app)
     # "declare" and parse parameters
