@@ -46,7 +46,6 @@ set(Qt5_LIBRARIES Qt5::Core Qt5::Widgets Qt5::OpenGL Qt5::Xml)
 target_link_libraries (unittests PRIVATE ${Qt5_LIBRARIES} PRIVATE std::filesystem)
 target_compile_definitions(unittests PRIVATE -DCXX_FILESYSTEM_HAVE_FS -DCXX_FILESYSTEM_IS_EXPERIMENTAL=$<BOOL:${CXX_FILESYSTEM_IS_EXPERIMENTAL}> -DCXX_FILESYSTEM_NAMESPACE=${CXX_FILESYSTEM_NAMESPACE})
 
-
 # convenience target for running only the unit tests
 add_custom_target(run_unittests
     #this way we can use fake data from /tests/unittest/ dir (if we have any):
