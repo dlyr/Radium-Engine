@@ -55,27 +55,28 @@ void MultiIndexedGeometry::checkConsistency() const {
 #endif
 }
 
-bool
-MultiIndexedGeometry::append( const MultiIndexedGeometry& other ) {
+bool MultiIndexedGeometry::append( const MultiIndexedGeometry& other ) {
     bool dataHasBeenCopied = false;
     for ( const auto& [key, value] : other.m_indices )
     {
         auto it = m_indices.find( key );
-        if ( it == m_indices.end() ) //copy entire layer
+        if ( it == m_indices.end() ) // copy entire layer
         {
-            m_indices[key] = value;
+            m_indices[key]    = value;
             dataHasBeenCopied = true;
         }
         else
             // try to append to an existing layer: should always work
             if ( it->second.second->append( *( value.second ) ) )
-                dataHasBeenCopied = true;
-            else
-                CORE_ASSERT( false,
-                             "Inconsistent situation found: layers with different semantics sharing the same key" );
+            dataHasBeenCopied = true;
+        else
+            CORE_ASSERT( false,
+                         "Inconsistent situation found: layers with different semantics sharing "
+                         "the same key" );
     }
 
-    if ( dataHasBeenCopied ){
+    if ( dataHasBeenCopied )
+    {
         invalidateAabb();
         notify();
     }
