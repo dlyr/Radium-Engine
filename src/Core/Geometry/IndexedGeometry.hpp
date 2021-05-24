@@ -44,7 +44,7 @@ class RA_CORE_API GeometryIndexLayerBase : public Utils::ObservableVoid,
     virtual bool append( const GeometryIndexLayerBase& other ) = 0;
 
     /// \brief Compare if two layers have the same content
-    virtual inline bool operator== ( const GeometryIndexLayerBase& other ) const { return false; }
+    virtual inline bool operator==( const GeometryIndexLayerBase& other ) const { return false; }
 
     /// \return the number of index (i.e. "faces") contained in the layer.
     virtual size_t size() = 0;
@@ -76,7 +76,7 @@ struct GeometryIndexLayer : public GeometryIndexLayerBase {
     }
 
     /// \warning Does not account for elements permutations
-    inline bool operator== ( const GeometryIndexLayerBase &other ) const final {
+    inline bool operator==( const GeometryIndexLayerBase& other ) const final {
         if ( shareSemantic( other ) )
         {
             const auto& othercasted = static_cast<const GeometryIndexLayer<T>&>( other );
