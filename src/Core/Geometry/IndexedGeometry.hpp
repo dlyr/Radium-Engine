@@ -506,6 +506,15 @@ struct getType<Vector1ui> {
 
 } // namespace IndexLayerType
 
+/**
+ * \brief A single layer MultiIndexedGeometry.
+ * This class actually provide compatibility with old geometry with a main layer.
+ * Main layer contains indices of a specific type (point, line, triangle, poly).
+ * Derived classes explicit the kind of indices of the main layer.
+ * Since IndexedGeometry is a MultiIndexedGeometry, one can add index layer on the fly.
+ * \warning will be depracated when MultiIndexedGeometry will be supported directly on the engine
+ * side.
+ */
 template <typename T>
 class IndexedGeometry : public MultiIndexedGeometry
 {
