@@ -186,7 +186,7 @@ class RA_ENGINE_API VaoIndices
         void operator()() { m_displayable->m_indicesDirty = true; }
 
       private:
-        VaoIndices* m_displayable;
+        VaoIndices* m_displayable { nullptr };
     };
 
   protected:
@@ -350,44 +350,79 @@ class IndexedGeometry : public CoreGeometryDisplayable<T>, public VaoIndices
 };
 
 /// An engine mesh owning a MultiIndexedCoreGeometry, with multiple indices layer.
-/// \todo Work in progress.
-template <typename T>
-class MultiIndexedGeometry : public CoreGeometryDisplayable<T>
+class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
 {
   public:
-    using base = CoreGeometryDisplayable<T>;
-    using CoreGeometryDisplayable<T>::CoreGeometryDisplayable;
-    explicit MultiIndexedGeometry(
+    using base = AttribArrayDisplayable;
+
+    using LayerSemanticCollection =
+        typename Core::Geometry::MultiIndexedGeometry::LayerSemanticCollection;
+    using LayerSemantic = typename Core::Geometry::MultiIndexedGeometry::LayerSemantic;
+    using LayerKeyType  = typename Core::Geometry::MultiIndexedGeometry::LayerKeyType;
+    using LayerKeyHash  = Core::Geometry::MultiIndexedGeometry::LayerKeyHash;
+
+    explicit GeometryDisplayable(
         const std::string& name,
-        typename base::CoreGeometry&& geom,
+        typename Core::Geometry::MultiIndexedGeometry&& geom,
         typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_TRIANGLES );
+    virtual inline ~GeometryDisplayable();
     void render( const ShaderProgram* prog ) override;
 
-    void loadGeometry( T&& mesh ) override;
+    inline Core::Geometry::MultiIndexedGeometry& getGeometry() { return m_geom; }
+    inline const Core::Geometry::MultiIndexedGeometry& getGeometry() const { return m_geom; }
+
+    /// Bind meshAttribName to shaderAttribName.
+    /// meshAttribName is a vertex attrib added to the underlying CoreGeometry
+    /// shaderAttribName is the name of the input paramter of the shader.
+    /// By default the same name is used, but this mecanism allows to override
+    /// this behavior.
+    /// Only one shaderAttribName can be bound to a meshAttribName and the other
+    /// way round.
+    /// \param meshAttribName: name of the attribute on the CoreGeometry side
+    /// \param shaderAttribName: name of the input vertex attribute on the
+    /// shader side.
+    void setAttribNameCorrespondence( const std::string& meshAttribName,
+                                      const std::string& shaderAttribName );
+
+    void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh );
+    inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh, LayerKeyType key ) {
+        loadGeometry( std::move( mesh ) );
+        addRenderLayer( key );
+    }
+    template <typename RangeOfLayerKeys>
+    inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh,
+                              const RangeOfLayerKeys& r ) {
+        loadGeometry( std::move( mesh ) );
+        for ( const auto& k : r )
+            addRenderLayer( k );
+    }
+    bool addRenderLayer( LayerKeyType key );
+    bool removeRenderLayer( LayerKeyType key );
 
   protected:
-    void updateGL_specific_impl() override;
+    void updateGL_specific_impl();
+    void setupCoreMeshObservers();
 
-    using LayerSemanticCollection = Core::Utils::ObjectWithSemantic::SemanticNameCollection;
-    using LayerSemantic           = Core::Utils::ObjectWithSemantic::SemanticName;
-    using LayerKeyType            = std::pair<LayerSemanticCollection, std::string>;
+    /// assume m_vao is bound.
+    void autoVertexAttribPointer( const ShaderProgram* prog );
 
-    using EntryType = std::pair<bool, VaoIndices*>;
-    struct RA_CORE_API KeyHash {
-        std::size_t operator()( const LayerKeyType& k ) const {
-            // Mix semantic collection into a single identifier string
-            std::ostringstream stream;
-            std::copy(
-                k.first.begin(), k.first.end(), std::ostream_iterator<std::string>( stream, "" ) );
-            std::string result = stream.str();
-            std::sort( result.begin(), result.end() );
+    /// m_mesh Observer method, called whenever an attrib is added or removed from
+    /// m_mesh.
+    /// it adds an observer to the new attrib.
+    void addAttribObserver( const std::string& name );
 
-            // Combine with layer name hash
-            return std::hash<std::string> {}( result ) ^
-                   ( std::hash<std::string> {}( k.second ) << 1 );
-        }
-    };
-    std::unordered_map<LayerKeyType, EntryType, KeyHash> m_indices;
+    void addToTranslationTable( const std::string& name );
+
+    // <observerId, vao>
+    using LayerEntryType = std::pair<int, VaoIndices*>; // std::pair<bool, VaoIndices*>;
+
+    using TranslationTable = std::map<std::string, std::string>;
+    TranslationTable m_translationTableMeshToShader;
+    TranslationTable m_translationTableShaderToMesh;
+
+  private:
+    Core::Geometry::MultiIndexedGeometry m_geom;
+    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
 };
 
 /// LineMesh, own a Core::Geometry::LineMesh
