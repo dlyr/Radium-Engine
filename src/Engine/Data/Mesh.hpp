@@ -190,37 +190,12 @@ class RA_ENGINE_API VaoIndices
     };
 
   protected:
+    // vbo
     std::unique_ptr<globjects::Buffer> m_indices { nullptr };
     bool m_indicesDirty { true };
     /// number of elements to draw (i.e number of indices to use)
     /// automatically set by updateGL(), not meaningfull if m_indicesDirty.
     size_t m_numElements { 0 };
-};
-
-/// This class handles an attrib array displayable on gpu only, without core
-/// geometry. Use only when you don't need to access the cpu geometry again, or
-/// when you need to specify special indices.
-template <typename I>
-class IndexedAttribArrayDisplayable : public AttribArrayDisplayable, public VaoIndices
-{
-    using IndexType          = I;
-    using IndexContainerType = Ra::Core::AlignedStdVector<IndexType>;
-
-    template <typename T>
-    inline void addAttrib( const std::string& name,
-                           const typename Ra::Core::Utils::Attrib<T>::Container& data );
-    template <typename T>
-    inline void addAttrib( const std::string& name,
-                           const typename Ra::Core ::Utils::Attrib<T>::Container&& data );
-    inline void updateGL() override;
-
-    inline void render( const ShaderProgram* prog ) override;
-
-  protected:
-    /// assume m_vao is bound.
-    inline void autoVertexAttribPointer( const ShaderProgram* prog );
-    IndexContainerType m_cpu_indices;
-    AttribManager m_attribManager;
 };
 
 /// Template class to manage the Displayable aspect of a Core Geomertry, such as TriangleMesh.
@@ -361,10 +336,10 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     using LayerKeyType  = typename Core::Geometry::MultiIndexedGeometry::LayerKeyType;
     using LayerKeyHash  = Core::Geometry::MultiIndexedGeometry::LayerKeyHash;
 
-    explicit GeometryDisplayable(
-        const std::string& name,
-        typename Core::Geometry::MultiIndexedGeometry&& geom,
-        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_TRIANGLES );
+    explicit GeometryDisplayable( const std::string& name,
+                                  typename Core::Geometry::MultiIndexedGeometry&& geom,
+                                  typename base::MeshRenderMode renderMode =
+                                      base::MeshRenderMode::RM_TRIANGLES ); // remove rendermode
     virtual inline ~GeometryDisplayable();
     void render( const ShaderProgram* prog ) override;
 
@@ -398,6 +373,8 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     }
     bool addRenderLayer( LayerKeyType key );
     bool removeRenderLayer( LayerKeyType key );
+    // bool setRenderMode( LayerKeyType key, RenderMode );
+    // RenderMode getRenderMode( LayerKeyType key );
 
   protected:
     void updateGL_specific_impl();
@@ -414,7 +391,8 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     void addToTranslationTable( const std::string& name );
 
     // <observerId, vao>
-    using LayerEntryType = std::pair<int, VaoIndices*>; // std::pair<bool, VaoIndices*>;
+    using LayerEntryType =
+        std::pair<int, VaoIndices*>; // std::pair<int, { globject::glvertexArray, MeshRenderMode}>;
 
     using TranslationTable = std::map<std::string, std::string>;
     TranslationTable m_translationTableMeshToShader;
@@ -423,6 +401,9 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
   private:
     Core::Geometry::MultiIndexedGeometry m_geom;
     std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
+
+    // collection vbo: attributs
+    // collection vbo: differents indices
 };
 
 /// LineMesh, own a Core::Geometry::LineMesh

@@ -386,6 +386,7 @@ class RA_CORE_API MultiIndexedGeometry : public AttribArrayGeometry, public Util
 
     using LayerEntryType = std::pair<bool, std::unique_ptr<GeometryIndexLayerBase>>;
 
+  public:
     struct RA_CORE_API LayerKeyHash {
         std::size_t operator()( const LayerKeyType& k ) const;
     };
