@@ -152,9 +152,8 @@ void AttribArrayDisplayable::setDirty( const Ra::Core::Geometry::MeshAttrib& typ
 ////////////////  MultiIndexedGeometry  ///////////////////////////////
 
 GeometryDisplayable::GeometryDisplayable( const std::string& name,
-                                          typename Core::Geometry::MultiIndexedGeometry&& geom,
-                                          typename base::MeshRenderMode renderMode ) :
-    base( name, renderMode ), m_geom( std::move( geom ) ) {}
+                                          typename Core::Geometry::MultiIndexedGeometry&& geom ) :
+    base( name ), m_geom( std::move( geom ) ) {}
 
 GeometryDisplayable::~GeometryDisplayable() {}
 
@@ -370,23 +369,24 @@ AttribArrayDisplayable::getVboHandle( const std::string& name ) {
     return {};
 }
 
-void PointCloud::render( const ShaderProgram* prog ) {
-    if ( m_vao ) {
-        autoVertexAttribPointer( prog );
-        m_vao->bind();
-        m_vao->drawArrays(
-            static_cast<GLenum>( m_renderMode ), 0, GLsizei( m_mesh.vertices().size() ) );
-        m_vao->unbind();
-    }
-}
-
-void PointCloud::loadGeometry( Core::Geometry::PointCloud&& mesh ) {
-    loadGeometry_common( std::move( mesh ) );
-}
-
-void PointCloud::updateGL_specific_impl() {
-    if ( !m_vao ) { m_vao = globjects::VertexArray::create(); }
-}
+// void PointCloud::render( const ShaderProgram* prog ) {
+//    if ( m_vao )
+//    {
+//        autoVertexAttribPointer( prog );
+//        m_vao->bind();
+//        m_vao->drawArrays(
+//            static_cast<GLenum>( m_renderMode ), 0, GLsizei( m_mesh.vertices().size() ) );
+//        m_vao->unbind();
+//    }
+//}
+//
+// void PointCloud::loadGeometry( Core::Geometry::PointCloud&& mesh ) {
+//    loadGeometry_common( std::move( mesh ) );
+//}
+//
+// void PointCloud::updateGL_specific_impl() {
+//    if ( !m_vao ) { m_vao = globjects::VertexArray::create(); }
+//}
 
 } // namespace Data
 } // namespace Engine

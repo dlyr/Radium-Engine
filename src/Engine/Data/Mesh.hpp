@@ -47,6 +47,8 @@ class RA_ENGINE_API Vao
  * with a specific render mode (e.g. GL_TRIANGLES or GL_LINES).
  * It maintains the attributes and keeps them in sync with the GPU.
  * \note Attribute names are used to automatic location binding when using shaders.
+ *
+ * \TODO Remove rendermode attribute
  */
 class RA_ENGINE_API AttribArrayDisplayable : public Displayable
 {
@@ -75,9 +77,11 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
   public:
     explicit AttribArrayDisplayable( const std::string& name,
                                      MeshRenderMode renderMode = RM_TRIANGLES );
+
     AttribArrayDisplayable( const AttribArrayDisplayable& rhs ) = delete;
     void operator=( const AttribArrayDisplayable& rhs ) = delete;
 
+    // no need to detach listener since TriangleMesh is owned by Mesh.
     ~AttribArrayDisplayable() {}
 
     using Displayable::getName;
@@ -282,27 +286,27 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
 };
 
 /// A PointCloud without indices
-class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::PointCloud>
-{
-    using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
-
-  public:
-    using base::CoreGeometryDisplayable;
-    inline explicit PointCloud(
-        const std::string& name,
-        typename base::CoreGeometry&& geom,
-        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_POINTS );
-
-    inline explicit PointCloud( const std::string& name, MeshRenderMode renderMode = RM_POINTS );
-
-    /// use glDrawArrays to draw all the points in the point cloud
-    void render( const ShaderProgram* prog ) override;
-
-    void loadGeometry( Core::Geometry::PointCloud&& mesh ) override;
-
-  protected:
-    void updateGL_specific_impl() override;
-};
+// class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::PointCloud>
+//{
+//     using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
+//
+//   public:
+//     using base::CoreGeometryDisplayable;
+//     inline explicit PointCloud(
+//         const std::string& name,
+//         typename base::CoreGeometry&& geom,
+//         typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_POINTS );
+//
+//     inline explicit PointCloud( const std::string& name, MeshRenderMode renderMode = RM_POINTS );
+//
+//     /// use glDrawArrays to draw all the points in the point cloud
+//     void render( const ShaderProgram* prog ) override;
+//
+//     void loadGeometry( Core::Geometry::PointCloud&& mesh ) override;
+//
+//   protected:
+//     void updateGL_specific_impl() override;
+// };
 
 /// An engine mesh owning CoreGeometry, with indices
 template <typename T>
@@ -337,9 +341,7 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     using LayerKeyHash  = Core::Geometry::MultiIndexedGeometry::LayerKeyHash;
 
     explicit GeometryDisplayable( const std::string& name,
-                                  typename Core::Geometry::MultiIndexedGeometry&& geom,
-                                  typename base::MeshRenderMode renderMode =
-                                      base::MeshRenderMode::RM_TRIANGLES ); // remove rendermode
+                                  typename Core::Geometry::MultiIndexedGeometry&& geom );
     virtual inline ~GeometryDisplayable();
     void render( const ShaderProgram* prog ) override;
 
@@ -390,20 +392,32 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
 
     void addToTranslationTable( const std::string& name );
 
-    // <observerId, vao>
-    using LayerEntryType =
-        std::pair<int, VaoIndices*>; // std::pair<int, { globject::glvertexArray, MeshRenderMode}>;
+  private:
+    Core::Geometry::MultiIndexedGeometry m_geom;
+
+    /// Data required to configure rendering for each layer
+    struct LayerEntryType {
+        int observerId { -1 };
+        globjects::VertexArray vao {};
+        base::MeshRenderMode renderMode { RM_TRIANGLES };
+    };
+    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
+
+    /// Data required to store and used VBOs
+    struct VBOEntryType {
+        bool dirty { false };
+        globjects::Buffer buffer {};
+        size_t numElements { 0 };
+    };
+    using VBOCollection = std::vector<VBOEntryType>;
+    /// Collection of VBOs for per-vertex attributes
+    VBOCollection m_attribVBOs;
+    /// Collection of VBOs for each layer indices
+    VBOCollection m_indicesVBOs;
 
     using TranslationTable = std::map<std::string, std::string>;
     TranslationTable m_translationTableMeshToShader;
     TranslationTable m_translationTableShaderToMesh;
-
-  private:
-    Core::Geometry::MultiIndexedGeometry m_geom;
-    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
-
-    // collection vbo: attributs
-    // collection vbo: differents indices
 };
 
 /// LineMesh, own a Core::Geometry::LineMesh
