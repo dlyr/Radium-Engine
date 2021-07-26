@@ -241,17 +241,49 @@ void GeometryDisplayable::setAttribNameCorrespondence( const std::string& meshAt
     m_translationTableMeshToShader[meshAttribName]   = shaderAttribName;
 }
 
-bool GeometryDisplayable::addRenderLayer( LayerKeyType key ) {
+bool GeometryDisplayable::addRenderLayer( LayerKeyType key, base::MeshRenderMode renderMode ) {
     if ( !m_geom.containsLayer( key ) ) return false;
     auto it = m_geomLayers.find( key );
     if ( it == m_geomLayers.end() ) return false;
+    const auto& abstractLayer = m_geom.getLayer( key );
 
-    VaoIndices* vao = new VaoIndices;
+    using LayerType           = Ra::Core::Geometry::TriangleIndexLayer;
+    const auto& triangleLayer = dynamic_cast<const LayerType&>( abstractLayer );
+
     auto& geomLayer = m_geom.getLayerWithLock( key );
-    int observerId  = geomLayer.attach( VaoIndices::IndicesObserver( vao ) );
+    /// \fixme Implement observers for indices
+    // int observerId  = geomLayer.attach( VaoIndices::IndicesObserver( vao ) );
+    int observerId = -1;
     m_geom.unlockLayer( key );
 
-    m_geomLayers[key] = { observerId, vao };
+    // create vao
+    auto& l      = m_geomLayers.insert( { key, LayerEntryType() } ).first->second;
+    l.observerId = observerId;
+    l.renderMode = renderMode;
+    l.vao        = globjects::VertexArray::create();
+
+    // create indices vbo
+    m_indicesVBOs.push_back( {} );
+    auto& vbo  = m_indicesVBOs.back();
+    vbo.buffer = globjects::Buffer::create();
+    vbo.dirty  = true;
+
+    /// \todo Move to dedicated method
+    // upload data to gpu
+    if ( vbo.dirty ) {
+        //        vbo.numElements = triangleLayer.getSize() *
+        //        LayerType::IndexType::RowsAtCompileTime;
+        /// this one do not work since buffer is not a std::vector
+        vbo.buffer->setData(
+            static_cast<gl::GLsizeiptr>( triangleLayer.getSize() * sizeof( LayerType::IndexType ) ),
+            triangleLayer.collection().data(),
+            GL_STATIC_DRAW );
+        vbo.dirty = false;
+    }
+
+    l.vao->bind();
+    l.vao->bindElementBuffer( vbo.buffer.get() );
+    l.vao->unbind();
 
     return false;
 }
@@ -262,10 +294,10 @@ bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
     // the layer might have already been deleted
     if ( m_geom.containsLayer( key ) ) {
         auto& geomLayer = m_geom.getLayerWithLock( key );
-        geomLayer.detach( it->second.first );
+        geomLayer.detach( it->second.observerId );
         m_geom.unlockLayer( key );
     }
-    delete ( it->second.second );
+    it->second.vao.release();
     m_geomLayers.erase( it );
 
     return true;
@@ -369,24 +401,23 @@ AttribArrayDisplayable::getVboHandle( const std::string& name ) {
     return {};
 }
 
-// void PointCloud::render( const ShaderProgram* prog ) {
-//    if ( m_vao )
-//    {
-//        autoVertexAttribPointer( prog );
-//        m_vao->bind();
-//        m_vao->drawArrays(
-//            static_cast<GLenum>( m_renderMode ), 0, GLsizei( m_mesh.vertices().size() ) );
-//        m_vao->unbind();
-//    }
-//}
-//
-// void PointCloud::loadGeometry( Core::Geometry::PointCloud&& mesh ) {
-//    loadGeometry_common( std::move( mesh ) );
-//}
-//
-// void PointCloud::updateGL_specific_impl() {
-//    if ( !m_vao ) { m_vao = globjects::VertexArray::create(); }
-//}
+void PointCloud::render( const ShaderProgram* prog ) {
+    if ( m_vao ) {
+        autoVertexAttribPointer( prog );
+        m_vao->bind();
+        m_vao->drawArrays(
+            static_cast<GLenum>( m_renderMode ), 0, GLsizei( m_mesh.vertices().size() ) );
+        m_vao->unbind();
+    }
+}
+
+void PointCloud::loadGeometry( Core::Geometry::PointCloud&& mesh ) {
+    loadGeometry_common( std::move( mesh ) );
+}
+
+void PointCloud::updateGL_specific_impl() {
+    if ( !m_vao ) { m_vao = globjects::VertexArray::create(); }
+}
 
 } // namespace Data
 } // namespace Engine

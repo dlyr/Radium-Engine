@@ -286,27 +286,27 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
 };
 
 /// A PointCloud without indices
-// class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::PointCloud>
-//{
-//     using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
-//
-//   public:
-//     using base::CoreGeometryDisplayable;
-//     inline explicit PointCloud(
-//         const std::string& name,
-//         typename base::CoreGeometry&& geom,
-//         typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_POINTS );
-//
-//     inline explicit PointCloud( const std::string& name, MeshRenderMode renderMode = RM_POINTS );
-//
-//     /// use glDrawArrays to draw all the points in the point cloud
-//     void render( const ShaderProgram* prog ) override;
-//
-//     void loadGeometry( Core::Geometry::PointCloud&& mesh ) override;
-//
-//   protected:
-//     void updateGL_specific_impl() override;
-// };
+class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::PointCloud>
+{
+    using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
+
+  public:
+    using base::CoreGeometryDisplayable;
+    inline explicit PointCloud(
+        const std::string& name,
+        typename base::CoreGeometry&& geom,
+        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_POINTS );
+
+    inline explicit PointCloud( const std::string& name, MeshRenderMode renderMode = RM_POINTS );
+
+    /// use glDrawArrays to draw all the points in the point cloud
+    void render( const ShaderProgram* prog ) override;
+
+    void loadGeometry( Core::Geometry::PointCloud&& mesh ) override;
+
+  protected:
+    void updateGL_specific_impl() override;
+};
 
 /// An engine mesh owning CoreGeometry, with indices
 template <typename T>
@@ -362,18 +362,23 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
                                       const std::string& shaderAttribName );
 
     void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh );
-    inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh, LayerKeyType key ) {
+    inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh,
+                              LayerKeyType key,
+                              base::MeshRenderMode renderMode ) {
         loadGeometry( std::move( mesh ) );
-        addRenderLayer( key );
+        addRenderLayer( key, renderMode );
     }
+
+    /// \param r is a collection of keys and renderMode, e.g. { {key1, RM_TRIANGLES}, {key2,
+    /// RM_LINES} }
     template <typename RangeOfLayerKeys>
     inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh,
                               const RangeOfLayerKeys& r ) {
         loadGeometry( std::move( mesh ) );
         for ( const auto& k : r )
-            addRenderLayer( k );
+            addRenderLayer( k.first, k.second );
     }
-    bool addRenderLayer( LayerKeyType key );
+    bool addRenderLayer( LayerKeyType key, base::MeshRenderMode renderMode );
     bool removeRenderLayer( LayerKeyType key );
     // bool setRenderMode( LayerKeyType key, RenderMode );
     // RenderMode getRenderMode( LayerKeyType key );
@@ -396,17 +401,21 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     Core::Geometry::MultiIndexedGeometry m_geom;
 
     /// Data required to configure rendering for each layer
+    /// \note In the current version, do not know which VBOEntryType is associated to this vao:
+    ///       there is no way to clean m_indicesVBOs when a LayerEntryType is removed.
     struct LayerEntryType {
         int observerId { -1 };
-        globjects::VertexArray vao {};
+        std::unique_ptr<globjects::VertexArray> vao { nullptr };
         base::MeshRenderMode renderMode { RM_TRIANGLES };
+
+        inline LayerEntryType() = default;
     };
     std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
 
     /// Data required to store and used VBOs
     struct VBOEntryType {
         bool dirty { false };
-        globjects::Buffer buffer {};
+        std::unique_ptr<globjects::Buffer> buffer { nullptr };
         size_t numElements { 0 };
     };
     using VBOCollection = std::vector<VBOEntryType>;

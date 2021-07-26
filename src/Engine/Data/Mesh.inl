@@ -237,8 +237,7 @@ void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
         auto func = [this]( Ra::Core::Utils::AttribBase* b ) {
             auto idx = m_handleToBuffer[b->getName()];
 
-            if ( m_dataDirty[idx] )
-            {
+            if ( m_dataDirty[idx] ) {
                 if ( !m_vbos[idx] ) { m_vbos[idx] = globjects::Buffer::create(); }
                 m_vbos[idx]->setData( b->getBufferSize(), b->dataPtr(), GL_DYNAMIC_DRAW );
                 m_dataDirty[idx] = false;
@@ -248,12 +247,10 @@ void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
         m_mesh.vertexAttribs().for_each_attrib( func );
 
         // cleanup removed attrib
-        for ( auto buffer : m_handleToBuffer )
-        {
+        for ( auto buffer : m_handleToBuffer ) {
             // do not remove name from handleToBuffer to keep index ...
             // we could also update handleToBuffer, m_vbos, m_dataDirty
-            if ( !m_mesh.hasAttrib( buffer.first ) && m_vbos[buffer.second] )
-            {
+            if ( !m_mesh.hasAttrib( buffer.first ) && m_vbos[buffer.second] ) {
                 m_vbos[buffer.second].reset( nullptr );
                 m_dataDirty[buffer.second] = false;
             }
@@ -293,13 +290,11 @@ void IndexedGeometry<T>::loadGeometry( T&& mesh ) {
 
 template <typename T>
 void IndexedGeometry<T>::updateGL_specific_impl() {
-    if ( !m_indices )
-    {
+    if ( !m_indices ) {
         m_indices      = globjects::Buffer::create();
         m_indicesDirty = true;
     }
-    if ( m_indicesDirty )
-    {
+    if ( m_indicesDirty ) {
         /// this one do not work since m_indices is not a std::vector
         // m_indices->setData( m_mesh.m_indices, GL_DYNAMIC_DRAW );
         m_numElements =
@@ -320,8 +315,7 @@ void IndexedGeometry<T>::updateGL_specific_impl() {
 
 template <typename T>
 void IndexedGeometry<T>::render( const ShaderProgram* prog ) {
-    if ( base::m_vao )
-    {
+    if ( base::m_vao ) {
         GL_CHECK_ERROR;
         base::m_vao->bind();
         base::autoVertexAttribPointer( prog );
@@ -379,8 +373,8 @@ void GeneralMesh<T>::updateGL_specific_impl() {
 
         this->m_indices->setData( static_cast<gl::GLsizeiptr>( m_triangleIndices.size() *
                                                                sizeof( GeneralMesh::IndexType ) ),
-            m_triangleIndices.data(),
-            GL_STATIC_DRAW );
+                                  m_triangleIndices.data(),
+                                  GL_STATIC_DRAW );
         this->m_indicesDirty = false;
     }
     if ( !base::m_vao ) { base::m_vao = globjects::VertexArray::create(); }
@@ -395,20 +389,16 @@ void GeneralMesh<T>::triangulate() {
     m_triangleIndices.reserve( this->m_mesh.getIndices().size() );
     for ( const auto& face : this->m_mesh.getIndices() ) {
         if ( face.size() == 3 ) { m_triangleIndices.push_back( face ); }
-        else
-        {
+        else {
             /// simple sew triangulation
             int minus { int( face.size() ) - 1 };
             int plus { 0 };
-            while ( plus + 1 < minus )
-            {
-                if ( ( plus - minus ) % 2 )
-                {
+            while ( plus + 1 < minus ) {
+                if ( ( plus - minus ) % 2 ) {
                     m_triangleIndices.emplace_back( face[plus], face[plus + 1], face[minus] );
                     ++plus;
                 }
-                else
-                {
+                else {
                     m_triangleIndices.emplace_back( face[minus], face[plus], face[minus - 1] );
                     --minus;
                 }
