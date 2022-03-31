@@ -342,11 +342,23 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
 
     explicit GeometryDisplayable( const std::string& name,
                                   typename Core::Geometry::MultiIndexedGeometry&& geom );
-    virtual inline ~GeometryDisplayable();
+    virtual ~GeometryDisplayable();
     void render( const ShaderProgram* prog ) override;
 
-    inline Core::Geometry::MultiIndexedGeometry& getGeometry() { return m_geom; }
-    inline const Core::Geometry::MultiIndexedGeometry& getGeometry() const { return m_geom; }
+    ///@{
+    /**  Returns the underlying CoreGeometry as an Core::Geometry::AbstractGeometry */
+    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const override {
+        return m_geom;
+    }
+    inline Core::Geometry::AbstractGeometry& getAbstractGeometry() override { return m_geom; }
+    ///@}
+    inline const Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() const override {
+        return m_geom;
+    }
+    inline Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() override { return m_geom; }
+
+    inline Core::Geometry::MultiIndexedGeometry& getCoreGeometry() { return m_geom; }
+    inline const Core::Geometry::MultiIndexedGeometry& getCoreGeometry() const { return m_geom; }
 
     /// Bind meshAttribName to shaderAttribName.
     /// meshAttribName is a vertex attrib added to the underlying CoreGeometry
@@ -382,6 +394,9 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     bool removeRenderLayer( LayerKeyType key );
     // bool setRenderMode( LayerKeyType key, RenderMode );
     // RenderMode getRenderMode( LayerKeyType key );
+
+    /// Update (i.e. send to GPU) the buffers marked as dirty
+    void updateGL() override {}
 
   protected:
     void updateGL_specific_impl();
@@ -561,6 +576,12 @@ template <>
 struct getType<Ra::Core::Geometry::PolyMesh> {
     using Type = Ra::Engine::Data::PolyMesh;
 };
+
+template <>
+struct getType<Ra::Core::Geometry::MultiIndexedGeometry> {
+    using Type = Ra::Engine::Data::GeometryDisplayable;
+};
+
 } // namespace RenderMeshType
 
 /// create Mesh, PolyMesh Engine::Data::*Mesh * from GeometryData
