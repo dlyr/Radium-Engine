@@ -396,7 +396,7 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     // RenderMode getRenderMode( LayerKeyType key );
 
     /// Update (i.e. send to GPU) the buffers marked as dirty
-    void updateGL() override {}
+    void updateGL() override;
 
   protected:
     void updateGL_specific_impl();

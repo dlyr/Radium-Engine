@@ -287,6 +287,7 @@ bool GeometryDisplayable::addRenderLayer( LayerKeyType key, base::MeshRenderMode
 
     return false;
 }
+
 bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
     auto it = m_geomLayers.find( key );
     if ( it == m_geomLayers.end() ) return false;
@@ -301,6 +302,43 @@ bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
     m_geomLayers.erase( it );
 
     return true;
+}
+
+void GeometryDisplayable::updateGL() {
+    if ( m_isDirty ) {
+        // Check that our dirty bits are consistent.
+        ON_ASSERT( bool dirtyTest = false; for ( auto d
+                                                 : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
+        CORE_ASSERT( dirtyTest == m_isDirty, "Dirty flags inconsistency" );
+        CORE_ASSERT( !( m_geom.vertices().empty() ), "No vertex." );
+
+        updateGL_specific_impl();
+
+        auto func = [this]( Ra::Core::Utils::AttribBase* b ) {
+            auto idx = m_handleToBuffer[b->getName()];
+
+            if ( m_dataDirty[idx] ) {
+                if ( !m_vbos[idx] ) { m_vbos[idx] = globjects::Buffer::create(); }
+                m_vbos[idx]->setData( b->getBufferSize(), b->dataPtr(), GL_DYNAMIC_DRAW );
+                m_dataDirty[idx] = false;
+            }
+        };
+
+        m_geom.vertexAttribs().for_each_attrib( func );
+
+        // cleanup removed attrib
+        for ( auto buffer : m_handleToBuffer ) {
+            // do not remove name from handleToBuffer to keep index ...
+            // we could also update handleToBuffer, m_vbos, m_dataDirty
+            if ( !m_geom.hasAttrib( buffer.first ) && m_vbos[buffer.second] ) {
+                m_vbos[buffer.second].reset( nullptr );
+                m_dataDirty[buffer.second] = false;
+            }
+        }
+
+        GL_CHECK_ERROR;
+        m_isDirty = false;
+    }
 }
 
 void GeometryDisplayable::updateGL_specific_impl() {
