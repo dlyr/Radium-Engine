@@ -23,6 +23,13 @@ SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent(
     generateMesh( data );
 }
 
+template <>
+SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::SurfaceMeshComponent(
+    const std::string& name,
+    Entity* entity,
+    Ra::Core::Geometry::MultiIndexedGeometry&& mesh,
+    Core::Asset::MaterialData* mat );
+
 template <typename CoreMeshType>
 SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent( const std::string& name,
                                                           Entity* entity,
