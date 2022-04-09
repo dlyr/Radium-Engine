@@ -7,7 +7,7 @@ namespace Core {
 namespace Geometry {
 
 template <uint U, uint V>
-TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::Color>& color ) {
+TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::Color>& color,bool generateTexCoord ) {
     constexpr uint slices = U;
     constexpr uint stacks = V;
 
@@ -21,6 +21,7 @@ TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::C
     vertices.reserve( 2 + slices * ( stacks - 1 ) );
     normals.reserve( 2 + slices * ( stacks - 1 ) );
     indices.reserve( 2 * slices * ( stacks - 1 ) );
+    texCoords.reserve( 2 + slices * ( stacks - 1 ) );
 
     const Scalar du = 1_ra / slices;
     const Scalar dv = 1_ra / stacks;
@@ -34,6 +35,7 @@ TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::C
                                          radius * std::sin( theta ) * std::sin( phi ),
                                          radius * std::cos( phi ) ) );
             normals.push_back( vertices.back().normalized() );
+            texCoords.emplace_back( u * du, v * dv, 0_ra );
 
             // Regular triangles
             if ( v > 1 ) {
@@ -68,6 +70,7 @@ TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::C
     }
 
     result.setIndices( std::move( indices ) );
+    if ( generateTexCoord ) result.addAttrib( "in_texcoord", std::move( texCoords ) );
     if ( bool( color ) ) result.colorize( *color );
     result.checkConsistency();
 
@@ -77,22 +80,27 @@ TriangleMesh makeParametricSphere( Scalar radius, const Utils::optional<Utils::C
 template <uint U, uint V>
 TriangleMesh makeParametricTorus( Scalar majorRadius,
                                   Scalar minorRadius,
-                                  const Utils::optional<Utils::Color>& color ) {
+                                  const Utils::optional<Utils::Color>& color,
+                                  bool generateTexCoord ) {
     TriangleMesh result;
     TriangleMesh::PointAttribHandle::Container vertices;
     TriangleMesh::NormalAttribHandle::Container normals;
     TriangleMesh::IndexContainerType indices;
     Ra::Core::Vector3Array texCoords;
 
-    vertices.reserve( U * V );
-    normals.reserve( V * V );
+    vertices.reserve( ( U + 1 ) * ( V + 1 ) );
+    normals.reserve( ( U + 1 ) * ( V + 1 ) );
     indices.reserve( 2 * U * V );
+    texCoords.reserve( ( U + 1 ) * ( V + 1 ) );
 
-    for ( uint iu = 0; iu < U; ++iu ) {
+    const Scalar du = 1_ra / U;
+    const Scalar dv = 1_ra / V;
+
+    for ( uint iu = 0; iu <= U; ++iu ) {
         Scalar u = Scalar( iu ) * Core::Math::PiMul2 / Scalar( U );
         Core::Vector3 circleCenter( majorRadius * std::cos( u ), majorRadius * std::sin( u ), 0.f );
 
-        for ( uint iv = 0; iv < V; ++iv ) {
+        for ( uint iv = 0; iv <= V; ++iv ) {
             Scalar v = Scalar( iv ) * Core::Math::PiMul2 / Scalar( V );
 
             Core::Vector3 vertex( ( majorRadius + minorRadius * std::cos( v ) ) * std::cos( u ),
@@ -101,18 +109,23 @@ TriangleMesh makeParametricTorus( Scalar majorRadius,
 
             vertices.push_back( vertex );
             normals.push_back( ( vertex - circleCenter ).normalized() );
+            texCoords.emplace_back( iu * du, iv * dv, 0_ra );
 
-            indices.push_back( Vector3ui(
-                iu * V + iv, ( ( iu + 1 ) % U ) * V + iv, iu * V + ( ( iv + 1 ) % V ) ) );
-            indices.push_back( Vector3ui( ( ( iu + 1 ) % U ) * V + iv,
-                                          ( ( iu + 1 ) % U ) * V + ( ( iv + 1 ) % V ),
-                                          iu * V + ( ( iv + 1 ) % V ) ) );
+            if ( iu != U && iv != V ) {
+                indices.push_back( Vector3ui( iu * ( V + 1 ) + iv,
+                                              ( ( iu + 1 ) ) * ( V + 1 ) + iv,
+                                              iu * ( V + 1 ) + ( ( iv + 1 ) ) ) );
+                indices.push_back( Vector3ui( ( ( iu + 1 ) ) * ( V + 1 ) + iv,
+                                              ( ( iu + 1 ) ) * ( V + 1 ) + ( ( iv + 1 ) ),
+                                              iu * ( V + 1 ) + ( ( iv + 1 ) ) ) );
+            }
         }
     }
 
     result.setVertices( std::move( vertices ) );
     result.setNormals( std::move( normals ) );
     result.setIndices( std::move( indices ) );
+    if ( generateTexCoord ) result.addAttrib( "in_texcoord", std::move( texCoords ) );
     if ( bool( color ) ) result.colorize( *color );
     result.checkConsistency();
 

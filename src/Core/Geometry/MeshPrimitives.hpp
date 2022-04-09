@@ -53,15 +53,16 @@ RA_CORE_API TriangleMesh makeSharpBox( const Aabb& aabb,
 /// Create a parametric spherical mesh of given radius. Template parameters set the resolution.
 template <uint U = 16, uint V = U>
 TriangleMesh makeParametricSphere( Scalar radius                              = 1_ra,
-                                   const Utils::optional<Utils::Color>& color = {} );
-
+                                   const Utils::optional<Utils::Color>& color = {},
+                                   bool generateTexCoord                      = false );
 /// Create a parametric torus mesh. The minor radius is the radius of the inside of the tube and the
 /// major radius is the radius of the whole torus. The torus will be centered at the origin and have
 /// Z as rotation axis. Template parameters set the resolution of the mesh.
 template <uint U = 16, uint V = U>
 TriangleMesh makeParametricTorus( Scalar majorRadius,
                                   Scalar minorRadius,
-                                  const Utils::optional<Utils::Color>& color = {} );
+                                  const Utils::optional<Utils::Color>& color = {},
+                                  bool generateTexCoord                      = false );
 
 /// Create a spherical mesh by subdivision of an icosahedron.
 RA_CORE_API TriangleMesh makeGeodesicSphere( Scalar radius                              = 1_ra,
