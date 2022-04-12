@@ -16,6 +16,8 @@ jobs:
     secrets:
       GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
       GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
+    with:
+      use-double: 'true'
   call-deploy-doc:
     needs: [increase-version-number]
     uses: ./.github/workflows/deploy-doc.yml
