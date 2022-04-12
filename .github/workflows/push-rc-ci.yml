@@ -25,5 +25,11 @@ jobs:
     secrets:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
   call-coverage:
-    needs: [build]
-    uses: ./.github/workflows/coverage.yml
+    uses: ./.github/workflows/build-matrix.yml
+    with:
+      windows: "false"
+      macos: "false"
+      build-release: "false"
+      build-debug: "true"
+      coverage: "true"
+      qt6: "false"
