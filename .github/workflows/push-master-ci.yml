@@ -16,6 +16,8 @@ jobs:
     secrets:
       GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
       GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
+    with:
+      use-double: 'true'
   call-deploy-doc:
     needs: [increase-version-number]
     uses: ./.github/workflows/deploy-doc.yml
@@ -23,7 +25,13 @@ jobs:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
   call-coverage:
     needs: [build]
-    uses: ./.github/workflows/coverage.yml
+    uses: ./.github/workflows/build-matrix.yml
+    with:
+      windows: "false"
+      macos: "false"
+      build-release: "false"
+      coverage: "true"
+      qt6: "false"
   call-notify:
     needs: [increase-version-number]
     uses: ./.github/workflows/notify-radium-releases.yml
