@@ -25,7 +25,7 @@ jobs:
 #      use-double: 'true'
 #      generate-badges: 'true'
   call-deploy-doc:
-    needs: [increase-version-number]
+#    needs: [increase-version-number]
     uses: ./.github/workflows/deploy-doc.yml
     secrets:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
