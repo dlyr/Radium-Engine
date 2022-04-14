@@ -4,6 +4,13 @@ Radium is a research 3D Engine for rendering, animation and processing.
 Developed and maintained by the [STORM research group](https://www.irit.fr/STORM/site/).
 
 The source code is hosted on github: https://github.com/STORM-IRIT/Radium-Engine
+$(GITHUB_REF)
+[$(GITHUB_REF)]($(GITHUB_REF))
+[73d85/raw/$(GITHUB_REF).windows-latest.Release.float.json](73d85/raw/$(GITHUB_REF).windows-latest.Release.float.json)
+
+
+[](https://github.com/STORM-IRIT/Radium-Engine/actions?query=branch%3A$(GITHUB_REF)+workflow%3A%22CI%22)
+
 
 # Badges
 [![source format badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/nmellado/0e76e93f56eba8a7b28d6a0116873d85/raw/format.json)](https://github.com/STORM-IRIT/Radium-Engine/actions?query=workflow%3A%22Compile+and+Test+Radium+libraries%22)
