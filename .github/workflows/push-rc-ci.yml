@@ -6,35 +6,35 @@ on:
       - release-candidate
 
 jobs:
-  increase-version-number:
-    uses: ./.github/workflows/increase-version.yml
-    secrets:
-      token: ${{ secrets.COMMIT_VERSION_TOKEN }}
-  call-guideline-checks:
-    uses: ./.github/workflows/guideline-checks.yml
-    secrets:
-      GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
-      GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
-  call-build:
-    needs: [increase-version-number]
-    uses: ./.github/workflows/build-matrix.yml
-    secrets:
-      GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
-      GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
-    with:
-      use-double: 'true'
-      generate-badges: 'true'
+#  increase-version-number:
+#    uses: ./.github/workflows/increase-version.yml
+#    secrets:
+#      token: ${{ secrets.COMMIT_VERSION_TOKEN }}
+#  call-guideline-checks:
+#    uses: ./.github/workflows/guideline-checks.yml
+#    secrets:
+#      GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
+#      GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
+#  call-build:
+#    needs: [increase-version-number]
+#    uses: ./.github/workflows/build-matrix.yml
+#    secrets:
+#      GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
+#      GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
+#    with:
+#      use-double: 'true'
+#      generate-badges: 'true'
   call-deploy-doc:
     needs: [increase-version-number]
     uses: ./.github/workflows/deploy-doc.yml
     secrets:
       REPO_ACCESS_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
-  call-coverage:
-    needs: [call-build]
-    uses: ./.github/workflows/build-matrix.yml
-    with:
-      windows: "false"
-      macos: "false"
-      build-release: "false"
-      coverage: "true"
-      qt6: "false"
+#  call-coverage:
+#    needs: [call-build]
+#    uses: ./.github/workflows/build-matrix.yml
+#    with:
+#      windows: "false"
+#      macos: "false"
+#      build-release: "false"
+#      coverage: "true"
+#      qt6: "false"
