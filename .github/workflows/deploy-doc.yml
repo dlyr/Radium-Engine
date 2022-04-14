@@ -43,7 +43,7 @@ jobs:
         if: always()
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${${{ github.ref }}#refs/heads/})"
-        id: extract_branch
+        id: extract0branch
       - name: Configure Doc
         run: |
           cd build/Radium-Engine

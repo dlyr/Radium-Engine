@@ -211,7 +211,7 @@ jobs:
         if: always()
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${${{ github.ref }}#refs/heads/})"
-        id: extract_branch
+        id: extract-branch
       - name: Update badge on merge (failure)
         if: ${{ failure() && inputs.generate-badges == 'true' }}
         uses: schneegans/dynamic-badges-action@v1.0.0
