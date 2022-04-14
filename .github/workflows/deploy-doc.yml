@@ -43,8 +43,9 @@ jobs:
         if: always()
         shell: bash
         run: |
-          echo "echo ${${{ github.ref }}#refs/heads/}"
-          echo "::set-output name=branch::$(echo ${${{ github.ref }}#refs/heads/})"
+          GITHUB_REF=${{ github.ref }}
+          echo "echo ${GITHUB_REF#refs/heads/}"
+          echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
         id: extract-branch
       - name: Configure Doc
         run: |
