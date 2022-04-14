@@ -42,7 +42,9 @@ jobs:
       - name: Extract ref for badges prefix
         if: always()
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${${{ github.ref }}#refs/heads/})"
+        run: |
+          echo "echo ${${{ github.ref }}#refs/heads/}"
+          echo "::set-output name=branch::$(echo ${${{ github.ref }}#refs/heads/})"
         id: extract-branch
       - name: Configure Doc
         run: |
