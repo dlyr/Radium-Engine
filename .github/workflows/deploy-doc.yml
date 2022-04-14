@@ -58,7 +58,7 @@ jobs:
           export GITHUB_REF="${{ steps.extract-branch.outputs.branch }}"
           cd build/Radium-Engine
           sed -i 's/object type="image\/svg+xml" data/img src/g ; s/>codecov<\/object/ alt="codecov" class="inline"\//g' html/index.html
-          sed -i "s/\$(GITHUB_REF)/${GITHUB_REF}/g" doc/html/index.html
+          sed -i "s/\$(GITHUB_REF)/${GITHUB_REF}/g" html/index.html
           cat doc/html/index.html
       - name: Git branch name
         id: git-branch-name
