@@ -7,6 +7,7 @@
 set(gui_sources
     AboutDialog/AboutDialog.cpp
     BaseApplication.cpp
+    MaterialParameterEditor/MaterialParameterEditor.cpp
     RadiumWindow/SimpleWindow.cpp
     SelectionManager/SelectionManager.cpp
     SkeletonBasedAnimation/SkeletonBasedAnimationUI.cpp
@@ -34,18 +35,18 @@ set(gui_sources
     Viewer/TrackballCameraManipulator.cpp
     Viewer/Viewer.cpp
     Viewer/WindowQt.cpp
-    Widgets/ControlPanel.cpp
-    Widgets/PowerSlider.cpp
     Widgets/CheckingSpinBox.cpp
+    Widgets/ControlPanel.cpp
     Widgets/MatrixEditor.cpp
+    Widgets/PowerSlider.cpp
     Widgets/VectorEditor.cpp
-    MaterialParameterEditor/MaterialParameterEditor.cpp
 )
 
 set(gui_headers
     AboutDialog/AboutDialog.hpp
     BaseApplication.hpp
     MainWindowInterface.hpp
+    MaterialParameterEditor/MaterialParameterEditor.hpp
     RadiumWindow/SimpleWindowFactory.hpp
     RadiumWindow/SimpleWindow.hpp
     RaGui.hpp
@@ -77,12 +78,11 @@ set(gui_headers
     Viewer/TrackballCameraManipulator.hpp
     Viewer/Viewer.hpp
     Viewer/WindowQt.hpp
-    Widgets/ControlPanel.hpp
-    Widgets/PowerSlider.hpp
     Widgets/CheckingSpinBox.hpp
+    Widgets/ControlPanel.hpp
     Widgets/MatrixEditor.hpp
+    Widgets/PowerSlider.hpp
     Widgets/VectorEditor.hpp
-    MaterialParameterEditor/MaterialParameterEditor.hpp
 )
 
 set(gui_inlines Viewer/WindowQt.inl)
