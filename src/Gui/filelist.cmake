@@ -38,7 +38,6 @@ set(gui_sources
     Widgets/CheckingSpinBox.cpp
     Widgets/ControlPanel.cpp
     Widgets/MatrixEditor.cpp
-    Widgets/PowerSlider.cpp
     Widgets/VectorEditor.cpp
 )
 
@@ -81,7 +80,6 @@ set(gui_headers
     Widgets/CheckingSpinBox.hpp
     Widgets/ControlPanel.hpp
     Widgets/MatrixEditor.hpp
-    Widgets/PowerSlider.hpp
     Widgets/VectorEditor.hpp
 )
 

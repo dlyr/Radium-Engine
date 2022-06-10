@@ -11,6 +11,7 @@ include(QtFunctions)
 # Find packages
 find_qt_package(COMPONENTS Core Widgets OpenGL Xml REQUIRED)
 find_package(OpenGL REQUIRED)
+find_package(PowerSlider REQUIRED)
 
 # Qt
 set(Qt_LIBRARIES Qt::Core Qt::Widgets Qt::OpenGL Qt::Xml)
@@ -29,7 +30,7 @@ add_library(
 
 add_dependencies(${ra_gui_target} Core Engine PluginBase IO)
 target_link_libraries(${ra_gui_target} PUBLIC Core Engine PluginBase IO)
-target_link_libraries(${ra_gui_target} PRIVATE ${Qt_LIBRARIES} OpenGL::GL)
+target_link_libraries(${ra_gui_target} PRIVATE ${Qt_LIBRARIES} OpenGL::GL PowerSlider::PowerSlider)
 
 target_compile_options(${ra_gui_target} PUBLIC ${RA_DEFAULT_COMPILE_OPTIONS})
 
