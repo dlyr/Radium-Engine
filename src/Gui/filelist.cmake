@@ -35,7 +35,6 @@ set(gui_sources
     Viewer/TrackballCameraManipulator.cpp
     Viewer/Viewer.cpp
     Viewer/WindowQt.cpp
-    Widgets/CheckingSpinBox.cpp
     Widgets/ControlPanel.cpp
     Widgets/MatrixEditor.cpp
     Widgets/VectorEditor.cpp
@@ -83,7 +82,7 @@ set(gui_headers
     Widgets/VectorEditor.hpp
 )
 
-set(gui_inlines Viewer/WindowQt.inl)
+set(gui_inlines Viewer/WindowQt.inl Widgets/CheckingSpinBox.inl Widgets/ControlPanel.inl)
 
 set(gui_uis AboutDialog/AboutDialog.ui SkeletonBasedAnimation/SkeletonBasedAnimationUI.ui
             Timeline/HelpDialog.ui Timeline/Timeline.ui
