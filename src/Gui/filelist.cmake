@@ -76,13 +76,13 @@ set(gui_headers
     Viewer/TrackballCameraManipulator.hpp
     Viewer/Viewer.hpp
     Viewer/WindowQt.hpp
-    Widgets/CheckingSpinBox.hpp
+    Widgets/ConstrainedNumericSpinBox.hpp
     Widgets/ControlPanel.hpp
     Widgets/MatrixEditor.hpp
     Widgets/VectorEditor.hpp
 )
 
-set(gui_inlines Viewer/WindowQt.inl Widgets/CheckingSpinBox.inl Widgets/ControlPanel.inl)
+set(gui_inlines Viewer/WindowQt.inl Widgets/ConstrainedNumericSpinBox.inl Widgets/ControlPanel.inl)
 
 set(gui_uis AboutDialog/AboutDialog.ui SkeletonBasedAnimation/SkeletonBasedAnimationUI.ui
             Timeline/HelpDialog.ui Timeline/Timeline.ui
