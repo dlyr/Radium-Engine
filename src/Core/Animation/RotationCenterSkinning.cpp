@@ -1,14 +1,32 @@
-#include <Core/Animation/RotationCenterSkinning.hpp>
-
-#include <array>
-#include <unordered_map>
-
 #include <Core/Animation/DualQuaternionSkinning.hpp>
 #include <Core/Animation/HandleWeight.hpp>
 #include <Core/Animation/Pose.hpp>
 #include <Core/Animation/SkinningData.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
 #include <Core/Utils/Log.hpp>
+#include <Eigen/Core>
+#include <Eigen/Sparse>
+
+#include <OpenMesh/Core/Mesh/ArrayKernel.hh>
+#include <OpenMesh/Core/Mesh/Handles.hh>
+#include <OpenMesh/Core/Mesh/IteratorsT.hh>
+#include <OpenMesh/Core/Mesh/PolyConnectivity_inline_impl.hh>
+#include <OpenMesh/Core/Mesh/PolyMeshT.hh>
+#include <OpenMesh/Core/Mesh/SmartHandles.hh>
+#include <algorithm>
+#include <cmath>
+#include <map>
+#include <memory>
+#include <new>
+#include <ostream>
+#include <set>
+#include <stdlib.h>
+#include <string>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
+
 
 namespace Ra {
 namespace Core {

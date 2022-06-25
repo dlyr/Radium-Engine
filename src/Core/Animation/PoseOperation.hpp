@@ -1,10 +1,13 @@
 #pragma once
 
 #include <Core/Animation/Pose.hpp>
+#include <Core/CoreMacros.hpp>
+#include <Core/RaCore.hpp>
 #include <Core/Types.hpp>
 
 namespace Ra {
 namespace Core {
+
 namespace Animation {
 
 /*

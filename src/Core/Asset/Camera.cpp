@@ -1,6 +1,12 @@
 #include <Core/Asset/Camera.hpp>
-#include <Core/Containers/MakeShared.hpp>
 #include <Core/Math/Math.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <Eigen/Householder>
+#include <Eigen/LU>
+#include <Eigen/SVD>
+#include <algorithm>
+
 
 namespace Ra {
 

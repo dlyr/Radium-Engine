@@ -73,6 +73,7 @@ if(RADIUM_USE_DOUBLE)
     add_definitions(-DCORE_USE_DOUBLE)
 endif()
 # Changing the default value for CMAKE_BUILD_PARALLEL_LEVEL
+
 if(NOT DEFINED ENV{CMAKE_BUILD_PARALLEL_LEVEL})
     include(ProcessorCount)
     ProcessorCount(N)

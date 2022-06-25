@@ -8,8 +8,8 @@
 #include <Core/Animation/RotationCenterSkinning.hpp>
 #include <Core/Geometry/DistanceQueries.hpp>
 #include <Core/Utils/Color.hpp>
+#include <Core/Utils/Index.hpp>
 #include <Core/Utils/Log.hpp>
-
 #include <Engine/Data/BlinnPhongMaterial.hpp>
 #include <Engine/Data/Mesh.hpp>
 #include <Engine/Data/ShaderConfigFactory.hpp>
@@ -18,6 +18,16 @@
 #include <Engine/Rendering/RenderObject.hpp>
 #include <Engine/Rendering/RenderObjectManager.hpp>
 #include <Engine/Rendering/RenderTechnique.hpp>
+#include <Engine/Scene/Component.hpp>
+#include <Engine/Scene/ComponentMessenger.hpp>
+#include <algorithm>
+
+#include <functional>
+#include <new>
+#include <ostream>
+#include <set>
+#include <string.h>
+#include <unordered_map>
 
 using namespace Ra::Core;
 

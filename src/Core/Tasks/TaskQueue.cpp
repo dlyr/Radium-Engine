@@ -1,5 +1,6 @@
-#include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
+
+#include <Core/Tasks/Task.hpp>
 
 #include <algorithm>
 #include <iostream>

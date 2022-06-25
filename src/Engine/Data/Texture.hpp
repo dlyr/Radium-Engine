@@ -5,6 +5,11 @@
 #include <Engine/OpenGL.hpp>
 #include <Engine/RaEngine.hpp>
 
+#include <glbinding/gl/boolean.h>
+#include <glbinding/gl/enum.h>
+#include <glbinding/gl/types.h>
+#include <glbinding/gl45core/enum.h>
+
 #include <memory>
 #include <mutex>
 #include <string>

@@ -3,14 +3,55 @@
 #include "Core/Utils/Log.hpp"
 #include "TopologicalMesh.hpp"
 
+#include <Core/Geometry/StandardAttribNames.hpp>
+#include <Eigen/src/Core/AssignEvaluator.h>
+#include <Eigen/src/Core/BooleanRedux.h>
+#include <Eigen/src/Core/DenseCoeffsBase.h>
+#include <Eigen/src/Core/GenericPacketMath.h>
+#include <Eigen/src/Core/Matrix.h>
+#include <Eigen/src/Core/MatrixBase.h>
+#include <Eigen/src/Core/util/Memory.h>
+#include <stddef.h>
+#include <OpenMesh/Core/Mesh/CirculatorsT.hh>
+#include <OpenMesh/Core/Mesh/Handles.hh>
+#include <OpenMesh/Core/Mesh/IteratorsT.hh>
+#include <OpenMesh/Core/Mesh/PolyConnectivity.hh>
+#include <OpenMesh/Core/Mesh/PolyConnectivity_inline_impl.hh>
+#include <OpenMesh/Core/Mesh/PolyMeshT.hh>
+#include <OpenMesh/Core/Mesh/SmartHandles.hh>
 #include <typeinfo>
 #include <unordered_map>
+#include <algorithm>
+#include <iterator>
+#include <map>
+#include <memory>
+#include <ostream>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
-#include <Core/Geometry/StandardAttribNames.hpp>
+#include "Core/Containers/AlignedStdVector.hpp"
+#include "Core/Containers/VectorArray.hpp"
+#include "Core/CoreMacros.hpp"
+#include "Core/Geometry/IndexedGeometry.hpp"
+#include "Core/Geometry/IndexedGeometry.inl"
+#include "Core/Geometry/TriangleMesh.inl"
+#include "Core/Types.hpp"
+#include "Core/Utils/Attribs.hpp"
+#include "Core/Utils/Attribs.inl"
+#include "Core/Utils/Index.hpp"
+#include "Core/Utils/Index.inl"
+#include "Core/Utils/Log.hpp"
+
+namespace OpenMesh {
+template <class T> struct HPropHandleT;
+}  // namespace OpenMesh
 
 namespace Ra {
 namespace Core {
 namespace Geometry {
+class TopologicalMesh;
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////      WedgeData                //////////////////////////////

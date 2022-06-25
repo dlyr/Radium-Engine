@@ -3,10 +3,12 @@
 #include <Core/Utils/Log.hpp>
 #include <Engine/Data/Texture.hpp>
 #include <Engine/RadiumEngine.hpp>
-
-#include <globjects/Texture.h>
-
+#include <Engine/OpenGL.hpp>
 #include <cmath>
+#include <glbinding-aux/types_to_string.h>
+#include <glbinding/gl/functions-patches.h>
+#include <globjects/Texture.h>
+#include <ostream>
 
 namespace Ra {
 namespace Engine {

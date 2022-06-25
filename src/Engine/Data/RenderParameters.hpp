@@ -8,6 +8,7 @@
 #include <nlohmann/json.hpp>
 
 #include <Core/Containers/AlignedAllocator.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Types.hpp>
 #include <Core/Utils/BijectiveAssociation.hpp>
 #include <Core/Utils/Color.hpp>
