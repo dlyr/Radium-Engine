@@ -25,6 +25,7 @@ set(core_sources
     Asset/MaterialData.cpp
     Containers/AdjacencyList.cpp
     Geometry/CatmullClarkSubdivider.cpp
+    Geometry/Curve2D.cpp
     Geometry/IndexedGeometry.cpp
     Geometry/LoopSubdivider.cpp
     Geometry/MeshPrimitives.cpp
