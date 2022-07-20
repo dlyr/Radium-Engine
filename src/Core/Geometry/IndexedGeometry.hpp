@@ -64,7 +64,7 @@ struct GeometryIndexLayer : public GeometryIndexLayerBase {
 
     inline size_t getSize() const override final;
 
-    inline std::unique_ptr<GeometryIndexLayerBase> clone() override final;
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override;
 
     inline size_t getNumberOfComponents() const override final;
 
@@ -440,6 +440,12 @@ struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
 struct RA_CORE_API QuadIndexLayer : public GeometryIndexLayer<Vector4ui> {
     inline QuadIndexLayer();
     static constexpr const char* staticSemanticName = "QuadMesh";
+
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() {
+        auto copy          = std::make_unique<QuadIndexLayer>( *this );
+        copy->collection() = collection();
+        return copy;
+    }
 
   protected:
     template <class... SemanticNames>
