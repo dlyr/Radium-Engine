@@ -419,6 +419,12 @@ struct RA_CORE_API PointCloudIndexLayer : public GeometryIndexLayer<Vector1ui> {
 
     static constexpr const char* staticSemanticName = "PointCloud";
 
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override {
+        auto copy          = std::make_unique<PointCloudIndexLayer>( *this );
+        copy->collection() = collection();
+        return copy;
+    }
+
   protected:
     template <class... SemanticNames>
     inline PointCloudIndexLayer( SemanticNames... names );
@@ -430,6 +436,12 @@ struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
     inline TriangleIndexLayer();
     static constexpr const char* staticSemanticName = "TriangleMesh";
 
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override {
+        auto copy          = std::make_unique<TriangleIndexLayer>( *this );
+        copy->collection() = collection();
+        return copy;
+    }
+
   protected:
     template <class... SemanticNames>
     inline explicit TriangleIndexLayer( SemanticNames... names );
@@ -440,8 +452,8 @@ struct RA_CORE_API TriangleIndexLayer : public GeometryIndexLayer<Vector3ui> {
 struct RA_CORE_API QuadIndexLayer : public GeometryIndexLayer<Vector4ui> {
     inline QuadIndexLayer();
     static constexpr const char* staticSemanticName = "QuadMesh";
-
-    inline std::unique_ptr<GeometryIndexLayerBase> clone() {
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override {
+        std::cerr << "clone quad mesh \n";
         auto copy          = std::make_unique<QuadIndexLayer>( *this );
         copy->collection() = collection();
         return copy;
@@ -459,6 +471,12 @@ struct RA_CORE_API PolyIndexLayer : public GeometryIndexLayer<VectorNui> {
     inline PolyIndexLayer();
     static constexpr const char* staticSemanticName = "PolyMesh";
 
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override {
+        auto copy          = std::make_unique<PolyIndexLayer>( *this );
+        copy->collection() = collection();
+        return copy;
+    }
+
   protected:
     template <class... SemanticNames>
     inline explicit PolyIndexLayer( SemanticNames... names );
@@ -469,6 +487,11 @@ struct RA_CORE_API PolyIndexLayer : public GeometryIndexLayer<VectorNui> {
 struct RA_CORE_API LineIndexLayer : public GeometryIndexLayer<Vector2ui> {
     inline LineIndexLayer();
     static constexpr const char* staticSemanticName = "LineMesh";
+    inline std::unique_ptr<GeometryIndexLayerBase> clone() override {
+        auto copy          = std::make_unique<LineIndexLayer>( *this );
+        copy->collection() = collection();
+        return copy;
+    }
 
   protected:
     template <class... SemanticNames>

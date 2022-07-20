@@ -9,19 +9,29 @@ namespace Geometry {
 
 MultiIndexedGeometry::MultiIndexedGeometry( const MultiIndexedGeometry& other ) :
     AttribArrayGeometry( other ) {
+    std::cerr << "MultiIndexedGeometry & other\n";
     deepCopy( other );
 }
 
 MultiIndexedGeometry::MultiIndexedGeometry( MultiIndexedGeometry&& other ) :
-    AttribArrayGeometry( std::move( other ) ), m_indices( std::move( other.m_indices ) ) {}
+    AttribArrayGeometry( std::move( other ) ), m_indices( std::move( other.m_indices ) ) {
+
+    std::cerr << "MultiIndexedGeometry && other\n";
+}
 
 MultiIndexedGeometry::MultiIndexedGeometry( const AttribArrayGeometry& other ) :
-    AttribArrayGeometry( other ) {}
+    AttribArrayGeometry( other ) {
+    std::cerr << "MultiIndexedGeometry & other\n";
+}
 
 MultiIndexedGeometry::MultiIndexedGeometry( AttribArrayGeometry&& other ) :
-    AttribArrayGeometry( std::move( other ) ) {}
+    AttribArrayGeometry( std::move( other ) ) {
+    std::cerr << "MultiIndexedGeometry Atrib && other\n";
+}
 
 MultiIndexedGeometry& MultiIndexedGeometry::operator=( const MultiIndexedGeometry& other ) {
+    std::cerr << "MultiIndexedGeometry = & other\n";
+
     invalidateAabb();
     AttribArrayGeometry::operator=( other );
     deepCopy( other );
@@ -30,6 +40,8 @@ MultiIndexedGeometry& MultiIndexedGeometry::operator=( const MultiIndexedGeometr
 }
 
 MultiIndexedGeometry& MultiIndexedGeometry::operator=( MultiIndexedGeometry&& other ) {
+    std::cerr << "MultiIndexedGeometry = && other\n";
+
     invalidateAabb();
     AttribArrayGeometry::operator=( std::move( other ) );
     m_indices                    = std::move( other.m_indices );

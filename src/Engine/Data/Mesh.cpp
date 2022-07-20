@@ -224,7 +224,7 @@ void GeometryDisplayable::loadGeometry( Core::Geometry::MultiIndexedGeometry&& m
         std::cerr << "type info " << typeid( layer ).name() << "\n";
         std::cerr << "type info " << typeid( const Core::Geometry::QuadIndexLayer& ).name() << "\n";
 
-        const auto& quadLayer = static_cast<const Core::Geometry::QuadIndexLayer&>( layer );
+        const auto& quadLayer = dynamic_cast<const Core::Geometry::QuadIndexLayer&>( layer );
         std::cerr << "cast done\n";
 
         auto triangleLayer = std::make_unique<Core::Geometry::TriangleIndexLayer>();

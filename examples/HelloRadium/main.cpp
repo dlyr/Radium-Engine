@@ -28,7 +28,8 @@ int main( int argc, char* argv[] ) {
 
     //! [Creating the cube]
     std::cerr << "CREATE CUBE\n";
-    auto cube = Ra::Core::Geometry::makeSharpBox2( { 0.1f, 0.1f, 0.1f } );
+    auto cube { std::move( Ra::Core::Geometry::makeSharpBox2( { 0.1f, 0.1f, 0.1f } ) ) };
+    std::cerr << "DONE CUBE\n";
     //! [Creating the cube]
 
     //! [Colorize the Cube]

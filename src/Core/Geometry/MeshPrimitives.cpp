@@ -223,14 +223,15 @@ MultiIndexedGeometry makeSharpBox2( const Aabb& aabb,
     std::cerr << "make typeinfo " << typeid( tmp ).name() << "\n";
     if ( bool( color ) ) result.colorize( *color );
     result.checkConsistency();
-
-    return MultiIndexedGeometry { result };
+    std::cerr << "return make sharp box aabb \n";
+    return MultiIndexedGeometry { std::move( result ) };
 }
 
 MultiIndexedGeometry makeSharpBox2( const Vector3& halfExts,
                                     const Utils::optional<Utils::Color>& color,
                                     bool generateTexCoord ) {
     Aabb aabb( -halfExts, halfExts );
+    std::cerr << "return make sharp box half \n";
     return makeSharpBox2( aabb, color, generateTexCoord );
 }
 
