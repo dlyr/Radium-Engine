@@ -212,6 +212,7 @@ inline void IndexedGeometry<T>::setIndices( IndexContainerType&& indices ) {
     auto& abstractLayer = getLayerWithLock( m_mainIndexLayerKey );
     static_cast<IndexedGeometry<T>::DefaultLayerType&>( abstractLayer ).collection() =
         std::move( indices );
+    indicesUnlock();
     notify();
 }
 
@@ -219,6 +220,7 @@ template <typename T>
 inline void IndexedGeometry<T>::setIndices( const IndexContainerType& indices ) {
     auto& abstractLayer = getLayerWithLock( m_mainIndexLayerKey );
     static_cast<IndexedGeometry<T>::DefaultLayerType&>( abstractLayer ).collection() = indices;
+    indicesUnlock();
     notify();
 }
 
