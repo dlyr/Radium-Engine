@@ -1,3 +1,5 @@
+#include "Core/Geometry/IndexedGeometry.hpp"
+#include "Engine/Data/Mesh.hpp"
 #include <Engine/Rendering/ForwardRenderer.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
@@ -201,6 +203,29 @@ void computeIndices( Core::Geometry::LineMesh::IndexContainerType& indices,
     indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
 }
 
+template <typename IndexContainerType>
+void computeIndices2( Core::Geometry::LineIndexLayer::IndexContainerType& indices,
+                      const IndexContainerType& other ) {
+
+    for ( const auto& index : other ) {
+        auto s = index.size();
+        for ( unsigned int i = 0; i < s; ++i ) {
+            int i1 = index[i];
+            int i2 = index[( i + 1 ) % s];
+            if ( i1 > i2 ) std::swap( i1, i2 );
+            indices.emplace_back( i1, i2 );
+        }
+    }
+
+    std::sort( indices.begin(),
+               indices.end(),
+               []( const Core::Geometry::LineMesh::IndexType& a,
+                   const Core::Geometry::LineMesh::IndexType& b ) {
+                   return a[0] < b[0] || ( a[0] == b[0] && a[1] < b[1] );
+               } );
+    indices.erase( std::unique( indices.begin(), indices.end() ), indices.end() );
+}
+
 // store LineMesh and Core, define the observer functor to update data one core update for wireframe
 // linemesh
 template <typename CoreGeometry>
@@ -254,6 +279,34 @@ void setupLineMesh( std::shared_ptr<Data::LineMesh>& disp, CoreGeometry& core ) 
     }
     else {
         disp.reset();
+    }
+}
+
+// create a linemesh to draw wireframe given a core mesh
+template <typename IndexLayer>
+void setupLineMesh( Data::GeometryDisplayable& displayable, const std::string& name ) {
+
+    std::cerr << "setup line mesh\n";
+    auto lineLayer     = std::make_unique<Core::Geometry::LineIndexLayer>();
+    auto& indices      = lineLayer->collection();
+    auto& coreGeometry = displayable.getCoreGeometry();
+
+    if ( coreGeometry.containsLayer( IndexLayer::staticSemanticName ) ) {
+        auto layerOccurence =
+            coreGeometry.getFirstLayerOccurrence( IndexLayer::staticSemanticName );
+        auto& layer = dynamic_cast<const IndexLayer&>( layerOccurence.second );
+        computeIndices2( indices, layer.collection() );
+
+        if ( indices.size() > 0 ) {
+
+            Geometry::MultiIndexedGeometry::LayerKeyType lineKey = {
+                { Core::Geometry::LineIndexLayer::staticSemanticName }, name };
+            auto layerAdded = coreGeometry.addLayer( std::move( lineLayer ), false, name );
+            if ( !layerAdded.first ) { LOG( logERROR ) << "failed to add wireframe"; }
+            else {
+                displayable.addRenderLayer( lineKey, Data::AttribArrayDisplayable::RM_LINES );
+            }
+        }
     }
 }
 
@@ -453,6 +506,7 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
             if ( it == m_wireframes.end() ) {
                 std::shared_ptr<Data::LineMesh> disp;
 
+                using dispmesh = Ra::Engine::Data::GeometryDisplayable;
                 using trimesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::TriangleMesh>;
                 using polymesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::PolyMesh>;
                 using quadmesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::QuadMesh>;
@@ -461,6 +515,7 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                 auto tm          = std::dynamic_pointer_cast<trimesh>( displayable );
                 auto tp          = std::dynamic_pointer_cast<polymesh>( displayable );
                 auto tq          = std::dynamic_pointer_cast<quadmesh>( displayable );
+                auto td          = std::dynamic_pointer_cast<dispmesh>( displayable );
 
                 auto processLineMesh = []( auto cm, std::shared_ptr<Data::LineMesh>& lm ) {
                     if ( cm->getRenderMode() ==
@@ -471,6 +526,7 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                 if ( tm ) { processLineMesh( tm, disp ); }
                 if ( tp ) { processLineMesh( tp, disp ); }
                 if ( tq ) { processLineMesh( tq, disp ); }
+                //    if ( td ) { setupLineMesh() }
 
                 m_wireframes[ro.get()] = disp;
                 wro                    = disp;
@@ -492,7 +548,56 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                     shader->setUniform( "transform.view", renderData.viewMatrix );
                     shader->setUniform( "transform.model", modelMatrix );
                     shader->setUniform( "viewport", Core::Vector2 { m_width, m_height } );
+                    shader->setUniform( "pixelWidth", 1.8f );
                     wro->render( shader );
+
+                    GL_CHECK_ERROR;
+                }
+            }
+        };
+
+        auto drawWireframeNew = [this, &renderData]( const auto& ro ) {
+            auto displayable = ro->getMesh();
+            using dispmesh   = Ra::Engine::Data::GeometryDisplayable;
+            auto td          = std::dynamic_pointer_cast<dispmesh>( displayable );
+            if ( td ) {
+
+                Geometry::MultiIndexedGeometry::LayerKeyType lineKey = {
+                    { Core::Geometry::LineIndexLayer::staticSemanticName }, "wireframe triangles" };
+                Geometry::MultiIndexedGeometry::LayerKeyType lineKey2 = {
+                    { Core::Geometry::LineIndexLayer::staticSemanticName }, "wireframe main" };
+
+                if ( !td->getCoreGeometry().containsLayer( lineKey ) ) {
+                    std::cerr << "setup line\n";
+                    setupLineMesh<Core::Geometry::TriangleIndexLayer>( *td, "wireframe triangles" );
+                }
+                if ( !td->getCoreGeometry().containsLayer( lineKey2 ) ) {
+                    std::cerr << "setup quad line\n";
+                    setupLineMesh<Core::Geometry::QuadIndexLayer>( *td, "wireframe main" );
+                }
+
+                const Data::ShaderProgram* shader =
+                    m_shaderProgramManager->getShaderProgram( "Wireframe" );
+
+                if ( shader && ro->isVisible() ) {
+                    GL_CHECK_ERROR;
+                    td->updateGL();
+                    GL_CHECK_ERROR;
+                    shader->bind();
+                    GL_CHECK_ERROR;
+
+                    Core::Matrix4 modelMatrix = ro->getTransformAsMatrix();
+                    shader->setUniform( "transform.proj", renderData.projMatrix );
+                    shader->setUniform( "transform.view", renderData.viewMatrix );
+                    shader->setUniform( "transform.model", modelMatrix );
+                    shader->setUniform( "viewport", Core::Vector2 { m_width, m_height } );
+                    shader->setUniform( "pixelWidth", 1.2f );
+                    GL_CHECK_ERROR;
+                    td->render( shader, lineKey );
+
+                    shader->setUniform( "pixelWidth", 2.8f );
+                    GL_CHECK_ERROR;
+                    td->render( shader, lineKey2 );
 
                     GL_CHECK_ERROR;
                 }
@@ -501,6 +606,7 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
 
         for ( const auto& ro : m_fancyRenderObjects ) {
             drawWireframe( ro );
+            drawWireframeNew( ro );
         }
         for ( const auto& ro : m_transparentRenderObjects ) {
             drawWireframe( ro );
