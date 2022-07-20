@@ -153,7 +153,9 @@ void AttribArrayDisplayable::setDirty( const Ra::Core::Geometry::MeshAttrib& typ
 
 GeometryDisplayable::GeometryDisplayable( const std::string& name,
                                           typename Core::Geometry::MultiIndexedGeometry&& geom ) :
-    base( name ), m_geom( std::move( geom ) ) {}
+    base( name ) {
+    loadGeometry( std::move( geom ) );
+}
 
 GeometryDisplayable::~GeometryDisplayable() {}
 
@@ -161,6 +163,14 @@ void GeometryDisplayable::loadGeometry( Core::Geometry::MultiIndexedGeometry&& m
     m_geomLayers.clear();
     m_geom = std::move( mesh );
     setupCoreMeshObservers();
+
+    /// \todo check if other layer ? at least triangulate
+    if ( m_geom.containsLayer( Core::Geometry::TriangleIndexLayer::staticSemanticName ) ) {
+        auto [key, layer] = m_geom.getFirstLayerOccurrence(
+            Core::Geometry::TriangleIndexLayer::staticSemanticName );
+        addRenderLayer( key, AttribArrayDisplayable::RM_TRIANGLES );
+    }
+    m_isDirty = true;
 }
 
 void GeometryDisplayable::setupCoreMeshObservers() {
@@ -244,48 +254,15 @@ void GeometryDisplayable::setAttribNameCorrespondence( const std::string& meshAt
 bool GeometryDisplayable::addRenderLayer( LayerKeyType key, base::MeshRenderMode renderMode ) {
     if ( !m_geom.containsLayer( key ) ) return false;
     auto it = m_geomLayers.find( key );
-    if ( it == m_geomLayers.end() ) return false;
-    const auto& abstractLayer = m_geom.getLayer( key );
+    if ( it != m_geomLayers.end() ) return false;
 
-    using LayerType           = Ra::Core::Geometry::TriangleIndexLayer;
-    const auto& triangleLayer = dynamic_cast<const LayerType&>( abstractLayer );
+    m_activeLayerKey = key;
+    auto& l          = m_geomLayers.insert( { m_activeLayerKey, LayerEntryType() } ).first->second;
 
-    auto& geomLayer = m_geom.getLayerWithLock( key );
-    /// \fixme Implement observers for indices
-    // int observerId  = geomLayer.attach( VaoIndices::IndicesObserver( vao ) );
-    int observerId = -1;
-    m_geom.unlockLayer( key );
-
-    // create vao
-    auto& l      = m_geomLayers.insert( { key, LayerEntryType() } ).first->second;
-    l.observerId = observerId;
+    l.observerId = -1;
     l.renderMode = renderMode;
-    l.vao        = globjects::VertexArray::create();
 
-    // create indices vbo
-    m_indicesVBOs.push_back( {} );
-    auto& vbo  = m_indicesVBOs.back();
-    vbo.buffer = globjects::Buffer::create();
-    vbo.dirty  = true;
-
-    /// \todo Move to dedicated method
-    // upload data to gpu
-    if ( vbo.dirty ) {
-        //        vbo.numElements = triangleLayer.getSize() *
-        //        LayerType::IndexType::RowsAtCompileTime;
-        /// this one do not work since buffer is not a std::vector
-        vbo.buffer->setData(
-            static_cast<gl::GLsizeiptr>( triangleLayer.getSize() * sizeof( LayerType::IndexType ) ),
-            triangleLayer.collection().data(),
-            GL_STATIC_DRAW );
-        vbo.dirty = false;
-    }
-
-    l.vao->bind();
-    l.vao->bindElementBuffer( vbo.buffer.get() );
-    l.vao->unbind();
-
-    return false;
+    return true;
 }
 
 bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
@@ -298,7 +275,7 @@ bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
         geomLayer.detach( it->second.observerId );
         m_geom.unlockLayer( key );
     }
-    it->second.vao.release();
+    it->second.vao.reset();
     m_geomLayers.erase( it );
 
     return true;
@@ -306,13 +283,35 @@ bool GeometryDisplayable::removeRenderLayer( LayerKeyType key ) {
 
 void GeometryDisplayable::updateGL() {
     if ( m_isDirty ) {
-        // Check that our dirty bits are consistent.
-        ON_ASSERT( bool dirtyTest = false; for ( auto d
-                                                 : m_dataDirty ) { dirtyTest = dirtyTest || d; } );
-        CORE_ASSERT( dirtyTest == m_isDirty, "Dirty flags inconsistency" );
-        CORE_ASSERT( !( m_geom.vertices().empty() ), "No vertex." );
 
-        updateGL_specific_impl();
+        const auto& abstractLayer = m_geom.getLayerWithLock( m_activeLayerKey );
+        using LayerType           = Ra::Core::Geometry::TriangleIndexLayer;
+        const auto& triangleLayer = dynamic_cast<const LayerType&>( abstractLayer );
+        // create vao
+        auto& l = m_geomLayers[m_activeLayerKey];
+        if ( !l.vao ) { l.vao = globjects::VertexArray::create(); }
+
+        auto& vbo = l.indices;
+        if ( !vbo.buffer ) {
+            vbo.buffer      = globjects::Buffer::create();
+            vbo.dirty       = true;
+            vbo.numElements = triangleLayer.getSize() * triangleLayer.getNumberOfComponents();
+        }
+
+        // upload data to gpu
+        if ( vbo.dirty ) {
+            vbo.buffer->setData( static_cast<gl::GLsizeiptr>( triangleLayer.getSize() *
+                                                              sizeof( LayerType::IndexType ) ),
+                                 triangleLayer.collection().data(),
+                                 GL_STATIC_DRAW );
+            vbo.dirty = false;
+        }
+        m_geom.unlockLayer( m_activeLayerKey );
+
+        l.vao->bind();
+        l.vao->bindElementBuffer( vbo.buffer.get() );
+        l.vao->unbind();
+        GL_CHECK_ERROR;
 
         auto func = [this]( Ra::Core::Utils::AttribBase* b ) {
             auto idx = m_handleToBuffer[b->getName()];
@@ -341,52 +340,18 @@ void GeometryDisplayable::updateGL() {
     }
 }
 
-void GeometryDisplayable::updateGL_specific_impl() {
-    CORE_ASSERT( false, "not implemented yet" );
-    //    if ( !m_indices )
-    //    {
-    //        m_indices      = globjects::Buffer::create();
-    //        m_indicesDirty = true;
-    //    }
-    //    if ( m_indicesDirty )
-    //    {
-    //        /// this one do not work since m_indices is not a std::vector
-    //        // m_indices->setData( m_mesh.m_indices, GL_DYNAMIC_DRAW );
-    //        m_numElements =
-    //            base::m_mesh.getIndices().size() *
-    //            base::CoreGeometry::IndexType::RowsAtCompileTime;
-    //
-    //        m_indices->setData(
-    //            static_cast<gl::GLsizeiptr>( base::m_mesh.getIndices().size() *
-    //                                         sizeof( typename base::CoreGeometry::IndexType ) ),
-    //            base::m_mesh.getIndices().data(),
-    //            GL_STATIC_DRAW );
-    //        m_indicesDirty = false;
-    //    }
-    //    if ( !base::m_vao ) { base::m_vao = globjects::VertexArray::create(); }
-    //    base::m_vao->bind();
-    //    base::m_vao->bindElementBuffer( m_indices.get() );
-    //    base::m_vao->unbind();
-    /// \todo implement !
-}
-
-void GeometryDisplayable::render( const ShaderProgram* ) {
-    CORE_ASSERT( false, "not implemented yet" );
-    //    if ( base::m_vao )
-    //    {
-    //        GL_CHECK_ERROR;
-    //        base::m_vao->bind();
-    //        base::autoVertexAttribPointer( prog );
-    //        GL_CHECK_ERROR;
-    //        base::m_vao->drawElements( static_cast<GLenum>( base::m_renderMode ),
-    //                                   GLsizei( m_numElements ),
-    //                                   GL_UNSIGNED_INT,
-    //                                   nullptr );
-    //        GL_CHECK_ERROR;
-    //        base::m_vao->unbind();
-    //        GL_CHECK_ERROR;
-    //    }
-    /// \todo implement !
+void GeometryDisplayable::render( const ShaderProgram* prog ) {
+    if ( m_geomLayers[m_activeLayerKey].vao ) {
+        m_geomLayers[m_activeLayerKey].vao->bind();
+        autoVertexAttribPointer( prog );
+        m_geomLayers[m_activeLayerKey].vao->drawElements(
+            static_cast<GLenum>( base::m_renderMode ),
+            GLsizei( m_geomLayers[m_activeLayerKey].indices.numElements ),
+            GL_UNSIGNED_INT,
+            nullptr );
+        m_geomLayers[m_activeLayerKey].vao->unbind();
+        GL_CHECK_ERROR;
+    }
 }
 
 void GeometryDisplayable::autoVertexAttribPointer( const ShaderProgram* prog ) {
@@ -407,8 +372,9 @@ void GeometryDisplayable::autoVertexAttribPointer( const ShaderProgram* prog ) {
         auto attrib     = m_geom.getAttribBase( attribName );
 
         if ( attrib && attrib->getSize() > 0 ) {
-            m_vao->enable( loc );
-            auto binding = m_vao->binding( idx );
+            m_geomLayers[m_activeLayerKey].vao->enable( loc );
+            auto binding = m_geomLayers[m_activeLayerKey].vao->binding( idx );
+
             binding->setAttribute( loc );
             CORE_ASSERT( m_vbos[m_handleToBuffer[attribName]].get(), "vbo is nullptr" );
 #ifdef CORE_USE_DOUBLE
@@ -423,9 +389,10 @@ void GeometryDisplayable::autoVertexAttribPointer( const ShaderProgram* prog ) {
             binding->setFormat( attrib->getNumberOfComponents(), GL_SCALAR );
         }
         else {
-            m_vao->disable( loc );
+            m_geomLayers[m_activeLayerKey].vao->disable( loc );
         }
     }
+    GL_CHECK_ERROR;
 }
 
 Ra::Core::Utils::optional<gl::GLuint> AttribArrayDisplayable::getVaoHandle() {

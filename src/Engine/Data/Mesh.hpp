@@ -399,7 +399,6 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     void updateGL() override;
 
   protected:
-    void updateGL_specific_impl();
     void setupCoreMeshObservers();
 
     /// assume m_vao is bound.
@@ -415,29 +414,38 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
   private:
     Core::Geometry::MultiIndexedGeometry m_geom;
 
-    /// Data required to configure rendering for each layer
-    /// \note In the current version, do not know which VBOEntryType is associated to this vao:
-    ///       there is no way to clean m_indicesVBOs when a LayerEntryType is removed.
-    struct LayerEntryType {
-        int observerId { -1 };
-        std::unique_ptr<globjects::VertexArray> vao { nullptr };
-        base::MeshRenderMode renderMode { RM_TRIANGLES };
-
-        inline LayerEntryType() = default;
-    };
-    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
-
-    /// Data required to store and used VBOs
+    // for vertex attribs, with dirty
     struct VBOEntryType {
+        bool dirty { false };
+        std::unique_ptr<globjects::Buffer> buffer { nullptr };
+    };
+
+    // for indices, with dirty and  num elements
+    struct IndicesVBO {
         bool dirty { false };
         std::unique_ptr<globjects::Buffer> buffer { nullptr };
         size_t numElements { 0 };
     };
+
+    /// LayerKey with it's corresponding indices.
+    struct LayerEntryType {
+        int observerId { -1 };
+        std::unique_ptr<globjects::VertexArray> vao { nullptr };
+        IndicesVBO indices;
+        base::MeshRenderMode renderMode { RM_TRIANGLES };
+
+        inline LayerEntryType() = default;
+    };
+
+    /// The collection of indices layer we can use for rendering
+    std::unordered_map<LayerKeyType, LayerEntryType, LayerKeyHash> m_geomLayers;
+
+    /// "main" triangle layer
+    LayerKeyType m_activeLayerKey;
+
     using VBOCollection = std::vector<VBOEntryType>;
     /// Collection of VBOs for per-vertex attributes
     VBOCollection m_attribVBOs;
-    /// Collection of VBOs for each layer indices
-    VBOCollection m_indicesVBOs;
 
     using TranslationTable = std::map<std::string, std::string>;
     TranslationTable m_translationTableMeshToShader;
