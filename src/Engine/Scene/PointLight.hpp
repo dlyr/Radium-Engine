@@ -1,10 +1,11 @@
 #pragma once
 
 #include <Core/CoreMacros.hpp>
-#include <Eigen/src/Core/Matrix.h>
-#include <Eigen/src/Core/util/Memory.h>
 #include <Engine/RaEngine.hpp>
 #include <Engine/Scene/Light.hpp>
+
+#include <Eigen/Dense>
+
 #include <string>
 
 namespace Ra {
@@ -46,4 +47,5 @@ class RA_ENGINE_API PointLight final : public Ra::Engine::Scene::Light
 } // namespace Scene
 } // namespace Engine
 } // namespace Ra
+
 #include "PointLight.inl"
