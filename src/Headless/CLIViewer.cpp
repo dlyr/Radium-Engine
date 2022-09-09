@@ -23,10 +23,6 @@ constexpr int defaultSystemPriority = 1000;
 CLIViewer::CLIViewer( const glbinding::Version& glVersion ) :
     CLIBaseApplication(), m_glContext { glVersion } {
     // add ->required() to force user to give a filename;
-    addOption( "-f,--file", m_parameters.m_dataFile, "Data file to process." )
-        ->check( CLI::ExistingFile );
-    addOption( "-s,--size", m_parameters.m_size, "Size of the computed image." )->delimiter( 'x' );
-    addFlag( "-a,--animation", m_parameters.m_animationEnable, "Enable Radium Animation system." );
 }
 
 CLIViewer::~CLIViewer() {
@@ -46,7 +42,9 @@ const CLIViewer::ViewerParameters& CLIViewer::getCommandLineParameters() const {
 int CLIViewer::init( int argc, const char* argv[] ) {
     int parseResult = CLIBaseApplication::init( argc, argv );
     if ( parseResult != 0 ) {
-        LOG( logERROR ) << "Invalid command line argument, the application can't run";
+        if ( parseResult != 1 ) {
+            LOG( logERROR ) << "Invalid command line argument, the application can't run";
+        }
         return 1;
     };
     // Do the Viewer init

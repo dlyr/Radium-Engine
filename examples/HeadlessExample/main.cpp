@@ -19,6 +19,7 @@ int main( int argc, const char* argv[] ) {
     bool showWindow { false };
     glbinding::Version glVersion { 4, 4 };
     CLIViewer viewer { glVersion };
+
     viewer.addFlag( "-w,--window", showWindow, "Map the viewer window." );
     //! [Creating the viewer with custom parameters]
 
