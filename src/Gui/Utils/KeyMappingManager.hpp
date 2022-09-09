@@ -28,6 +28,9 @@ class RA_GUI_API KeyMappingManager : public Ra::Core::Utils::ObservableVoid
     using KeyMappingAction = Ra::Core::Utils::Index;
     using Context          = Ra::Core::Utils::Index;
 
+    KeyMappingManager();
+    ~KeyMappingManager();
+
     /// load configuration from filename, or default configration filename. It
     /// calls the listener callback then.
     void loadConfiguration( const std::string& filename = {} );
@@ -121,9 +124,6 @@ class RA_GUI_API KeyMappingManager : public Ra::Core::Utils::ObservableVoid
     static std::string enumNamesFromKeyboardModifiers( const Qt::KeyboardModifiers& modifiers );
 
   private:
-    KeyMappingManager();
-    ~KeyMappingManager();
-
     /// Save an XML node that describes an event/action.
     void saveNode( QXmlStreamWriter& stream, const QDomNode& domNode );
 
