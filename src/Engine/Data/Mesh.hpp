@@ -400,6 +400,8 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     /// Update (i.e. send to GPU) the buffers marked as dirty
     void updateGL() override;
 
+    inline size_t getNumVertices() const override { return m_geom.vertices().size(); }
+
   protected:
     void setupCoreMeshObservers();
 
@@ -429,7 +431,7 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
         size_t numElements { 0 };
     };
 
-    /// LayerKey with it's corresponding indices.
+    /// LayerKey with its corresponding indices.
     struct LayerEntryType {
         int observerId { -1 };
         std::unique_ptr<globjects::VertexArray> vao { nullptr };
