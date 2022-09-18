@@ -561,19 +561,22 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
             using dispmesh   = Ra::Engine::Data::GeometryDisplayable;
             auto td          = std::dynamic_pointer_cast<dispmesh>( displayable );
             if ( td ) {
+                using namespace Core::Geometry;
+                using LayerKeyType   = Core::Geometry::MultiIndexedGeometry::LayerKeyType;
+                using LineIndexLayer = Core::Geometry::LineIndexLayer;
 
-                Geometry::MultiIndexedGeometry::LayerKeyType lineKey = {
-                    { Core::Geometry::LineIndexLayer::staticSemanticName }, "wireframe triangles" };
-                Geometry::MultiIndexedGeometry::LayerKeyType lineKey2 = {
-                    { Core::Geometry::LineIndexLayer::staticSemanticName }, "wireframe main" };
+                LayerKeyType lineKey  = { { LineIndexLayer::staticSemanticName },
+                                         "wireframe triangles" };
+                LayerKeyType lineKey2 = { { LineIndexLayer::staticSemanticName },
+                                          "wireframe main" };
 
                 if ( !td->getCoreGeometry().containsLayer( lineKey ) ) {
                     std::cerr << "setup line\n";
-                    setupLineMesh<Core::Geometry::TriangleIndexLayer>( *td, "wireframe triangles" );
+                    setupLineMesh<TriangleIndexLayer>( *td, "wireframe triangles" );
                 }
                 if ( !td->getCoreGeometry().containsLayer( lineKey2 ) ) {
                     std::cerr << "setup quad line\n";
-                    setupLineMesh<Core::Geometry::QuadIndexLayer>( *td, "wireframe main" );
+                    setupLineMesh<QuadIndexLayer>( *td, "wireframe main" );
                 }
 
                 const Data::ShaderProgram* shader =
