@@ -515,8 +515,7 @@ class RA_ENGINE_API GeneralMesh : public IndexedGeometry<T>
     inline void updateGL_specific_impl() override;
 
   private:
-    inline void triangulate();
-    Core::AlignedStdVector<IndexType> m_triangleIndices;
+    Core::VectorArray<IndexType> m_triangleIndices;
 };
 
 using PolyMesh = GeneralMesh<Core::Geometry::PolyMesh>;

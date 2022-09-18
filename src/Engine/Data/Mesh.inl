@@ -366,7 +366,8 @@ void GeneralMesh<T>::updateGL_specific_impl() {
         this->m_indicesDirty = true;
     }
     if ( this->m_indicesDirty ) {
-        triangulate();
+        m_triangleIndices = Core::Geometry::triangulate( this->m_mesh.getIndices() );
+
         /// this one do not work since m_indices is not a std::vector
         // m_indices->setData( m_mesh.m_indices, GL_DYNAMIC_DRAW );
         this->m_numElements = m_triangleIndices.size() * GeneralMesh::IndexType::RowsAtCompileTime;
@@ -381,41 +382,6 @@ void GeneralMesh<T>::updateGL_specific_impl() {
     base::m_vao->bind();
     base::m_vao->bindElementBuffer( this->m_indices.get() );
     base::m_vao->unbind();
-}
-
-template <typename T>
-void GeneralMesh<T>::triangulate() {
-    m_triangleIndices.clear();
-    m_triangleIndices.reserve( this->m_mesh.getIndices().size() );
-    for ( const auto& face : this->m_mesh.getIndices() ) {
-        if ( face.size() == 3 ) { m_triangleIndices.push_back( face ); }
-        else {
-            /// simple sew triangulation
-            int minus { int( face.size() ) - 1 };
-            int plus { 0 };
-            while ( plus + 1 < minus ) {
-                if ( ( plus - minus ) % 2 ) {
-                    m_triangleIndices.emplace_back( face[plus], face[plus + 1], face[minus] );
-                    ++plus;
-                }
-                else {
-                    m_triangleIndices.emplace_back( face[minus], face[plus], face[minus - 1] );
-                    --minus;
-                }
-            }
-        }
-    }
-}
-
-template <>
-inline void GeneralMesh<Core::Geometry::QuadMesh>::triangulate() {
-    m_triangleIndices.clear();
-    m_triangleIndices.reserve( 2 * this->m_mesh.getIndices().size() );
-    // assume quads are convex
-    for ( const auto& face : this->m_mesh.getIndices() ) {
-        m_triangleIndices.emplace_back( face[0], face[1], face[2] );
-        m_triangleIndices.emplace_back( face[0], face[2], face[3] );
-    }
 }
 
 } // namespace Data
