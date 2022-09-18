@@ -1,4 +1,5 @@
 #include "Core/Geometry/IndexedGeometry.hpp"
+#include "Core/Utils/TypesUtils.hpp"
 #include "Engine/Data/Mesh.hpp"
 #include <Engine/Rendering/ForwardRenderer.hpp>
 
@@ -565,17 +566,30 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                 using LayerKeyType   = Core::Geometry::MultiIndexedGeometry::LayerKeyType;
                 using LineIndexLayer = Core::Geometry::LineIndexLayer;
 
-                LayerKeyType lineKey  = { { LineIndexLayer::staticSemanticName },
+                auto& coreGeom = td->getCoreGeometry();
+
+                LayerKeyType lineKey = { { LineIndexLayer::staticSemanticName },
                                          "wireframe triangles" };
+
                 LayerKeyType lineKey2 = { { LineIndexLayer::staticSemanticName },
                                           "wireframe main" };
 
-                if ( !td->getCoreGeometry().containsLayer( lineKey ) ) {
+                bool hasTriangleLayer =
+                    coreGeom.containsLayer( TriangleIndexLayer::staticSemanticName );
+                bool hasQuadLayer = coreGeom.containsLayer( QuadIndexLayer::staticSemanticName );
+                bool hasPolyLayer = coreGeom.containsLayer( PolyIndexLayer::staticSemanticName );
+
+                if ( hasTriangleLayer && !coreGeom.containsLayer( lineKey ) ) {
                     std::cerr << "setup line\n";
                     setupLineMesh<TriangleIndexLayer>( *td, "wireframe triangles" );
                 }
-                if ( !td->getCoreGeometry().containsLayer( lineKey2 ) ) {
-                    std::cerr << "setup quad line\n";
+
+                if ( hasPolyLayer && !coreGeom.containsLayer( lineKey2 ) ) {
+                    std::cerr << "setup main line from poly\n";
+                    setupLineMesh<PolyIndexLayer>( *td, "wireframe main" );
+                }
+                else if ( hasQuadLayer && !coreGeom.containsLayer( lineKey2 ) ) {
+                    std::cerr << "setup main line from quad\n";
                     setupLineMesh<QuadIndexLayer>( *td, "wireframe main" );
                 }
 
@@ -594,21 +608,31 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                     shader->setUniform( "transform.view", renderData.viewMatrix );
                     shader->setUniform( "transform.model", modelMatrix );
                     shader->setUniform( "viewport", Core::Vector2 { m_width, m_height } );
-                    shader->setUniform( "pixelWidth", 1.2f );
+                    if ( hasTriangleLayer && ( hasQuadLayer || hasPolyLayer ) )
+                        shader->setUniform( "pixelWidth", 1.2f );
+                    else
+                        shader->setUniform( "pixelWidth", 2.8f );
+
                     GL_CHECK_ERROR;
                     td->render( shader, lineKey );
 
-                    shader->setUniform( "pixelWidth", 2.8f );
-                    GL_CHECK_ERROR;
-                    td->render( shader, lineKey2 );
+                    if ( ( hasQuadLayer || hasPolyLayer ) ) {
+                        shader->setUniform( "pixelWidth", 2.8f );
+                        GL_CHECK_ERROR;
+                        td->render( shader, lineKey2 );
+                    }
 
                     GL_CHECK_ERROR;
                 }
             }
+            else {
+                std::cerr << "could not convert to geom disp "
+                          << Ra::Core::Utils::demangleType( displayable ) << "\n";
+            }
         };
 
         for ( const auto& ro : m_fancyRenderObjects ) {
-            drawWireframe( ro );
+            //            drawWireframe( ro );
             drawWireframeNew( ro );
         }
         for ( const auto& ro : m_transparentRenderObjects ) {
