@@ -262,7 +262,7 @@ void CoreGeometryDisplayable<CoreGeometry>::updateGL() {
 }
 
 template <typename CoreGeometry>
-void CoreGeometryDisplayable<CoreGeometry>::setAttribNameCorrespondance(
+void CoreGeometryDisplayable<CoreGeometry>::setAttribNameMatching(
     const std::string& meshAttribName,
     const std::string& shaderAttribName ) {
 

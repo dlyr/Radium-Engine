@@ -95,7 +95,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     /// Mark attrib data as dirty, forcing an update of the OpenGL buffer.
     ///@{
 
-    /// Use g_attribName to find the corresponding name and call setDirty(const std::string& name).
+    /// Use g_attribName to find the matching name and call setDirty(const std::string& name).
     /// \param type: the data to set to MeshAttrib
     void setDirty( const Core::Geometry::MeshAttrib& type );
 
@@ -118,7 +118,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     virtual Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry()             = 0;
     ///@}
 
-    /// \brief Get opengl's vbo handle (uint) corresponding to attrib \b name.
+    /// \brief Get opengl's vbo handle (uint) matching to attrib \b name.
     ///
     /// If vbo is not initialized or name do not correponds to an actual attrib name, the returned
     /// optional is empty
@@ -259,8 +259,8 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
     /// \param meshAttribName: name of the attribute on the CoreGeomtry side
     /// \param shaderAttribName: name of the input vertex attribute on the
     /// shader side.
-    void setAttribNameCorrespondance( const std::string& meshAttribName,
-                                      const std::string& shaderAttribName );
+    void setAttribNameMatching( const std::string& meshAttribName,
+                                const std::string& shaderAttribName );
 
   protected:
     virtual void updateGL_specific_impl() {}
@@ -372,8 +372,8 @@ class RA_ENGINE_API GeometryDisplayable : public AttribArrayDisplayable
     /// \param meshAttribName: name of the attribute on the CoreGeometry side
     /// \param shaderAttribName: name of the input vertex attribute on the
     /// shader side.
-    void setAttribNameCorrespondence( const std::string& meshAttribName,
-                                      const std::string& shaderAttribName );
+    void setAttribNameMatching( const std::string& meshAttribName,
+                                const std::string& shaderAttribName );
 
     void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh );
     inline void loadGeometry( Core::Geometry::MultiIndexedGeometry&& mesh,
