@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Geometry/IndexedGeometry.hpp"
 #include <Engine/Scene/GeometryComponent.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
@@ -24,7 +25,7 @@ SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent(
 }
 
 template <>
-SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::SurfaceMeshComponent(
+RA_ENGINE_API SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::SurfaceMeshComponent(
     const std::string& name,
     Entity* entity,
     Ra::Core::Geometry::MultiIndexedGeometry&& mesh,
@@ -52,6 +53,10 @@ void SurfaceMeshComponent<CoreMeshType>::generateMesh( const Ra::Core::Asset::Ge
     finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr,
                             data->getFrame() );
 }
+
+template <>
+void SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::generateMesh(
+    const Ra::Core::Asset::GeometryData* data );
 
 template <typename CoreMeshType>
 void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(

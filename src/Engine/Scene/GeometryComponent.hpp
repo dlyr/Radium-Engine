@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Geometry/IndexedGeometry.hpp"
 #include <Core/Asset/GeometryData.hpp>
 #include <Core/Asset/VolumeData.hpp>
 #include <Core/Geometry/TriangleMesh.hpp>
@@ -98,11 +99,11 @@ class SurfaceMeshComponent : public GeometryComponent
     std::shared_ptr<RenderMeshType> m_displayMesh { nullptr };
 };
 
-using TriangleMeshComponent        = SurfaceMeshComponent<Ra::Core::Geometry::TriangleMesh>;
+using TriangleMeshComponent        = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
 using GeometryDisplayableComponent = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
 using LineMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::LineMesh>;
-using QuadMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::QuadMesh>;
-using PolyMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::PolyMesh>;
+using QuadMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
+using PolyMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
 
 /// \warning, WIP
 /// \todo doc.
