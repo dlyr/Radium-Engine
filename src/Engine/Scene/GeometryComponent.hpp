@@ -55,7 +55,7 @@ class RA_ENGINE_API GeometryComponent : public Component
  *  - triangles: rw (if deformable)
  */
 template <typename CoreMeshType>
-RA_ENGINE_API class SurfaceMeshComponent : public GeometryComponent
+class SurfaceMeshComponent : public GeometryComponent
 {
     using base = GeometryComponent;
 
