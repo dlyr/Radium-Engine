@@ -180,34 +180,18 @@ void GeometryDisplayable::loadGeometry( Core::Geometry::MultiIndexedGeometry&& m
         auto [key, layer] =
             m_geom.getFirstLayerOccurrence( Core::Geometry::QuadIndexLayer::staticSemanticName );
 
-        std::cerr << "cast quad layer\n";
-        std::for_each( layer.semantics().cbegin(),
-                       layer.semantics().cend(),
-                       []( const std::string& x ) { std::cerr << x << '\n'; } );
-
-        std::cerr << layer.getSize() << " " << layer.getNumberOfComponents() << " "
-                  << layer.getBufferSize() << "\n";
-
-        std::cerr << "type info " << demangleType( layer ) << "\n";
-        std::cerr << "type info " << demangleType<const Core::Geometry::QuadIndexLayer&>() << "\n";
-
         const auto& quadLayer = dynamic_cast<const Core::Geometry::QuadIndexLayer&>( layer );
-        std::cerr << "cast done\n";
 
-        auto triangleLayer = std::make_unique<Core::Geometry::TriangleIndexLayer>();
-        std::cerr << "triangulate layer\n";
+        auto triangleLayer          = std::make_unique<Core::Geometry::TriangleIndexLayer>();
         triangleLayer->collection() = Core::Geometry::triangulate( quadLayer.collection() );
-        std::cerr << "add triangle layer\n";
 
         LayerKeyType triangleKey = { triangleLayer->semantics(), "triangulation" };
         auto layerAdded = m_geom.addLayer( std::move( triangleLayer ), false, "triangulation" );
-        std::cerr << "add triangle layer done\n";
 
         if ( !layerAdded.first ) { LOG( logERROR ) << "failed to add triangleLayer"; }
         else {
             m_activeLayerKey = triangleKey;
             addRenderLayer( triangleKey, AttribArrayDisplayable::RM_TRIANGLES );
-            std::cerr << "triangulate done\n";
         }
     }
     else if ( m_geom.containsLayer( Core::Geometry::PolyIndexLayer::staticSemanticName ) ) {
