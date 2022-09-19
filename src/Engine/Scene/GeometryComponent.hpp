@@ -6,6 +6,7 @@
 #include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Geometry/Volume.hpp>
 #include <Engine/Data/Mesh.hpp>
+#include <Engine/RaEngine.hpp>
 #include <Engine/Scene/Component.hpp>
 
 namespace Ra {
