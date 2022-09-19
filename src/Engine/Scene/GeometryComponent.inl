@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/Geometry/IndexedGeometry.hpp"
+#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
