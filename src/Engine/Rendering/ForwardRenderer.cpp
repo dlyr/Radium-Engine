@@ -1,16 +1,17 @@
-#include "Core/Geometry/IndexedGeometry.hpp"
-#include "Core/Utils/TypesUtils.hpp"
-#include "Engine/Data/Mesh.hpp"
 #include <Engine/Rendering/ForwardRenderer.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
+#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
+#include <Core/RaCore.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
-
+#include <Core/Utils/TypesUtils.hpp>
 #include <Engine/Data/LambertianMaterial.hpp>
 #include <Engine/Data/Material.hpp>
+#include <Engine/Data/Mesh.hpp>
 #include <Engine/Data/RenderParameters.hpp>
+#include <Engine/Data/ShaderProgram.hpp>
 #include <Engine/Data/ShaderProgramManager.hpp>
 #include <Engine/Data/Texture.hpp>
 #include <Engine/Data/ViewingParameters.hpp>
@@ -18,19 +19,13 @@
 #include <Engine/Rendering/DebugRender.hpp>
 #include <Engine/Rendering/RenderObject.hpp>
 #include <Engine/Scene/DefaultLightManager.hpp>
-#include <Engine/Scene/Light.hpp>
-#include <globjects/Framebuffer.h>
-
-/* Test Point cloud parameter provider */
-#include <Core/RaCore.hpp>
-#include <Engine/Data/ShaderProgram.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
-
+#include <Engine/Scene/Light.hpp>
 #include <Engine/Scene/SystemDisplay.hpp>
 
-#include <map>
-
+#include <globjects/Framebuffer.h>
 #include <globjects/Texture.h>
+#include <map>
 
 namespace Ra {
 using namespace Core;
@@ -286,8 +281,6 @@ void setupLineMesh( std::shared_ptr<Data::LineMesh>& disp, CoreGeometry& core ) 
 // create a linemesh to draw wireframe given a core mesh
 template <typename IndexLayer>
 void setupLineMesh( Data::GeometryDisplayable& displayable, const std::string& name ) {
-
-    std::cerr << "setup line mesh\n";
     auto lineLayer     = std::make_unique<Core::Geometry::LineIndexLayer>();
     auto& indices      = lineLayer->collection();
     auto& coreGeometry = displayable.getCoreGeometry();
@@ -580,16 +573,13 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                 bool hasPolyLayer = coreGeom.containsLayer( PolyIndexLayer::staticSemanticName );
 
                 if ( hasTriangleLayer && !coreGeom.containsLayer( lineKey ) ) {
-                    std::cerr << "setup line\n";
                     setupLineMesh<TriangleIndexLayer>( *td, "wireframe triangles" );
                 }
 
                 if ( hasPolyLayer && !coreGeom.containsLayer( lineKey2 ) ) {
-                    std::cerr << "setup main line from poly\n";
                     setupLineMesh<PolyIndexLayer>( *td, "wireframe main" );
                 }
                 else if ( hasQuadLayer && !coreGeom.containsLayer( lineKey2 ) ) {
-                    std::cerr << "setup main line from quad\n";
                     setupLineMesh<QuadIndexLayer>( *td, "wireframe main" );
                 }
 
@@ -626,17 +616,15 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                 }
             }
             else {
-                std::cerr << "could not convert to geom disp "
-                          << Ra::Core::Utils::demangleType( displayable ) << "\n";
+                // skip
             }
         };
 
         for ( const auto& ro : m_fancyRenderObjects ) {
-            //            drawWireframe( ro );
             drawWireframeNew( ro );
         }
         for ( const auto& ro : m_transparentRenderObjects ) {
-            drawWireframe( ro );
+            drawWireframeNew( ro );
         }
     }
 
