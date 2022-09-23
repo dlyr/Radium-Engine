@@ -55,7 +55,7 @@ void SurfaceMeshComponent<CoreMeshType>::generateMesh( const Ra::Core::Asset::Ge
 }
 
 template <>
-void SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::generateMesh(
+RA_ENGINE_API void SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::generateMesh(
     const Ra::Core::Asset::GeometryData* data );
 
 template <typename CoreMeshType>
