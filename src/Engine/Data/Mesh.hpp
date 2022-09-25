@@ -505,7 +505,7 @@ class RA_ENGINE_API Mesh : public IndexedGeometry<Core::Geometry::TriangleMesh>
 /// Each face of the polyhedron (typically quads) are assume to be planar and convex.
 /// Simple triangulation is performed on the fly before sending data to the GPU.
 template <typename T>
-class RA_ENGINE_API GeneralMesh : public IndexedGeometry<T>
+class GeneralMesh : public IndexedGeometry<T>
 {
     using base      = IndexedGeometry<T>;
     using IndexType = Core::Vector3ui;
