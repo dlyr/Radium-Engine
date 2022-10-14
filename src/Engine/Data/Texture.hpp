@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/Tasks/TaskQueue.hpp"
 #include <Engine/RaEngine.hpp>
 
 #include <memory>
@@ -250,6 +251,8 @@ class RA_ENGINE_API Texture final : public Synchronizable
     bool m_isMipMapped { false };
     /// Is the texture in LinearRGB ?
     bool m_isLinear { false };
+
+    Core::TaskQueue::TaskId m_taskId;
 };
 } // namespace Data
 } // namespace Engine

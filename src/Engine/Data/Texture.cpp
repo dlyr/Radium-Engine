@@ -1,3 +1,6 @@
+#include "Core/Tasks/Task.hpp"
+#include "Core/Tasks/TaskQueue.hpp"
+#include "Engine/RadiumEngine.hpp"
 #include <Core/Utils/Log.hpp>
 #include <Engine/Data/Texture.hpp>
 
@@ -97,7 +100,14 @@ void Texture::bindImageTexture( int unit,
 
 void Texture::updateData( void* newData ) {
     m_textureParameters.texels = newData;
+
     needSync();
+    if ( !m_taskId ) {
+        auto engine   = RadiumEngine::getInstance();
+        auto taskFunc = std::bind( &Texture::updateGL, this );
+        auto task     = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
+        m_taskId      = engine->addGpuTask( std::move( task ) );
+    }
 }
 
 // let the compiler warn about case fallthrough
@@ -282,6 +292,8 @@ void Texture::updateGL() {
     } break;
     }
     GL_CHECK_ERROR;
+
+    m_taskId = Core::TaskQueue::TaskId::Invalid();
 }
 
 // private functions
