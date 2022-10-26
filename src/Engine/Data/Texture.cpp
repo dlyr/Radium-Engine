@@ -26,12 +26,12 @@ Texture::~Texture() {
 }
 
 void Texture::initializeGL( bool linearize ) {
-    if ( ( m_textureParameters.target != GL_TEXTURE_1D ) &&
-         ( m_textureParameters.target != GL_TEXTURE_2D ) &&
-         ( m_textureParameters.target != GL_TEXTURE_RECTANGLE ) &&
-         ( m_textureParameters.target != GL_TEXTURE_3D ) &&
-         ( m_textureParameters.target != GL_TEXTURE_CUBE_MAP ) ) {
-        LOG( logERROR ) << "Texture of type " << m_textureParameters.target
+    if ( ( m_textureParameters.image.target != GL_TEXTURE_1D ) &&
+         ( m_textureParameters.image.target != GL_TEXTURE_2D ) &&
+         ( m_textureParameters.image.target != GL_TEXTURE_RECTANGLE ) &&
+         ( m_textureParameters.image.target != GL_TEXTURE_3D ) &&
+         ( m_textureParameters.image.target != GL_TEXTURE_CUBE_MAP ) ) {
+        LOG( logERROR ) << "Texture of type " << m_textureParameters.image.target
                         << " must be generated explicitly!";
         return;
     }
@@ -39,7 +39,7 @@ void Texture::initializeGL( bool linearize ) {
     if ( linearize ) {
         uint numComp  = 0;
         bool hasAlpha = false;
-        switch ( m_textureParameters.format ) {
+        switch ( m_textureParameters.image.format ) {
             // RED and RG texture store a gray scale color. Verify if we need to convert
         case GL_RED:
             numComp = 1;
@@ -57,27 +57,27 @@ void Texture::initializeGL( bool linearize ) {
             hasAlpha = true;
             break;
         default:
-            LOG( logERROR ) << "Textures with format " << m_textureParameters.format
+            LOG( logERROR ) << "Textures with format " << m_textureParameters.image.format
                             << " can't be linearized." << m_textureParameters.name;
             return;
         }
-        if ( m_textureParameters.target == GL_TEXTURE_CUBE_MAP ) {
+        if ( m_textureParameters.image.target == GL_TEXTURE_CUBE_MAP ) {
             linearizeCubeMap( numComp, hasAlpha );
         }
         else {
             // This will only do do the RGB space conversion
             sRGBToLinearRGB(
-                reinterpret_cast<uint8_t*>( m_textureParameters.texels ), numComp, hasAlpha );
+                reinterpret_cast<uint8_t*>( m_textureParameters.image.texels ), numComp, hasAlpha );
         }
     }
     // Generate OpenGL texture
     if ( m_texture == nullptr ) {
-        m_texture = globjects::Texture::create( m_textureParameters.target );
+        m_texture = globjects::Texture::create( m_textureParameters.image.target );
         GL_CHECK_ERROR;
     }
     // Update the sampler parameters
-    m_isMipMapped = !( m_textureParameters.minFilter == GL_NEAREST ||
-                       m_textureParameters.minFilter == GL_LINEAR );
+    m_isMipMapped = !( m_textureParameters.sampler.minFilter == GL_NEAREST ||
+                       m_textureParameters.sampler.minFilter == GL_LINEAR );
     updateParameters();
     // upload texture to the GPU
     updateGL();
@@ -96,7 +96,7 @@ void Texture::bindImageTexture( int unit,
                                 GLint layer,
                                 GLenum access ) {
     m_texture->bindImageTexture(
-        uint( unit ), level, layered, layer, access, m_textureParameters.internalFormat );
+        uint( unit ), level, layered, layer, access, m_textureParameters.image.internalFormat );
 }
 
 void Texture::updateGL() {
@@ -104,43 +104,43 @@ void Texture::updateGL() {
     switch ( m_texture->target() ) {
     case GL_TEXTURE_1D: {
         m_texture->image1D( 0,
-                            m_textureParameters.internalFormat,
-                            GLsizei( m_textureParameters.width ),
+                            m_textureParameters.image.internalFormat,
+                            GLsizei( m_textureParameters.image.width ),
                             0,
-                            m_textureParameters.format,
-                            m_textureParameters.type,
-                            m_textureParameters.texels );
+                            m_textureParameters.image.format,
+                            m_textureParameters.image.type,
+                            m_textureParameters.image.texels );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_2D:
     case GL_TEXTURE_RECTANGLE: {
         m_texture->image2D( 0,
-                            m_textureParameters.internalFormat,
-                            GLsizei( m_textureParameters.width ),
-                            GLsizei( m_textureParameters.height ),
+                            m_textureParameters.image.internalFormat,
+                            GLsizei( m_textureParameters.image.width ),
+                            GLsizei( m_textureParameters.image.height ),
                             0,
-                            m_textureParameters.format,
-                            m_textureParameters.type,
-                            m_textureParameters.texels );
+                            m_textureParameters.image.format,
+                            m_textureParameters.image.type,
+                            m_textureParameters.image.texels );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_3D: {
         m_texture->image3D( 0,
-                            m_textureParameters.internalFormat,
-                            GLsizei( m_textureParameters.width ),
-                            GLsizei( m_textureParameters.height ),
-                            GLsizei( m_textureParameters.depth ),
+                            m_textureParameters.image.internalFormat,
+                            GLsizei( m_textureParameters.image.width ),
+                            GLsizei( m_textureParameters.image.height ),
+                            GLsizei( m_textureParameters.image.depth ),
                             0,
-                            m_textureParameters.format,
-                            m_textureParameters.type,
-                            m_textureParameters.texels );
+                            m_textureParameters.image.format,
+                            m_textureParameters.image.type,
+                            m_textureParameters.image.texels );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_CUBE_MAP: {
         // Load the 6 faces of the cube-map
         static const void* nullTexels[6] { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-        auto texels = m_textureParameters.texels != nullptr
-                          ? (const void**)m_textureParameters.texels
+        auto texels = m_textureParameters.image.texels != nullptr
+                          ? (const void**)m_textureParameters.image.texels
                           : nullTexels;
 
         m_texture->bind();
@@ -148,59 +148,59 @@ void Texture::updateGL() {
         // cube-maps https://github.com/cginternals/globjects/issues/368
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[0] );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[1] );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[2] );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[3] );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[4] );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
                           0,
-                          m_textureParameters.internalFormat,
-                          GLsizei( m_textureParameters.width ),
-                          GLsizei( m_textureParameters.height ),
+                          m_textureParameters.image.internalFormat,
+                          GLsizei( m_textureParameters.image.width ),
+                          GLsizei( m_textureParameters.image.height ),
                           0,
-                          m_textureParameters.format,
-                          m_textureParameters.type,
+                          m_textureParameters.image.format,
+                          m_textureParameters.image.type,
                           texels[5] );
 
         m_texture->unbind();
@@ -217,7 +217,7 @@ void Texture::updateData( void* newData ) {
     // register gpu task to update opengl representation before next rendering
     std::lock_guard<std::mutex> lock( m_updateMutex );
 
-    m_textureParameters.texels = newData;
+    m_textureParameters.image.texels = newData;
 
     if ( m_updateDataTaskId.isInvalid() ) {
         auto taskFunc = [this]() {
@@ -235,24 +235,24 @@ void Texture::updateParameters() {
     switch ( m_texture->target() ) {
     case GL_TEXTURE_CUBE_MAP:
     case GL_TEXTURE_3D:
-        m_texture->setParameter( GL_TEXTURE_WRAP_R, m_textureParameters.wrapP );
+        m_texture->setParameter( GL_TEXTURE_WRAP_R, m_textureParameters.sampler.wrapP );
         GL_CHECK_ERROR;
         [[fallthrough]];
     case GL_TEXTURE_2D:
     case GL_TEXTURE_RECTANGLE:
-        m_texture->setParameter( GL_TEXTURE_WRAP_T, m_textureParameters.wrapT );
+        m_texture->setParameter( GL_TEXTURE_WRAP_T, m_textureParameters.sampler.wrapT );
         GL_CHECK_ERROR;
         [[fallthrough]];
     case GL_TEXTURE_1D:
-        m_texture->setParameter( GL_TEXTURE_WRAP_S, m_textureParameters.wrapS );
+        m_texture->setParameter( GL_TEXTURE_WRAP_S, m_textureParameters.sampler.wrapS );
         GL_CHECK_ERROR;
         break;
     default:
         break;
     }
-    m_texture->setParameter( GL_TEXTURE_MIN_FILTER, m_textureParameters.minFilter );
+    m_texture->setParameter( GL_TEXTURE_MIN_FILTER, m_textureParameters.sampler.minFilter );
     GL_CHECK_ERROR;
-    m_texture->setParameter( GL_TEXTURE_MAG_FILTER, m_textureParameters.magFilter );
+    m_texture->setParameter( GL_TEXTURE_MAG_FILTER, m_textureParameters.sampler.magFilter );
     GL_CHECK_ERROR;
 }
 
@@ -265,7 +265,7 @@ void Texture::linearize() {
     // (others are not really colors and must be managed explicitly by the user)
     uint numComp  = 0;
     bool hasAlpha = false;
-    switch ( m_textureParameters.format ) {
+    switch ( m_textureParameters.image.format ) {
         // RED texture store a gray scale color. Verify if we need to convert
     case GL_RED:
         numComp = 1;
@@ -278,11 +278,12 @@ void Texture::linearize() {
         hasAlpha = true;
         break;
     default:
-        LOG( logERROR ) << "Textures with format " << m_textureParameters.format
+        LOG( logERROR ) << "Textures with format " << m_textureParameters.image.format
                         << " can't be linearized." << m_textureParameters.name;
         return;
     }
-    sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.texels ), numComp, hasAlpha );
+    sRGBToLinearRGB(
+        reinterpret_cast<uint8_t*>( m_textureParameters.image.texels ), numComp, hasAlpha );
 }
 
 void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlphaChannel ) {
@@ -299,8 +300,9 @@ void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlpha
         };
         uint numValues = hasAlphaChannel ? numComponent - 1 : numComponent;
 #pragma omp parallel for
-        for ( int i = 0; i < int( m_textureParameters.width * m_textureParameters.height *
-                                  m_textureParameters.depth );
+        for ( int i = 0;
+              i < int( m_textureParameters.image.width * m_textureParameters.image.height *
+                       m_textureParameters.image.depth );
               ++i ) {
             // Convert each R or RGB value while keeping alpha unchanged
             for ( uint p = i * numComponent; p < i * numComponent + numValues; ++p ) {
@@ -311,22 +313,22 @@ void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlpha
 }
 
 void Texture::resize( size_t w, size_t h, size_t d, void* pix ) {
-    m_textureParameters.width  = w;
-    m_textureParameters.height = h;
-    m_textureParameters.depth  = d;
-    m_textureParameters.texels = pix;
+    m_textureParameters.image.width  = w;
+    m_textureParameters.image.height = h;
+    m_textureParameters.image.depth  = d;
+    m_textureParameters.image.texels = pix;
     if ( m_texture == nullptr ) { initializeGL( false ); }
     else { updateGL(); }
     if ( m_isMipMapped ) { m_texture->generateMipmap(); }
 }
 
 void Texture::linearizeCubeMap( uint numComponent, bool hasAlphaChannel ) {
-    if ( m_textureParameters.type == gl::GLenum::GL_UNSIGNED_BYTE ) {
+    if ( m_textureParameters.image.type == gl::GLenum::GL_UNSIGNED_BYTE ) {
         /// Only unsigned byte texture could be linearized. Considering other formats where
         /// already linear
         for ( int i = 0; i < 6; ++i ) {
             sRGBToLinearRGB(
-                reinterpret_cast<uint8_t*>( ( (void**)m_textureParameters.texels )[i] ),
+                reinterpret_cast<uint8_t*>( ( (void**)m_textureParameters.image.texels )[i] ),
                 numComponent,
                 hasAlphaChannel );
         }

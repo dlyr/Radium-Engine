@@ -173,19 +173,21 @@ void EnvironmentTexture::initializeTexture() {
     computeSHMatrices();
     // make the envmap cube texture
     Ra::Engine::Data::TextureParameters params { m_name,
-                                                 GL_TEXTURE_CUBE_MAP,
-                                                 m_width,
-                                                 m_height,
-                                                 1,
-                                                 GL_RGBA,
-                                                 GL_RGBA,
-                                                 GL_FLOAT,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_LINEAR_MIPMAP_LINEAR,
-                                                 GL_LINEAR,
-                                                 (void**)( m_skyData ) };
+                                                 {
+                                                     GL_CLAMP_TO_EDGE,
+                                                     GL_CLAMP_TO_EDGE,
+                                                     GL_CLAMP_TO_EDGE,
+                                                     GL_LINEAR_MIPMAP_LINEAR,
+                                                     GL_LINEAR,
+                                                 },
+                                                 { GL_TEXTURE_CUBE_MAP,
+                                                   m_width,
+                                                   m_height,
+                                                   1,
+                                                   GL_RGBA,
+                                                   GL_RGBA,
+                                                   GL_FLOAT,
+                                                   (void**)( m_skyData ) } };
     m_skyTexture = std::make_unique<Ra::Engine::Data::Texture>( params );
 
     if ( m_isSkyBox ) {
@@ -617,20 +619,17 @@ Ra::Engine::Data::Texture* EnvironmentTexture::getSHImage() {
             thepixels[4 * ( j * ambientWidth + i ) + 3] = 255;
         }
     }
-    Ra::Engine::Data::TextureParameters params { "shImage",
-                                                 GL_TEXTURE_2D,
-                                                 ambientWidth,
-                                                 ambientWidth,
-                                                 1,
-                                                 GL_RGBA,
-                                                 GL_RGBA,
-                                                 GL_UNSIGNED_BYTE,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_CLAMP_TO_EDGE,
-                                                 GL_LINEAR,
-                                                 GL_LINEAR,
-                                                 thepixels };
+    Ra::Engine::Data::TextureParameters params {
+        "shImage",
+        { GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE, GL_LINEAR, GL_LINEAR },
+        { GL_TEXTURE_2D,
+          ambientWidth,
+          ambientWidth,
+          1,
+          GL_RGBA,
+          GL_RGBA,
+          GL_UNSIGNED_BYTE,
+          thepixels } };
     m_shtexture = std::make_unique<Ra::Engine::Data::Texture>( params );
     return m_shtexture.get();
 }

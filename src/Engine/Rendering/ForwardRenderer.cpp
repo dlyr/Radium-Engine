@@ -96,25 +96,25 @@ void ForwardRenderer::initBuffers() {
     // Forward renderer internal textures texture
 
     Data::TextureParameters texparams;
-    texparams.width  = m_width;
-    texparams.height = m_height;
-    texparams.target = GL_TEXTURE_2D;
+    texparams.image.width  = m_width;
+    texparams.image.height = m_height;
+    texparams.image.target = GL_TEXTURE_2D;
 
     // Depth texture
-    texparams.minFilter                = GL_NEAREST;
-    texparams.magFilter                = GL_NEAREST;
-    texparams.internalFormat           = GL_DEPTH_COMPONENT24;
-    texparams.format                   = GL_DEPTH_COMPONENT;
-    texparams.type                     = GL_UNSIGNED_INT;
+    texparams.sampler.minFilter        = GL_NEAREST;
+    texparams.sampler.magFilter        = GL_NEAREST;
+    texparams.image.internalFormat     = GL_DEPTH_COMPONENT24;
+    texparams.image.format             = GL_DEPTH_COMPONENT;
+    texparams.image.type               = GL_UNSIGNED_INT;
     texparams.name                     = "Depth (fw renderer)";
     m_textures[RendererTextures_Depth] = std::make_unique<Data::Texture>( texparams );
 
     // Color texture
-    texparams.internalFormat = GL_RGBA32F;
-    texparams.format         = GL_RGBA;
-    texparams.type           = GL_SCALAR;
-    texparams.minFilter      = GL_LINEAR;
-    texparams.magFilter      = GL_LINEAR;
+    texparams.image.internalFormat = GL_RGBA32F;
+    texparams.image.format         = GL_RGBA;
+    texparams.image.type           = GL_SCALAR;
+    texparams.sampler.minFilter    = GL_LINEAR;
+    texparams.sampler.magFilter    = GL_LINEAR;
 
     texparams.name                   = "HDR";
     m_textures[RendererTextures_HDR] = std::make_unique<Data::Texture>( texparams );

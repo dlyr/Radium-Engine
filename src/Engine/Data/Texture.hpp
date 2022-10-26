@@ -39,9 +39,20 @@ namespace Data {
  * @note No coherence checking will be done on the content of this structure. User must ensure
  * coherent data and parameters before creating the OpenGL texture with Texture::initializeGL
  */
-struct TextureParameters {
-    /// Name of the texture
-    std::string name {};
+
+struct SamplerParameters {
+    /// OpenGL wrap mode in the s direction
+    GLenum wrapS { GL_CLAMP_TO_EDGE };
+    /// OpenGL wrap mode in the t direction
+    GLenum wrapT { GL_CLAMP_TO_EDGE };
+    /// OpenGL wrap mode in the p direction
+    GLenum wrapP { GL_CLAMP_TO_EDGE };
+    /// OpenGL minification filter ( GL_LINEAR or GL_NEAREST or GL_XXX_MIPMAP_YYY )
+    GLenum minFilter { GL_LINEAR };
+    /// OpenGL magnification filter ( GL_LINEAR or GL_NEAREST )
+    GLenum magFilter { GL_LINEAR };
+};
+struct ImageParameters {
     /// OpenGL target
     GLenum target { GL_TEXTURE_2D };
     /// width of the texture (s dimension)
@@ -56,16 +67,6 @@ struct TextureParameters {
     GLenum internalFormat { GL_RGB };
     /// Type of the components in external data
     GLenum type { GL_UNSIGNED_BYTE };
-    /// OpenGL wrap mode in the s direction
-    GLenum wrapS { GL_CLAMP_TO_EDGE };
-    /// OpenGL wrap mode in the t direction
-    GLenum wrapT { GL_CLAMP_TO_EDGE };
-    /// OpenGL wrap mode in the p direction
-    GLenum wrapP { GL_CLAMP_TO_EDGE };
-    /// OpenGL minification filter ( GL_LINEAR or GL_NEAREST or GL_XXX_MIPMAP_YYY )
-    GLenum minFilter { GL_LINEAR };
-    /// OpenGL magnification filter ( GL_LINEAR or GL_NEAREST )
-    GLenum magFilter { GL_LINEAR };
     /// External data (ownership is left to caller, not stored after OpenGL texture creation).
     /// Note that, for cube-map texture, this is considered as a "void*[6]" array containing the 6
     /// faces of the cube corresponding to the targets. <br/>
@@ -78,6 +79,11 @@ struct TextureParameters {
     /// @todo memory allocated for this pointer might be lost at texture deletion as ownership is
     /// unclear.
     void* texels { nullptr };
+};
+struct TextureParameters {
+    std::string name {};
+    SamplerParameters sampler;
+    ImageParameters image;
 };
 
 /** Represent a Texture of the engine
@@ -182,21 +188,21 @@ class RA_ENGINE_API Texture final
     /**
      * @return the pixel format of the texture
      */
-    GLenum format() const { return m_textureParameters.format; }
+    GLenum format() const { return m_textureParameters.image.format; }
     /**
      * @return the width of the texture
      */
-    size_t width() const { return m_textureParameters.width; }
+    size_t width() const { return m_textureParameters.image.width; }
     /**
      * @return the height of the texture
      */
-    size_t height() const { return m_textureParameters.height; }
+    size_t height() const { return m_textureParameters.image.height; }
     /**
      * @return the depth of the texture
      */
-    size_t depth() const { return m_textureParameters.depth; }
+    size_t depth() const { return m_textureParameters.image.depth; }
 
-    void* texels() { return m_textureParameters.texels; }
+    void* texels() { return m_textureParameters.image.texels; }
     /**
      * @return the globjects::Texture associated with the texture
      */

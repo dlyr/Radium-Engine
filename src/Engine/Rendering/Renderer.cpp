@@ -145,31 +145,31 @@ void Renderer::initialize( uint width, uint height ) {
     }
 
     Data::TextureParameters texparams;
-    texparams.width     = m_width;
-    texparams.height    = m_height;
-    texparams.target    = GL_TEXTURE_2D;
-    texparams.minFilter = GL_NEAREST;
-    texparams.magFilter = GL_NEAREST;
+    texparams.image.width       = m_width;
+    texparams.image.height      = m_height;
+    texparams.image.target      = GL_TEXTURE_2D;
+    texparams.sampler.minFilter = GL_NEAREST;
+    texparams.sampler.magFilter = GL_NEAREST;
 
-    texparams.name           = "Depth";
-    texparams.internalFormat = GL_DEPTH_COMPONENT24;
-    texparams.format         = GL_DEPTH_COMPONENT;
-    texparams.type           = GL_UNSIGNED_INT;
-    m_depthTexture           = std::make_unique<Data::Texture>( texparams );
+    texparams.name                 = "Depth";
+    texparams.image.internalFormat = GL_DEPTH_COMPONENT24;
+    texparams.image.format         = GL_DEPTH_COMPONENT;
+    texparams.image.type           = GL_UNSIGNED_INT;
+    m_depthTexture                 = std::make_unique<Data::Texture>( texparams );
 
-    m_pickingFbo             = std::make_unique<globjects::Framebuffer>();
-    texparams.name           = "Picking";
-    texparams.internalFormat = GL_RGBA32I;
-    texparams.format         = GL_RGBA_INTEGER;
-    texparams.type           = GL_INT;
-    m_pickingTexture         = std::make_unique<Data::Texture>( texparams );
+    m_pickingFbo                   = std::make_unique<globjects::Framebuffer>();
+    texparams.name                 = "Picking";
+    texparams.image.internalFormat = GL_RGBA32I;
+    texparams.image.format         = GL_RGBA_INTEGER;
+    texparams.image.type           = GL_INT;
+    m_pickingTexture               = std::make_unique<Data::Texture>( texparams );
 
     // Final texture
-    texparams.name           = "Final image";
-    texparams.internalFormat = GL_RGBA32F;
-    texparams.format         = GL_RGBA;
-    texparams.type           = GL_SCALAR;
-    m_fancyTexture           = std::make_unique<Data::Texture>( texparams );
+    texparams.name                 = "Final image";
+    texparams.image.internalFormat = GL_RGBA32F;
+    texparams.image.format         = GL_RGBA;
+    texparams.image.type           = GL_SCALAR;
+    m_fancyTexture                 = std::make_unique<Data::Texture>( texparams );
 
     m_displayedTexture                     = m_fancyTexture.get();
     m_secondaryTextures["Picking Texture"] = m_pickingTexture.get();
@@ -623,9 +623,9 @@ void Renderer::drawScreenInternal() {
     {
         GL_ASSERT( glDepthFunc( GL_ALWAYS ) );
 
-        auto shader = ( m_displayedTexture->getParameters().type == GL_INT ||
-                        m_displayedTexture->getParameters().type == GL_UNSIGNED_INT )
-                          ? ( m_displayedTexture->getParameters().format == GL_DEPTH_COMPONENT
+        auto shader = ( m_displayedTexture->getParameters().image.type == GL_INT ||
+                        m_displayedTexture->getParameters().image.type == GL_UNSIGNED_INT )
+                          ? ( m_displayedTexture->getParameters().image.format == GL_DEPTH_COMPONENT
                                   ? m_shaderProgramManager->getShaderProgram( "DisplayDepthBuffer" )
                                   : m_shaderProgramManager->getShaderProgram( "DrawScreenI" ) )
                           : m_shaderProgramManager->getShaderProgram( "DrawScreen" );

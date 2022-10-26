@@ -25,10 +25,10 @@ TextureManager::~TextureManager() {
 TextureParameters&
 TextureManager::addTexture( const std::string& name, uint width, uint height, void* data ) {
     TextureParameters texData;
-    texData.name   = name;
-    texData.width  = width;
-    texData.height = height;
-    texData.texels = data;
+    texData.name         = name;
+    texData.image.width  = width;
+    texData.image.height = height;
+    texData.image.texels = data;
 
     m_pendingTextures[name] = texData;
 
@@ -39,55 +39,55 @@ void TextureManager::loadTextureImage( TextureParameters& texParameters ) {
     stbi_set_flip_vertically_on_load( true );
     int n;
     unsigned char* data = stbi_load( texParameters.name.c_str(),
-                                     (int*)( &( texParameters.width ) ),
-                                     (int*)( &( texParameters.height ) ),
+                                     (int*)( &( texParameters.image.width ) ),
+                                     (int*)( &( texParameters.image.height ) ),
                                      &n,
                                      0 );
 
     if ( !data ) {
         LOG( logERROR ) << "Something went wrong when loading image \"" << texParameters.name
                         << "\".";
-        texParameters.width = texParameters.height = 0;
+        texParameters.image.width = texParameters.image.height = 0;
         return;
     }
 
     switch ( n ) {
     case 1: {
-        texParameters.format         = GL_RED;
-        texParameters.internalFormat = GL_R8;
+        texParameters.image.format         = GL_RED;
+        texParameters.image.internalFormat = GL_R8;
     } break;
 
     case 2: {
         // suppose it is GL_LUMINANCE_ALPHA
-        texParameters.format         = GL_RG;
-        texParameters.internalFormat = GL_RG8;
+        texParameters.image.format         = GL_RG;
+        texParameters.image.internalFormat = GL_RG8;
     } break;
 
     case 3: {
-        texParameters.format         = GL_RGB;
-        texParameters.internalFormat = GL_RGB8;
+        texParameters.image.format         = GL_RGB;
+        texParameters.image.internalFormat = GL_RGB8;
     } break;
 
     case 4: {
-        texParameters.format         = GL_RGBA;
-        texParameters.internalFormat = GL_RGBA8;
+        texParameters.image.format         = GL_RGBA;
+        texParameters.image.internalFormat = GL_RGBA8;
     } break;
     default: {
-        texParameters.format         = GL_RGBA;
-        texParameters.internalFormat = GL_RGBA8;
+        texParameters.image.format         = GL_RGBA;
+        texParameters.image.internalFormat = GL_RGBA8;
     } break;
     }
 
     CORE_ASSERT( data, "Data is null" );
-    texParameters.texels = data;
-    texParameters.type   = GL_UNSIGNED_BYTE;
+    texParameters.image.texels = data;
+    texParameters.image.type   = GL_UNSIGNED_BYTE;
 }
 
 Texture* TextureManager::loadTexture( const TextureParameters& texParameters, bool linearize ) {
     TextureParameters texParams = texParameters;
     // TODO : allow to keep texels in texture parameters with automatic lifetime management.
     bool mustFreeTexels = false;
-    if ( texParams.texels == nullptr ) {
+    if ( texParams.image.texels == nullptr ) {
         loadTextureImage( texParams );
         mustFreeTexels = true;
     }
@@ -95,8 +95,8 @@ Texture* TextureManager::loadTexture( const TextureParameters& texParameters, bo
     ret->initializeGL( linearize );
 
     if ( mustFreeTexels ) {
-        stbi_image_free( ret->getParameters().texels );
-        ret->getParameters().texels = nullptr;
+        stbi_image_free( ret->getParameters().image.texels );
+        ret->getParameters().image.texels = nullptr;
     }
     return ret;
 }
