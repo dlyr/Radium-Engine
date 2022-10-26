@@ -49,7 +49,7 @@ KeyMappingDummy
     }
 
 #define KMA_VALUE( XX ) \
-    XX = Gui::KeyMappingManager::getInstance()->getActionIndex( KeyMapping::getContext(), #XX );
+    XX = Gui::KeyMappingManager::getInstance()->getAction( KeyMapping::getContext(), #XX );
     KeyMappingDummy
 #undef KMA_VALUE
 }
@@ -111,9 +111,9 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
         // test on action
         auto validAction { mgr->getAction( cameraContext, Qt::LeftButton, Qt::NoModifier, -1 ) };
         REQUIRE( validAction.isValid() );
-        REQUIRE( validAction == mgr->getActionIndex( cameraContext, "TRACKBALLCAMERA_ROTATE" ) );
-        REQUIRE( mgr->getActionIndex( Ctx {}, "TRACKBALLCAMERA_ROTATE" ).isInvalid() );
-        REQUIRE( mgr->getActionIndex( Ctx { 42 }, "TRACKBALLCAMERA_ROTATE" ).isInvalid() );
+        REQUIRE( validAction == mgr->getAction( cameraContext, "TRACKBALLCAMERA_ROTATE" ) );
+        REQUIRE( mgr->getAction( Ctx {}, "TRACKBALLCAMERA_ROTATE" ).isInvalid() );
+        REQUIRE( mgr->getAction( Ctx { 42 }, "TRACKBALLCAMERA_ROTATE" ).isInvalid() );
         REQUIRE( mgr->getActionName( cameraContext, validAction ) == "TRACKBALLCAMERA_ROTATE" );
 
         // invalid action index returns "Invalid" action name
@@ -128,7 +128,7 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
         // tests some invalid actions
         auto invalidAction { mgr->getAction( cameraContext, Qt::LeftButton, Qt::AltModifier, -1 ) };
         REQUIRE( invalidAction.isInvalid() );
-        REQUIRE( invalidAction != mgr->getActionIndex( cameraContext, "TRACKBALLCAMERA_ROTATE" ) );
+        REQUIRE( invalidAction != mgr->getAction( cameraContext, "TRACKBALLCAMERA_ROTATE" ) );
         REQUIRE( mgr->getAction( Idx {}, Qt::LeftButton, Qt::AltModifier, -1 ).isInvalid() );
         REQUIRE( mgr->getAction( Idx {}, Qt::LeftButton, Qt::AltModifier, 1 ).isInvalid() );
         REQUIRE( mgr->getAction( Idx {}, Qt::LeftButton, Qt::NoModifier, -1 ).isInvalid() );
@@ -137,18 +137,18 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
         // with key and modifiers
         validAction = mgr->getAction( viewerContext, Qt::RightButton, Qt::NoModifier, Qt::Key_V );
         REQUIRE( validAction.isValid() );
-        REQUIRE( validAction == mgr->getActionIndex( viewerContext, "VIEWER_PICKING_VERTEX" ) );
+        REQUIRE( validAction == mgr->getAction( viewerContext, "VIEWER_PICKING_VERTEX" ) );
 
         // action index
-        REQUIRE( mgr->getActionIndex( viewerContext, "UnkownAction" ).isInvalid() );
+        REQUIRE( mgr->getAction( viewerContext, "UnkownAction" ).isInvalid() );
         validAction = mgr->getAction( viewerContext, Qt::NoButton, Qt::ControlModifier, Qt::Key_W );
         REQUIRE( validAction.isValid() );
-        REQUIRE( validAction == mgr->getActionIndex( viewerContext, "VIEWER_TOGGLE_WIREFRAME" ) );
+        REQUIRE( validAction == mgr->getAction( viewerContext, "VIEWER_TOGGLE_WIREFRAME" ) );
 
         // action are context dependent
         invalidAction = mgr->getAction( viewerContext, Qt::LeftButton, Qt::NoModifier, -1 );
         REQUIRE( invalidAction.isInvalid() );
-        REQUIRE( mgr->getActionIndex( cameraContext, "VIEWER_TOGGLE_WIREFRAME" ).isInvalid() );
+        REQUIRE( mgr->getAction( cameraContext, "VIEWER_TOGGLE_WIREFRAME" ).isInvalid() );
     }
 
     SECTION( "listener" ) {
@@ -163,8 +163,8 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
         mgr->loadConfiguration( "data/dummy1.xml" );
 
         // action index correspond to configuration
-        auto test1Idx = mgr->getActionIndex( Dummy::getContext(), "TEST1" );
-        auto test2Idx = mgr->getActionIndex( Dummy::getContext(), "TEST2" );
+        auto test1Idx = mgr->getAction( Dummy::getContext(), "TEST1" );
+        auto test2Idx = mgr->getAction( Dummy::getContext(), "TEST2" );
 
         REQUIRE( test1Idx ==
                  mgr->getAction( Dummy::getContext(), Qt::LeftButton, Qt::NoModifier, -1 ) );
@@ -176,8 +176,8 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
 
         // reload trigger configureKeyMapping and update binding/action index
         mgr->loadConfiguration( "data/dummy2.xml" );
-        auto test1Idx2 = mgr->getActionIndex( Dummy::getContext(), "TEST1" );
-        auto test2Idx2 = mgr->getActionIndex( Dummy::getContext(), "TEST2" );
+        auto test1Idx2 = mgr->getAction( Dummy::getContext(), "TEST1" );
+        auto test2Idx2 = mgr->getAction( Dummy::getContext(), "TEST2" );
 
         // action index have been updated in Dummy class (by observation)
         REQUIRE( Dummy::TEST1 ==
@@ -211,15 +211,54 @@ TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" 
         auto replicateContext = mgr->addContext( "Keymapping::CustomContext" );
         REQUIRE( replicateContext == customContext );
         auto customAction = mgr->addAction(
-            "Keymapping::CustomContext", "CustomAction", "Key_F1", "", "", "", false );
+            customContext, mgr->createEventBindingFromStrings( "", "", "Key_F1" ), "CustomAction" );
         REQUIRE( customAction.isValid() );
         auto customActionDuplicate = mgr->addAction(
-            "Keymapping::CustomContext", "CustomAction", "Key_F1", "", "", "", false );
+            customContext, mgr->createEventBindingFromStrings( "", "", "Key_F1" ), "CustomAction" );
         REQUIRE( customActionDuplicate.isValid() );
         REQUIRE( customActionDuplicate == customAction );
         auto customActionOtherBinding = mgr->addAction(
-            "Keymapping::CustomContext", "CustomAction", "Key_F2", "", "", "", false );
+            customContext, mgr->createEventBindingFromStrings( "", "", "Key_F2" ), "CustomAction" );
         REQUIRE( customActionOtherBinding.isValid() );
         REQUIRE( customActionOtherBinding == customAction );
+    }
+
+    SECTION( "Get Binding" ) {
+        mgr->loadConfiguration( "data/keymapping-valid.xml" );
+        // check context
+        auto cameraContext { mgr->getContext( "CameraContext" ) };
+        REQUIRE( cameraContext.isValid() );
+        REQUIRE( mgr->getContextName( cameraContext ) == "CameraContext" );
+
+        // test on action
+        auto validAction { mgr->getAction( cameraContext, Qt::LeftButton, Qt::NoModifier, -1 ) };
+        auto validBinding { mgr->getBinding( cameraContext, validAction ) };
+        REQUIRE( validAction.isValid() );
+        REQUIRE( validBinding );
+        REQUIRE( validAction == mgr->getAction( cameraContext,
+                                                validBinding->m_buttons,
+                                                validBinding->m_modifiers,
+                                                validBinding->m_key ) );
+        REQUIRE( validBinding->m_buttons == Qt::LeftButton );
+        REQUIRE( validBinding->m_modifiers == Qt::NoModifier );
+        REQUIRE( validBinding->m_key == -1 );
+        REQUIRE( validBinding->m_wheel == false );
+
+        auto invalidBinding { mgr->getBinding( cameraContext, {} ) };
+        REQUIRE( !invalidBinding );
+
+        KeyMappingManager::EventBinding mouseEvent { Qt::MouseButtons { Qt::LeftButton },
+                                                     Qt::ShiftModifier };
+        REQUIRE( mouseEvent.isMouseEvent() );
+
+        KeyMappingManager::EventBinding wheelEvent { true, Qt::ControlModifier };
+        REQUIRE( wheelEvent.isWheelEvent() );
+
+        KeyMappingManager::EventBinding keyEvent { Qt::Key_Bar, Qt::MetaModifier };
+        REQUIRE( keyEvent.isKeyEvent() );
+
+        KeyMappingManager::EventBinding combinedEvent {
+            Qt::LeftButton, Qt::MetaModifier, Qt::Key_Bar };
+        REQUIRE( ( !combinedEvent.isKeyEvent() && combinedEvent.isMouseEvent() ) );
     }
 }
