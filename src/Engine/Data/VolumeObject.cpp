@@ -52,6 +52,14 @@ void VolumeObject::loadGeometry( Core::Geometry::AbstractVolume* volume, const C
         m_volume = std::unique_ptr<Core::Geometry::AbstractVolume>( volume );
 
         auto dim = grid->size();
+
+        /// \todo clean tmp hack
+        // tmp hack create a shared ptr and copy to it.
+        std::shared_ptr<float[]> data( new float[grid->data().size()] );
+        auto itr = data.get();
+        for ( const auto& v : grid->data() ) {
+            *( itr++ ) = v;
+        }
         TextureParameters texparam {
             getName(),
             { GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_CLAMP_TO_BORDER, GL_LINEAR, GL_LINEAR },
@@ -62,7 +70,7 @@ void VolumeObject::loadGeometry( Core::Geometry::AbstractVolume* volume, const C
               GL_RED,
               GL_R32F,
               GL_SCALAR,
-              grid->data().data() } };
+              data } };
         m_tex.setParameters( texparam );
 
         m_isDirty = true;

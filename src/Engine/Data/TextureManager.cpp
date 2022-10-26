@@ -5,6 +5,8 @@
 
 #include <stb/stb_image.h>
 
+#include <memory>
+
 namespace Ra {
 namespace Engine {
 namespace Data {
@@ -22,8 +24,10 @@ TextureManager::~TextureManager() {
     m_pendingData.clear();
 }
 
-TextureParameters&
-TextureManager::addTexture( const std::string& name, uint width, uint height, void* data ) {
+TextureParameters& TextureManager::addTexture( const std::string& name,
+                                               uint width,
+                                               uint height,
+                                               std::shared_ptr<void> data ) {
     TextureParameters texData;
     texData.name         = name;
     texData.image.width  = width;
@@ -79,25 +83,16 @@ void TextureManager::loadTextureImage( TextureParameters& texParameters ) {
     }
 
     CORE_ASSERT( data, "Data is null" );
-    texParameters.image.texels = data;
+    texParameters.image.texels = std::shared_ptr<void>( data );
     texParameters.image.type   = GL_UNSIGNED_BYTE;
 }
 
 Texture* TextureManager::loadTexture( const TextureParameters& texParameters, bool linearize ) {
     TextureParameters texParams = texParameters;
     // TODO : allow to keep texels in texture parameters with automatic lifetime management.
-    bool mustFreeTexels = false;
-    if ( texParams.image.texels == nullptr ) {
-        loadTextureImage( texParams );
-        mustFreeTexels = true;
-    }
+    if ( texParams.image.texels == nullptr ) { loadTextureImage( texParams ); }
     auto ret = new Texture( texParams );
     ret->initializeGL( linearize );
-
-    if ( mustFreeTexels ) {
-        stbi_image_free( ret->getParameters().image.texels );
-        ret->getParameters().image.texels = nullptr;
-    }
     return ret;
 }
 
@@ -139,7 +134,8 @@ void TextureManager::deleteTexture( Texture* texture ) {
     deleteTexture( texture->getName() );
 }
 
-void TextureManager::updateTextureContent( const std::string& texture, void* content ) {
+void TextureManager::updateTextureContent( const std::string& texture,
+                                           std::shared_ptr<void> content ) {
     CORE_ASSERT( m_textures.find( texture ) != m_textures.end(),
                  "Trying to update non existing texture" );
     m_pendingData[texture] = content;
