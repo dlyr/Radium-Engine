@@ -4,6 +4,7 @@
 #include <Engine/Data/Texture.hpp>
 #include <Engine/RadiumEngine.hpp>
 
+#include <glbinding/gl/enum.h>
 #include <globjects/Texture.h>
 
 #include <cmath>
@@ -66,8 +67,9 @@ void Texture::initializeGL( bool linearize ) {
         }
         else {
             // This will only do do the RGB space conversion
-            sRGBToLinearRGB(
-                reinterpret_cast<uint8_t*>( m_textureParameters.image.texels ), numComp, hasAlpha );
+            sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.image.texels.get() ),
+                             numComp,
+                             hasAlpha );
         }
     }
     // Generate OpenGL texture
@@ -109,7 +111,7 @@ void Texture::updateGL() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels );
+                            m_textureParameters.image.texels.get() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_2D:
@@ -121,7 +123,7 @@ void Texture::updateGL() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels );
+                            m_textureParameters.image.texels.get() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_3D: {
@@ -133,15 +135,11 @@ void Texture::updateGL() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels );
+                            m_textureParameters.image.texels.get() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_CUBE_MAP: {
         // Load the 6 faces of the cube-map
-        static const void* nullTexels[6] { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-        auto texels = m_textureParameters.image.texels != nullptr
-                          ? (const void**)m_textureParameters.image.texels
-                          : nullTexels;
 
         m_texture->bind();
         // track globjects updates that will hopefully support direct loading of
@@ -154,7 +152,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[0] );
+                          m_textureParameters.image.cubeMap[0].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -163,7 +161,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[1] );
+                          m_textureParameters.image.cubeMap[1].get() );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                           0,
@@ -173,7 +171,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[2] );
+                          m_textureParameters.image.cubeMap[2].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -182,7 +180,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[3] );
+                          m_textureParameters.image.cubeMap[3].get() );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                           0,
@@ -192,7 +190,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[4] );
+                          m_textureParameters.image.cubeMap[4].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -201,7 +199,7 @@ void Texture::updateGL() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          texels[5] );
+                          m_textureParameters.image.cubeMap[5].get() );
 
         m_texture->unbind();
         GL_CHECK_ERROR
@@ -213,7 +211,7 @@ void Texture::updateGL() {
     GL_CHECK_ERROR;
 }
 
-void Texture::updateData( void* newData ) {
+void Texture::updateData( std::shared_ptr<void> newData ) {
     // register gpu task to update opengl representation before next rendering
     std::lock_guard<std::mutex> lock( m_updateMutex );
 
@@ -282,10 +280,17 @@ void Texture::linearize() {
                         << " can't be linearized." << m_textureParameters.name;
         return;
     }
-    sRGBToLinearRGB(
-        reinterpret_cast<uint8_t*>( m_textureParameters.image.texels ), numComp, hasAlpha );
+    if ( m_textureParameters.image.type == GL_TEXTURE_CUBE_MAP ) {
+        linearizeCubeMap( numComp, hasAlpha );
+    }
+    else {
+        sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.image.texels.get() ),
+                         numComp,
+                         hasAlpha );
+    }
 }
 
+/// \todo template by texels type
 void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlphaChannel ) {
     std::lock_guard<std::mutex> lock( m_updateMutex );
     if ( !m_isLinear ) {
@@ -312,7 +317,7 @@ void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlpha
     }
 }
 
-void Texture::resize( size_t w, size_t h, size_t d, void* pix ) {
+void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) {
     m_textureParameters.image.width  = w;
     m_textureParameters.image.height = h;
     m_textureParameters.image.depth  = d;
@@ -328,7 +333,7 @@ void Texture::linearizeCubeMap( uint numComponent, bool hasAlphaChannel ) {
         /// already linear
         for ( int i = 0; i < 6; ++i ) {
             sRGBToLinearRGB(
-                reinterpret_cast<uint8_t*>( ( (void**)m_textureParameters.image.texels )[i] ),
+                reinterpret_cast<uint8_t*>( m_textureParameters.image.cubeMap[i].get() ),
                 numComponent,
                 hasAlphaChannel );
         }

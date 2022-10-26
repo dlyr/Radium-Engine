@@ -78,7 +78,8 @@ struct ImageParameters {
     /// texels[5] <-- GL_TEXTURE_CUBE_MAP_NEGATIVE_Z <br/>
     /// @todo memory allocated for this pointer might be lost at texture deletion as ownership is
     /// unclear.
-    void* texels { nullptr };
+    std::shared_ptr<void> texels { nullptr };
+    std::array<std::shared_ptr<void>, 6> cubeMap {};
 };
 struct TextureParameters {
     std::string name {};
@@ -164,7 +165,7 @@ class RA_ENGINE_API Texture final
      * The texture does not own the pixel storage and will not free/delete that memory,
      * even when the texture is destroyed.
      */
-    void updateData( void* newData );
+    void updateData( std::shared_ptr<void> newData );
 
     /**
      * Update the parameters contained by the texture.
@@ -202,7 +203,7 @@ class RA_ENGINE_API Texture final
      */
     size_t depth() const { return m_textureParameters.image.depth; }
 
-    void* texels() { return m_textureParameters.image.texels; }
+    void* texels() { return m_textureParameters.image.texels.get(); }
     /**
      * @return the globjects::Texture associated with the texture
      */
@@ -221,7 +222,7 @@ class RA_ENGINE_API Texture final
      * @param d depth of the texture
      * @param pix the new texels array corresponding the the new texture dimension
      */
-    void resize( size_t w = 1, size_t h = 1, size_t d = 1, void* pix = nullptr );
+    void resize( size_t w = 1, size_t h = 1, size_t d = 1, std::shared_ptr<void> pix = nullptr );
 
     /// get read access to texture parameters
     const TextureParameters& getParameters() const { return m_textureParameters; }
