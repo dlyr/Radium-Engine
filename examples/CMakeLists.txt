@@ -27,6 +27,7 @@ foreach(
     RawShaderMaterial
     SimpleAnimation
     SimpleSimulation
+    SimpleSkinning
     TexturedQuad
     TexturedQuadDynamic
 )

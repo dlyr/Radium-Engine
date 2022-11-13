@@ -116,6 +116,15 @@ void SkeletonComponent::setTransform( const Index& roIdx, const Core::Transform&
     m_skel.setTransform( boneIdx, TBoneLocal * diff, SpaceType::LOCAL );
 }
 
+Core::Transform SkeletonComponent::getBoneTransform( uint boneIdx, const SpaceType MODE ) {
+    return m_skel.getTransform( boneIdx, MODE );
+}
+void SkeletonComponent::setBoneTransform( uint boneIdx,
+                                          const Core::Transform& transform,
+                                          const SpaceType MODE ) {
+    m_skel.setTransform( boneIdx, transform, MODE );
+    updateDisplay();
+}
 // Build from fileData
 
 void SkeletonComponent::handleSkeletonLoading( const Core::Asset::HandleData* data ) {
@@ -155,7 +164,7 @@ void SkeletonComponent::handleAnimationLoading(
             }
         }
     }
-    if ( m_animations.size() == 0 ) {
+    if ( m_animations.empty() ) {
         m_animations.emplace_back();
         for ( uint i = 0; i < m_skel.size(); ++i ) {
             m_animations[0].push_back( KeyFramedValue( 0_ra, pose[i] ) );
@@ -209,8 +218,11 @@ void SkeletonComponent::update( Scalar t ) {
 
     m_animationTime = m_speed * t;
     Scalar lastTime = 0;
-    for ( auto boneAnim : m_animations[m_animationID] ) {
-        lastTime = std::max( lastTime, *boneAnim.getTimes().rbegin() );
+    if ( !m_animations.empty() ) {
+        // m_animationID is always < m_animation.size() unless m_animations.empty()
+        for ( auto boneAnim : m_animations[m_animationID] ) {
+            lastTime = std::max( lastTime, *boneAnim.getTimes().rbegin() );
+        }
     }
     if ( m_autoRepeat ) {
         if ( !m_pingPong ) { m_animationTime = std::fmod( m_animationTime, lastTime ); }
