@@ -52,6 +52,7 @@ struct SamplerParameters {
     /// OpenGL magnification filter ( GL_LINEAR or GL_NEAREST )
     GLenum magFilter { GL_LINEAR };
 };
+
 struct ImageParameters {
     /// OpenGL target
     GLenum target { GL_TEXTURE_2D };
@@ -81,10 +82,11 @@ struct ImageParameters {
     std::shared_ptr<void> texels { nullptr };
     std::array<std::shared_ptr<void>, 6> cubeMap {};
 };
+
 struct TextureParameters {
     std::string name {};
-    SamplerParameters sampler;
-    ImageParameters image;
+    SamplerParameters sampler {};
+    ImageParameters image {};
 };
 
 /** Represent a Texture of the engine
