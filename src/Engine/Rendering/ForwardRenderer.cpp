@@ -493,63 +493,6 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
         glBlendFuncSeparate( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO );
         GL_ASSERT( glDrawBuffers( 1, buffers ) ); // Draw color texture
 
-        auto drawWireframe = [this, &renderData]( const auto& ro ) {
-            std::shared_ptr<Data::Displayable> wro;
-
-            WireMap::iterator it = m_wireframes.find( ro.get() );
-            if ( it == m_wireframes.end() ) {
-                std::shared_ptr<Data::LineMesh> disp;
-
-                using dispmesh = Ra::Engine::Data::GeometryDisplayable;
-                using trimesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::TriangleMesh>;
-                using polymesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::PolyMesh>;
-                using quadmesh = Ra::Engine::Data::IndexedGeometry<Ra::Core::Geometry::QuadMesh>;
-
-                auto displayable = ro->getMesh();
-                auto tm          = std::dynamic_pointer_cast<trimesh>( displayable );
-                auto tp          = std::dynamic_pointer_cast<polymesh>( displayable );
-                auto tq          = std::dynamic_pointer_cast<quadmesh>( displayable );
-                auto td          = std::dynamic_pointer_cast<dispmesh>( displayable );
-
-                auto processLineMesh = []( auto cm, std::shared_ptr<Data::LineMesh>& lm ) {
-                    if ( cm->getRenderMode() ==
-                         Data::AttribArrayDisplayable::MeshRenderMode::RM_TRIANGLES ) {
-                        setupLineMesh( lm, cm->getCoreGeometry() );
-                    }
-                };
-                if ( tm ) { processLineMesh( tm, disp ); }
-                if ( tp ) { processLineMesh( tp, disp ); }
-                if ( tq ) { processLineMesh( tq, disp ); }
-                //    if ( td ) { setupLineMesh() }
-
-                m_wireframes[ro.get()] = disp;
-                wro                    = disp;
-            }
-            else {
-                wro = it->second;
-            }
-
-            const Data::ShaderProgram* shader =
-                m_shaderProgramManager->getShaderProgram( "Wireframe" );
-
-            if ( shader && wro ) {
-                shader->bind();
-                if ( ro->isVisible() ) {
-                    wro->updateGL();
-
-                    Core::Matrix4 modelMatrix = ro->getTransformAsMatrix();
-                    shader->setUniform( "transform.proj", renderData.projMatrix );
-                    shader->setUniform( "transform.view", renderData.viewMatrix );
-                    shader->setUniform( "transform.model", modelMatrix );
-                    shader->setUniform( "viewport", Core::Vector2 { m_width, m_height } );
-                    shader->setUniform( "pixelWidth", 1.8f );
-                    wro->render( shader );
-
-                    GL_CHECK_ERROR;
-                }
-            }
-        };
-
         auto drawWireframeNew = [this, &renderData]( const auto& ro ) {
             auto displayable = ro->getMesh();
             using dispmesh   = Ra::Engine::Data::GeometryDisplayable;
