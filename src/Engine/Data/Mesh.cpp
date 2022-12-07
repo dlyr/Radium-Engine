@@ -381,8 +381,6 @@ void GeometryDisplayable::render( const ShaderProgram* prog, const LayerKeyType&
             GL_CHECK_ERROR;
             autoVertexAttribPointer( prog, key );
             GL_CHECK_ERROR;
-            LOG( logERROR ) << "draw " << *key.first.begin() << " [" << key.second << "] "
-                            << prog->getBasicConfiguration().getName();
             m_geomLayers[key].vao->drawElements(
                 static_cast<GLenum>( m_geomLayers[key].renderMode ),
                 GLsizei( m_geomLayers[key].indices.numElements ),
