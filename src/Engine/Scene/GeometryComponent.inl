@@ -1,9 +1,10 @@
 #pragma once
 
-#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
+#include <Core/Geometry/IndexedGeometry.hpp>
+#include <Core/Geometry/TriangleMesh.hpp>
 #include <Engine/Data/BlinnPhongMaterial.hpp>
 #include <Engine/Data/MaterialConverters.hpp>
 #include <Engine/Data/RenderParameters.hpp>
@@ -121,7 +122,12 @@ void SurfaceMeshComponent<CoreMeshType>::setupIO( const std::string& id ) {
 
     cm->registerOutput<CoreMeshType>( getEntity(), this, id, cbOut );
     cm->registerReadWrite<CoreMeshType>( getEntity(), this, id, cbRw );
+    if ( std::is_convertible<CoreMeshType*, Core::Geometry::AttribArrayGeometry*>() &&
+         !std::is_same<CoreMeshType, Core::Geometry::AttribArrayGeometry>() ) {
 
+        cm->registerOutput<Core::Geometry::AttribArrayGeometry>( getEntity(), this, id, cbOut );
+        cm->registerReadWrite<Core::Geometry::AttribArrayGeometry>( getEntity(), this, id, cbRw );
+    }
     base::setupIO( id );
 }
 
