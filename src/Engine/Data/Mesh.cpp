@@ -391,8 +391,8 @@ void GeometryDisplayable::render( const ShaderProgram* prog, const LayerKeyType&
             GL_CHECK_ERROR;
         }
         else {
-            LOG( logERROR ) << "try to draw an invalid layer " << *key.first.begin() << " ["
-                            << key.second << "]\n";
+            LOG( logERROR ) << getName() << "try to draw an invalid layer " << *key.first.begin()
+                            << " [" << key.second << "]\n";
         }
     }
     else {
