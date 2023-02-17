@@ -1,0 +1,33 @@
+name: PR CI (release/float)
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  pull_request:
+  merge_group:
+    branches:
+      - release-candidate
+
+env:
+  ext-dir: $GITHUB_WORKSPACE/external/install/
+
+jobs:
+  call-guideline-checks:
+    uses: ./.github/workflows/guideline-checks.yml
+    secrets:
+      GIST_BADGES_TOKEN:  ${{ secrets.GIST_BADGES_TOKEN }}
+      GIST_BADGES_SECRET: ${{ secrets.GIST_BADGES_SECRET }}
+  call-build:
+    uses: ./.github/workflows/build-matrix.yml
+    with:
+      build-debug: "false"
+  call-coverage:
+    uses: ./.github/workflows/build-matrix.yml
+    with:
+      windows: "false"
+      macos: "false"
+      build-release: "false"
+      coverage: "true"
+      qt6: "false"
