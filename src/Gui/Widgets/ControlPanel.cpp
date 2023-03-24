@@ -25,11 +25,11 @@ ControlPanel::ControlPanel( const std::string& name, bool hline, QWidget* parent
     m_contentLayout = new QGridLayout();
     m_contentLayout->setObjectName( "first content layout" );
 
-    if ( !name.empty() ) {
+        if ( !name.empty() ) {
         auto panelName = new QLabel();
-        panelName->setText( name.c_str() );
+            panelName->setText( name.c_str() );
         m_mainLayout->addWidget( panelName );
-    }
+        }
     if ( hline ) {
         QFrame* line;
         line = new QFrame();
@@ -127,7 +127,7 @@ void ControlPanel::addPowerSliderInput( const std::string& name,
                                         double max,
                                         const std::string& tooltip ) {
     auto inputLabel = new QLabel( tr( name.c_str() ) );
-    auto inputField = new PowerSlider();
+    auto inputField  = new PowerSlider();
     if ( !tooltip.empty() ) {
         auto tooltipString =
             QString( "<qt>%1</qt>" ).arg( QString( tooltip.c_str() ).toHtmlEscaped() );
@@ -175,6 +175,7 @@ void ControlPanel::addColorInput(
     const std::string& tooltip ) {
 
     auto button    = new QPushButton( name.c_str() );
+    button->setObjectName( name.c_str() );
     auto srgbColor = Ra::Core::Utils::Color::linearRGBTosRGB( color );
     auto clrBttn   = QColor::fromRgbF( srgbColor[0], srgbColor[1], srgbColor[2], srgbColor[3] );
     auto clrDlg    = [callback, clrBttn, withAlpha, button, name]() mutable {
@@ -264,7 +265,7 @@ void ControlPanel::addFileOutput( const std::string& name,
 
 void ControlPanel::addSeparator() {
     QFrame* line = new QFrame();
-    line->setFrameShape( QFrame::HLine );
+        line->setFrameShape( QFrame::HLine );
     line->setFrameShadow( QFrame::Sunken );
     m_mainLayout->addWidget( line );
     m_contentLayout = new QGridLayout();
