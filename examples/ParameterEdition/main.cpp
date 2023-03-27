@@ -18,46 +18,43 @@ using namespace Ra::Core;
 
 /* Changed the underlying type to verify the good behavior of the edition */
 enum Values : unsigned int { VALUE_0 = 10, VALUE_1 = 20, VALUE_2 = 30 };
+using ValuesType = typename std::underlying_type_t<Values>;
 
+// TODO : replace the following by a visitor. See ParameterSetEditor.
 template <typename RP>
 void printParameterValue( const RenderParameters& parameters, const ::std::string& p ) {
-    if ( parameters.containsParameter<RP>( p ) )
-        std::cout << parameters.getParameter<RP>( p ).m_value << " ("
-                  << Utils::demangleType<typename RP::value_type>() << ")";
+    if ( auto param = parameters.containsParameter<RP>( p ); param )
+        std::cout << ( *param )->second << " (" << Utils::demangleType<RP>() << ")";
 }
 
 template <typename T, int N>
 void printVectorParameterValue( const RenderParameters& parameters, const ::std::string& p ) {
-    using RP = RenderParameters::TParameter<Eigen::Matrix<T, N, 1>>;
-    if ( parameters.containsParameter<RP>( p ) )
-        std::cout << parameters.getParameter<RP>( p ).m_value.transpose() << " ("
-                  << Utils::demangleType<typename RP::value_type>() << ")";
+    using RP = Eigen::Matrix<T, N, 1>;
+    if ( auto param = parameters.containsParameter<RP>( p ); param )
+        std::cout << ( *param )->second.transpose() << " (" << Utils::demangleType<RP>() << ")";
 }
 
 void printColorParameterValue( const RenderParameters& parameters, const ::std::string& p ) {
-    using RP = RenderParameters::ColorParameter;
-    if ( parameters.containsParameter<RP>( p ) )
-        std::cout << parameters.getParameter<RP>( p ).m_value.transpose() << " ("
-                  << Utils::demangleType<typename RP::value_type>() << ")";
+    using RP = Ra::Core::Utils::Color;
+    if ( auto param = parameters.containsParameter<RP>( p ); param )
+        std::cout << ( *param )->second.transpose() << " (" << Utils::demangleType<RP>() << ")";
 }
 
 template <typename T, int N, int M>
 void printMatrixParameterValue( const RenderParameters& parameters, const ::std::string& p ) {
-    using RP = RenderParameters::TParameter<Eigen::Matrix<T, N, M>>;
-    if ( parameters.containsParameter<RP>( p ) )
-        std::cout << "\n"
-                  << parameters.getParameter<RP>( p ).m_value << "\n ("
-                  << Utils::demangleType<typename RP::value_type>() << ")";
+    using RP = Eigen::Matrix<T, N, M>;
+    if ( auto param = parameters.containsParameter<RP>( p ); param )
+        std::cout << "\n" << ( *param )->second << "\n (" << Utils::demangleType<RP>() << ")";
 }
 
 template <typename T>
 void printCollectionParameterValue( const RenderParameters& parameters, const ::std::string& p ) {
-    using RP = RenderParameters::TParameter<std::vector<T>>;
-    if ( parameters.containsParameter<RP>( p ) ) {
+    using RP = std::vector<T>;
+    if ( auto param = parameters.containsParameter<RP>( p ); param ) {
         std::cout << "\n";
-        auto v = parameters.getParameter<RP>( p ).m_value;
+        const auto& v = ( *param )->second;
         std::copy( v.begin(), v.end(), std::ostream_iterator<T>( std::cout, " " ) );
-        std::cout << "\n (" << Utils::demangleType<typename RP::value_type>() << ")";
+        std::cout << "\n (" << Utils::demangleType<RP>() << ")";
     }
 }
 
@@ -67,7 +64,7 @@ void printAllParameters( const RenderParameters& parameters ) {
     std::cout << "Parameters for type " << Utils::demangleType<T>() << " : " << params.size()
               << "\n";
     for ( const auto& [key, p] : params ) {
-        std::cout << "\t" << key << " = " << p.m_value << "\n";
+        std::cout << "\t" << key << " = " << p << "\n";
     }
 }
 
@@ -145,10 +142,10 @@ int main( int argc, char* argv[] ) {
     //! [Creating the edition dialog]
 
     //! [Management of string<->value conversion for enumeration parameters]
-    auto vnc = new RenderParameters::EnumConverter<Values>( { { Values::VALUE_0, "VALUE_0" },
-                                                              { Values::VALUE_1, "VALUE_1" },
-                                                              { Values::VALUE_2, "VALUE_2" } } );
-    auto valuesEnumConverter = std::shared_ptr<RenderParameters::EnumConverter<Values>>( vnc );
+    auto vnc = new Ra::Core::Utils::EnumConverter<ValuesType>( { { Values::VALUE_0, "VALUE_0" },
+                                                                 { Values::VALUE_1, "VALUE_1" },
+                                                                 { Values::VALUE_2, "VALUE_2" } } );
+    auto valuesEnumConverter = std::shared_ptr<Ra::Core::Utils::EnumConverter<ValuesType>>( vnc );
     //! [Management of string<->value conversion for enumeration parameters]
 
     //! [filling the parameter set to edit ]
@@ -175,20 +172,20 @@ int main( int argc, char* argv[] ) {
 
     //! [Printing several parameters before edition ]
     std::cout << "\nPrinting all parameters before editiong :\n";
-    printAllParameters<RenderParameters::IntParameter>( parameters );
-    printAllParameters<RenderParameters::BoolParameter>( parameters );
-    printAllParameters<RenderParameters::UIntParameter>( parameters );
-    printAllParameters<RenderParameters::ScalarParameter>( parameters );
+    printAllParameters<int>( parameters );
+    printAllParameters<bool>( parameters );
+    printAllParameters<uint>( parameters );
+    printAllParameters<Scalar>( parameters );
     //! [Printing several parameters before edition ]
 
     //! [Filling the editor with the parameter set ]
     editor.setupFromParameters( parameters, parameterSet_metadata );
     auto printParameter = [&parameters]( const std::string& p ) {
         std::cout << "Parameter " << p << " was modified. New value is ";
-        printParameterValue<RenderParameters::IntParameter>( parameters, p );
-        printParameterValue<RenderParameters::BoolParameter>( parameters, p );
-        printParameterValue<RenderParameters::UIntParameter>( parameters, p );
-        printParameterValue<RenderParameters::ScalarParameter>( parameters, p );
+        printParameterValue<int>( parameters, p );
+        printParameterValue<bool>( parameters, p );
+        printParameterValue<uint>( parameters, p );
+        printParameterValue<Scalar>( parameters, p );
         printCollectionParameterValue<int>( parameters, p );
         printCollectionParameterValue<unsigned int>( parameters, p );
         printCollectionParameterValue<Scalar>( parameters, p );
@@ -209,9 +206,9 @@ int main( int argc, char* argv[] ) {
 
     //! [Printing several parameters after edition ]
     std::cout << "\nPrinting all parameters before quit : ";
-    printAllParameters<RenderParameters::IntParameter>( parameters );
-    printAllParameters<RenderParameters::BoolParameter>( parameters );
-    printAllParameters<RenderParameters::UIntParameter>( parameters );
-    printAllParameters<RenderParameters::ScalarParameter>( parameters );
+    printAllParameters<int>( parameters );
+    printAllParameters<bool>( parameters );
+    printAllParameters<uint>( parameters );
+    printAllParameters<Scalar>( parameters );
     //! [Printing several parameters after edition ]
 }
