@@ -152,10 +152,12 @@ inline TextureParameters& BlinnPhongMaterial::addTexture( const TextureSemantic&
     CORE_ASSERT( !texture.empty(), "Invalid texture name" );
 
     TextureParameters data;
-    data.name  = texture;
+    data.name          = texture;
     data.sampler.wrapS = GL_REPEAT;
     data.sampler.wrapT = GL_REPEAT;
-    if ( semantic != TextureSemantic::TEX_NORMAL ) { data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR; }
+    if ( semantic != TextureSemantic::TEX_NORMAL ) {
+        data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+    }
     return addTexture( semantic, data );
 }
 
