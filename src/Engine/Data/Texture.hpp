@@ -68,17 +68,8 @@ struct ImageParameters {
     GLenum internalFormat { GL_RGB };
     /// Type of the components in external data
     GLenum type { GL_UNSIGNED_BYTE };
-    /// External data (ownership is left to caller, not stored after OpenGL texture creation).
-    /// Note that, for cube-map texture, this is considered as a "void*[6]" array containing the 6
-    /// faces of the cube corresponding to the targets. <br/>
-    /// texels[0] <-- GL_TEXTURE_CUBE_MAP_POSITIVE_X <br/>
-    /// texels[1] <-- GL_TEXTURE_CUBE_MAP_NEGATIVE_X <br/>
-    /// texels[2] <-- GL_TEXTURE_CUBE_MAP_POSITIVE_Y <br/>
-    /// texels[3] <-- GL_TEXTURE_CUBE_MAP_NEGATIVE_Y <br/>
-    /// texels[4] <-- GL_TEXTURE_CUBE_MAP_POSITIVE_Z <br/>
-    /// texels[5] <-- GL_TEXTURE_CUBE_MAP_NEGATIVE_Z <br/>
-    /// @todo memory allocated for this pointer might be lost at texture deletion as ownership is
-    /// unclear.
+
+    /// texels OR cubeMap, shared ownership
     std::shared_ptr<void> texels { nullptr };
     std::array<std::shared_ptr<void>, 6> cubeMap {};
 };
@@ -245,6 +236,8 @@ class RA_ENGINE_API Texture final
     }
 
   private:
+    /** Send texture data to the GPU and generate mipmap if needed
+     */
     void updateGL();
 
     /**

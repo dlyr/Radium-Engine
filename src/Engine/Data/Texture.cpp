@@ -83,8 +83,6 @@ void Texture::initializeGL( bool linearize ) {
     updateParameters();
     // upload texture to the GPU
     updateGL();
-    // Generate mip-map if needed.
-    if ( m_isMipMapped ) { m_texture->generateMipmap(); }
 }
 
 void Texture::bind( int unit ) {
@@ -208,6 +206,9 @@ void Texture::updateGL() {
         CORE_ASSERT( 0, "Unsupported texture type ?" );
     } break;
     }
+    // Generate mip-map if needed.
+    if ( m_isMipMapped ) { m_texture->generateMipmap(); }
+
     GL_CHECK_ERROR;
 }
 
