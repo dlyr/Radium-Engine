@@ -44,6 +44,7 @@ int main( int argc, char* argv[] ) {
     // these values will be used when engine initialize texture GL representation.
     textureParameters.image.format         = gl::GLenum::GL_RED;
     textureParameters.image.internalFormat = gl::GLenum::GL_R8;
+    textureParameters.sampler.minFilter    = gl::GLenum::GL_LINEAR_MIPMAP_LINEAR;
     //! [Creating a texture]
 
     //! [Create an entity and component to draw or data]
