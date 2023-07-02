@@ -690,7 +690,6 @@ void EnvironmentTexture::updateGL() {
         m_skyTexture->initializeGL();
         glEnable( GL_TEXTURE_CUBE_MAP_SEAMLESS );
         m_glReady = true;
-        // saveShProjection( "SHImage.png" );
     }
 }
 
