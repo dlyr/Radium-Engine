@@ -680,8 +680,8 @@ void Renderer::resize( uint w, uint h ) {
         m_fancyTexture->resize( m_width, m_height );
 
         m_pickingFbo->bind();
-        m_pickingFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_depthTexture->texture() );
-        m_pickingFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_pickingTexture->texture() );
+        m_pickingFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_depthTexture->getGPUTexture() );
+        m_pickingFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_pickingTexture->getGPUTexture() );
         if ( m_pickingFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE ) {
             LOG( logERROR ) << "File " << __FILE__ << "(" << __LINE__ << ") Picking FBO Error "
                             << m_pickingFbo->checkStatus();
@@ -719,17 +719,18 @@ std::unique_ptr<uchar[]> Renderer::grabFrame( size_t& w, size_t& h ) const {
     tex->bind();
 
     // Get a buffer to store the pixels of the OpenGL texture (in float format)
-    auto pixels = std::unique_ptr<float[]>( new float[tex->width() * tex->height() * 4] );
+    auto pixels = std::unique_ptr<float[]>( new float[tex->getWidth() * tex->getHeight() * 4] );
 
     // Grab the texture data
     GL_ASSERT( glGetTexImage( GL_TEXTURE_2D, 0, GL_RGBA, GL_SCALAR, pixels.get() ) );
 
     // Now we must convert the floats to RGB while flipping the image updisde down.
-    auto writtenPixels = std::unique_ptr<uchar[]>( new uchar[tex->width() * tex->height() * 4] );
-    for ( uint j = 0; j < tex->height(); ++j ) {
-        for ( uint i = 0; i < tex->width(); ++i ) {
-            auto in = 4 * ( j * tex->width() + i ); // Index in the texture buffer
-            auto ou = 4 * ( ( tex->height() - 1 - j ) * tex->width() +
+    auto writtenPixels =
+        std::unique_ptr<uchar[]>( new uchar[tex->getWidth() * tex->getHeight() * 4] );
+    for ( uint j = 0; j < tex->getHeight(); ++j ) {
+        for ( uint i = 0; i < tex->getWidth(); ++i ) {
+            auto in = 4 * ( j * tex->getWidth() + i ); // Index in the texture buffer
+            auto ou = 4 * ( ( tex->getHeight() - 1 - j ) * tex->getWidth() +
                             i ); // Index in the final image (note the j flipping).
 
             writtenPixels[ou + 0] =
@@ -742,8 +743,8 @@ std::unique_ptr<uchar[]> Renderer::grabFrame( size_t& w, size_t& h ) const {
                 (uchar)std::clamp( float( pixels[in + 3] * 255.f ), float( 0 ), float( 255 ) );
         }
     }
-    w = tex->width();
-    h = tex->height();
+    w = tex->getWidth();
+    h = tex->getHeight();
     return writtenPixels;
 }
 
