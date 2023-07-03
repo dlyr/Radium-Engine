@@ -644,7 +644,7 @@ Ra::Engine::Data::Texture* EnvironmentTexture::getSHImage() {
 void EnvironmentTexture::saveShProjection( const std::string& filename ) {
     auto tex  = getSHImage();
     auto flnm = std::string( "../" ) + filename;
-    stbi_write_png( flnm.c_str(), tex->width(), tex->height(), 4, tex->texels(), 0 );
+    stbi_write_png( flnm.c_str(), tex->getWidth(), tex->getHeight(), 4, tex->getTexels(), 0 );
 }
 
 const Ra::Core::Matrix4& EnvironmentTexture::getShMatrix( int channel ) {

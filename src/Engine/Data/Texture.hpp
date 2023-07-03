@@ -145,27 +145,27 @@ class RA_ENGINE_API Texture final
     /**
      * @return the pixel format of the texture
      */
-    GLenum format() const { return m_textureParameters.image.format; }
+    GLenum getFormat() const { return m_textureParameters.image.format; }
     /**
      * @return the width of the texture
      */
-    size_t width() const { return m_textureParameters.image.width; }
+    size_t getWidth() const { return m_textureParameters.image.width; }
     /**
      * @return the height of the texture
      */
-    size_t height() const { return m_textureParameters.image.height; }
+    size_t getHeight() const { return m_textureParameters.image.height; }
     /**
      * @return the depth of the texture
      */
-    size_t depth() const { return m_textureParameters.image.depth; }
+    size_t getDepth() const { return m_textureParameters.image.depth; }
 
-    void* texels() { return m_textureParameters.image.texels.get(); }
+    void* getTexels() { return m_textureParameters.image.texels.get(); }
     /**
      * Get the underlying globjects::Texture. Use with care since you can brake the equivalence
      * of image and sampler parameters between cpu Data::Texture and gpu side globlects::Texture.
      * @return the globjects::Texture associated with the texture.
      */
-    globjects::Texture* texture() const { return m_texture.get(); }
+    globjects::Texture* getGPUTexture() const { return m_texture.get(); }
 
     /// get read access to texture parameters
     const TextureParameters& getParameters() const { return m_textureParameters; }
@@ -179,6 +179,7 @@ class RA_ENGINE_API Texture final
      * even when the texture is destroyed.
      */
     void updateData( std::shared_ptr<void> newData );
+
     /** Resize the texture.
      *
      * Need active OpenGL context.
@@ -199,28 +200,9 @@ class RA_ENGINE_API Texture final
      * representation task. If samplerParameter is change, the method call setSamplerParameters() to
      * register update GPU sample task.
      */
-    void setParameters( const TextureParameters& textureParameters ) {
-        m_updateMutex.lock();
-        bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
-        m_updateMutex.unlock();
-        if ( test1 ) setSamplerParameters( textureParameters.sampler );
-
-        m_updateMutex.lock();
-        bool test2 = ( textureParameters.image != m_textureParameters.image );
-        m_updateMutex.unlock();
-        if ( test2 ) setImageParameters( textureParameters.image );
-    }
-
-    void setImageParameters( const ImageParameters& imageParameters ) {
-        std::lock_guard<std::mutex> lock( m_updateMutex );
-        m_textureParameters.image = imageParameters;
-        registerUpdateImageDataTask();
-    }
-    void setSamplerParameters( const SamplerParameters& samplerParameters ) {
-        std::lock_guard<std::mutex> lock( m_updateMutex );
-        m_textureParameters.sampler = samplerParameters;
-        registerUpdateSamplerParametersTask();
-    }
+    void setParameters( const TextureParameters& textureParameters );
+    void setImageParameters( const ImageParameters& imageParameters );
+    void setSamplerParameters( const SamplerParameters& samplerParameters );
 
     /**
      *

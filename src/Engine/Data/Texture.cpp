@@ -44,12 +44,14 @@ void Texture::initializeGL( bool linearize ) {
     // upload texture to the GPU
     registerUpdateImageDataTask();
 }
+
 void Texture::updateData( std::shared_ptr<void> newData ) {
     // register gpu task to update opengl representation before next rendering
     std::lock_guard<std::mutex> lock( m_updateMutex );
     m_textureParameters.image.texels = newData;
     registerUpdateImageDataTask();
 }
+
 void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) {
     m_textureParameters.image.width  = w;
     m_textureParameters.image.height = h;
@@ -61,6 +63,30 @@ void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) 
         sendImageDataToGPU();
     }
     else { sendImageDataToGPU(); }
+}
+
+void Texture::setParameters( const TextureParameters& textureParameters ) {
+    m_updateMutex.lock();
+    bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
+    m_updateMutex.unlock();
+    if ( test1 ) setSamplerParameters( textureParameters.sampler );
+
+    m_updateMutex.lock();
+    bool test2 = ( textureParameters.image != m_textureParameters.image );
+    m_updateMutex.unlock();
+    if ( test2 ) setImageParameters( textureParameters.image );
+}
+
+void Texture::setImageParameters( const ImageParameters& imageParameters ) {
+    std::lock_guard<std::mutex> lock( m_updateMutex );
+    m_textureParameters.image = imageParameters;
+    registerUpdateImageDataTask();
+}
+
+void Texture::setSamplerParameters( const SamplerParameters& samplerParameters ) {
+    std::lock_guard<std::mutex> lock( m_updateMutex );
+    m_textureParameters.sampler = samplerParameters;
+    registerUpdateSamplerParametersTask();
 }
 
 void Texture::bind( int unit ) {
@@ -76,6 +102,7 @@ void Texture::bindImageTexture( int unit,
     m_texture->bindImageTexture(
         uint( unit ), level, layered, layer, access, m_textureParameters.image.internalFormat );
 }
+
 void Texture::linearize() {
     // Only RGB and RGBA texture contains color information
     // (others are not really colors and must be managed explicitly by the user)
@@ -125,6 +152,7 @@ void Texture::computeIsMipMappedFlag() {
     m_isMipMapped = !( m_textureParameters.sampler.minFilter == GL_NEAREST ||
                        m_textureParameters.sampler.minFilter == GL_LINEAR );
 }
+
 bool Texture::createTexture() {
     if ( m_texture == nullptr ) {
         m_texture = globjects::Texture::create( m_textureParameters.image.target );
