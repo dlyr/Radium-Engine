@@ -52,6 +52,13 @@ struct SamplerParameters {
     /// OpenGL magnification filter ( GL_LINEAR or GL_NEAREST )
     GLenum magFilter { GL_LINEAR };
 };
+inline bool operator==( const SamplerParameters& lhs, const SamplerParameters& rhs ) {
+    return lhs.wrapS == rhs.wrapS && lhs.wrapT == rhs.wrapT && lhs.wrapP == rhs.wrapP &&
+           lhs.minFilter == rhs.minFilter && lhs.magFilter == rhs.magFilter;
+}
+inline bool operator!=( const SamplerParameters& lhs, const SamplerParameters& rhs ) {
+    return !( lhs == rhs );
+}
 
 struct ImageParameters {
     /// OpenGL target
@@ -73,6 +80,14 @@ struct ImageParameters {
     std::shared_ptr<void> texels { nullptr };
     std::array<std::shared_ptr<void>, 6> cubeMap {};
 };
+inline bool operator==( const ImageParameters& lhs, const ImageParameters rhs ) {
+    return lhs.target == rhs.target && lhs.width == rhs.width && lhs.height == rhs.height &&
+           lhs.format == rhs.format && lhs.internalFormat == rhs.internalFormat &&
+           lhs.type == rhs.type && lhs.texels == rhs.texels && lhs.cubeMap == rhs.cubeMap;
+}
+inline bool operator!=( const ImageParameters& lhs, const ImageParameters& rhs ) {
+    return !( lhs == rhs );
+}
 
 struct TextureParameters {
     std::string name {};
@@ -161,17 +176,6 @@ class RA_ENGINE_API Texture final
     void updateData( std::shared_ptr<void> newData );
 
     /**
-     * Update the parameters contained by the texture.
-     *
-     * Need active OpenGL context.
-     *
-     * User first modify the public attributes corresponding to the parameter he wants to change
-     * the value (e.g wrap* or *Filter) and call this function to update the OpenGL texture
-     * state ...
-     */
-    void updateParameters();
-
-    /**
      * Convert a color texture from sRGB to Linear RGB spaces.
      * This will transform the internal representation of the texture to GL_SCALAR (GL_FLOAT).
      * Only GL_RGB[8, 16, 16F, 32F] and GL_RGBA[8, 16, 16F, 32F] are managed.
@@ -220,25 +224,41 @@ class RA_ENGINE_API Texture final
     /// get read access to texture parameters
     const TextureParameters& getParameters() const { return m_textureParameters; }
 
-    /** get read/write access to texture parameters, need to update
-     * representation afterward, @see setParameters()
-     */
-    TextureParameters& getParameters() { return m_textureParameters; }
-
     /** set TextureParameters.
-     * If texels is changed, need to call initializeGL() to update GPU representation
-     * if only wrap or filter parameters are change, updateParameters() is
-     * sufficient to update the GPU representation.
+     * If imageParameters is changed, the method call setImageParameters() to register update GPU
+     * representation task. If samplerParameter is change, the method call setSamplerParameters() to
+     * register update GPU sample task.
      */
     void setParameters( const TextureParameters& textureParameters ) {
+        m_updateMutex.lock();
+        bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
+        m_updateMutex.unlock();
+        if ( test1 ) setSamplerParameters( textureParameters.sampler );
+
+        m_updateMutex.lock();
+        bool test2 = ( textureParameters.image != m_textureParameters.image );
+        m_updateMutex.unlock();
+        if ( test2 ) setImageParameters( textureParameters.image );
+    }
+
+    void setImageParameters( const ImageParameters& imageParameters ) {
         std::lock_guard<std::mutex> lock( m_updateMutex );
-        m_textureParameters = textureParameters;
+        m_textureParameters.image = imageParameters;
+        updateData();
+    }
+    void setSamplerParameters( const SamplerParameters& samplerParameters ) {
+        std::lock_guard<std::mutex> lock( m_updateMutex );
+        m_textureParameters.sampler = samplerParameters;
+        updateParameters();
     }
 
   private:
+    void updateData();
+    void updateParameters();
     /** Send texture data to the GPU and generate mipmap if needed
      */
-    void updateGL();
+    void updateGLData();
+    void updateGLParameters();
 
     /**
      * Convert a color texture from sRGB to Linear RGB spaces.
@@ -267,7 +287,8 @@ class RA_ENGINE_API Texture final
     /// Is the texture in LinearRGB ?
     bool m_isLinear { false };
     /// is valid when a gpu update task is registered (e.g. after a call to setData)
-    Core::TaskQueue::TaskId m_updateDataTaskId;
+    Core::TaskQueue::TaskId m_updateImageTaskId;
+    Core::TaskQueue::TaskId m_updateSamplerTaskId;
     /// mutex to protect non gpu setters, in a thread safe way.
     std::mutex m_updateMutex;
 };

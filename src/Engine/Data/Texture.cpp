@@ -21,8 +21,12 @@ Texture::Texture( const TextureParameters& texParameters ) :
     m_isLinear { false } {}
 
 Texture::~Texture() {
-    if ( m_updateDataTaskId.isValid() ) {
-        RadiumEngine::getInstance()->removeGpuTask( m_updateDataTaskId );
+    if ( m_updateImageTaskId.isValid() ) {
+        RadiumEngine::getInstance()->removeGpuTask( m_updateImageTaskId );
+    }
+
+    if ( m_updateSamplerTaskId.isValid() ) {
+        RadiumEngine::getInstance()->removeGpuTask( m_updateSamplerTaskId );
     }
 }
 
@@ -82,7 +86,7 @@ void Texture::initializeGL( bool linearize ) {
                        m_textureParameters.sampler.minFilter == GL_LINEAR );
     updateParameters();
     // upload texture to the GPU
-    updateGL();
+    updateData();
 }
 
 void Texture::bind( int unit ) {
@@ -99,7 +103,7 @@ void Texture::bindImageTexture( int unit,
         uint( unit ), level, layered, layer, access, m_textureParameters.image.internalFormat );
 }
 
-void Texture::updateGL() {
+void Texture::updateGLData() {
     CORE_ASSERT( m_texture != nullptr, "Cannot update non initialized texture" );
     switch ( m_texture->target() ) {
     case GL_TEXTURE_1D: {
@@ -215,22 +219,37 @@ void Texture::updateGL() {
 void Texture::updateData( std::shared_ptr<void> newData ) {
     // register gpu task to update opengl representation before next rendering
     std::lock_guard<std::mutex> lock( m_updateMutex );
-
     m_textureParameters.image.texels = newData;
+    updateData();
+}
 
-    if ( m_updateDataTaskId.isInvalid() ) {
+void Texture::updateData() {
+    // register gpu task to update opengl representation before next rendering
+    if ( m_updateImageTaskId.isInvalid() ) {
         auto taskFunc = [this]() {
             std::lock_guard<std::mutex> taskLock( m_updateMutex );
-            this->updateGL();
-            m_updateDataTaskId = Core::TaskQueue::TaskId::Invalid();
+            this->updateGLData();
+            m_updateImageTaskId = Core::TaskQueue::TaskId::Invalid();
         };
-        auto task          = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
-        m_updateDataTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
+        auto task           = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
+        m_updateImageTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
+    }
+}
+
+void Texture::updateParameters() {
+    if ( m_updateSamplerTaskId.isInvalid() ) {
+        auto taskFunc = [this]() {
+            std::lock_guard<std::mutex> taskLock( m_updateMutex );
+            this->updateGLParameters();
+            m_updateSamplerTaskId = Core::TaskQueue::TaskId::Invalid();
+        };
+        auto task             = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
+        m_updateSamplerTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
     }
 }
 
 // let the compiler warn about case fallthrough
-void Texture::updateParameters() {
+void Texture::updateGLParameters() {
     switch ( m_texture->target() ) {
     case GL_TEXTURE_CUBE_MAP:
     case GL_TEXTURE_3D:
@@ -256,10 +275,6 @@ void Texture::updateParameters() {
 }
 
 void Texture::linearize() {
-    if ( m_texture != nullptr ) {
-        LOG( logERROR ) << "Only non OpenGL initialized texture can be linearized.";
-        return;
-    }
     // Only RGB and RGBA texture contains color information
     // (others are not really colors and must be managed explicitly by the user)
     uint numComp  = 0;
@@ -289,6 +304,7 @@ void Texture::linearize() {
                          numComp,
                          hasAlpha );
     }
+    if ( m_texture != nullptr ) { updateGLData(); }
 }
 
 /// \todo template by texels type
@@ -324,7 +340,7 @@ void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) 
     m_textureParameters.image.depth  = d;
     m_textureParameters.image.texels = pix;
     if ( m_texture == nullptr ) { initializeGL( false ); }
-    else { updateGL(); }
+    else { updateGLData(); }
     if ( m_isMipMapped ) { m_texture->generateMipmap(); }
 }
 
