@@ -253,6 +253,9 @@ class RA_ENGINE_API Texture final
     }
 
   private:
+    bool isSupportedTarget();
+    void computeIsMipMappedFlag();
+    bool createTexture();
     void updateData();
     void updateParameters();
     /** Send texture data to the GPU and generate mipmap if needed

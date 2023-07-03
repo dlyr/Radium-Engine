@@ -30,7 +30,7 @@ Texture::~Texture() {
     }
 }
 
-void Texture::initializeGL( bool linearize ) {
+bool Texture::isSupportedTarget() {
     if ( ( m_textureParameters.image.target != GL_TEXTURE_1D ) &&
          ( m_textureParameters.image.target != GL_TEXTURE_2D ) &&
          ( m_textureParameters.image.target != GL_TEXTURE_RECTANGLE ) &&
@@ -38,53 +38,26 @@ void Texture::initializeGL( bool linearize ) {
          ( m_textureParameters.image.target != GL_TEXTURE_CUBE_MAP ) ) {
         LOG( logERROR ) << "Texture of type " << m_textureParameters.image.target
                         << " must be generated explicitly!";
-        return;
+        return false;
     }
-    // Transform texels if needed
-    if ( linearize ) {
-        uint numComp  = 0;
-        bool hasAlpha = false;
-        switch ( m_textureParameters.image.format ) {
-            // RED and RG texture store a gray scale color. Verify if we need to convert
-        case GL_RED:
-            numComp = 1;
-            break;
-        case GL_RG:
-            // corresponds to deprecated GL_LUMINANCE_ALPHA
-            numComp  = 2;
-            hasAlpha = true;
-            break;
-        case GL_RGB:
-            numComp = 3;
-            break;
-        case GL_RGBA:
-            numComp  = 4;
-            hasAlpha = true;
-            break;
-        default:
-            LOG( logERROR ) << "Textures with format " << m_textureParameters.image.format
-                            << " can't be linearized." << m_textureParameters.name;
-            return;
-        }
-        if ( m_textureParameters.image.target == GL_TEXTURE_CUBE_MAP ) {
-            linearizeCubeMap( numComp, hasAlpha );
-        }
-        else {
-            // This will only do do the RGB space conversion
-            sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.image.texels.get() ),
-                             numComp,
-                             hasAlpha );
-        }
-    }
-    // Generate OpenGL texture
-    if ( m_texture == nullptr ) {
-        m_texture = globjects::Texture::create( m_textureParameters.image.target );
-        GL_CHECK_ERROR;
-    }
-    // Update the sampler parameters
+    return true;
+}
+
+void Texture::computeIsMipMappedFlag() {
     m_isMipMapped = !( m_textureParameters.sampler.minFilter == GL_NEAREST ||
                        m_textureParameters.sampler.minFilter == GL_LINEAR );
+}
+
+void Texture::initializeGL( bool linearize ) {
+    if ( !isSupportedTarget() ) return;
+    // Transform texels if needed
+    if ( linearize ) { this->linearize(); }
+
+    computeIsMipMappedFlag();
+
+    // Update the sampler parameters
     updateParameters();
+
     // upload texture to the GPU
     updateData();
 }
@@ -228,6 +201,8 @@ void Texture::updateData() {
     if ( m_updateImageTaskId.isInvalid() ) {
         auto taskFunc = [this]() {
             std::lock_guard<std::mutex> taskLock( m_updateMutex );
+            // Generate OpenGL texture
+            this->createTexture();
             this->updateGLData();
             m_updateImageTaskId = Core::TaskQueue::TaskId::Invalid();
         };
@@ -236,10 +211,21 @@ void Texture::updateData() {
     }
 }
 
+bool Texture::createTexture() {
+    if ( m_texture == nullptr ) {
+        m_texture = globjects::Texture::create( m_textureParameters.image.target );
+        GL_CHECK_ERROR;
+        return true;
+    }
+    return false;
+}
+
 void Texture::updateParameters() {
     if ( m_updateSamplerTaskId.isInvalid() ) {
         auto taskFunc = [this]() {
             std::lock_guard<std::mutex> taskLock( m_updateMutex );
+            // Generate OpenGL texture
+            this->createTexture();
             this->updateGLParameters();
             m_updateSamplerTaskId = Core::TaskQueue::TaskId::Invalid();
         };
@@ -304,7 +290,6 @@ void Texture::linearize() {
                          numComp,
                          hasAlpha );
     }
-    if ( m_texture != nullptr ) { updateGLData(); }
 }
 
 /// \todo template by texels type
@@ -339,9 +324,12 @@ void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) 
     m_textureParameters.image.height = h;
     m_textureParameters.image.depth  = d;
     m_textureParameters.image.texels = pix;
-    if ( m_texture == nullptr ) { initializeGL( false ); }
+    if ( createTexture() ) {
+        computeIsMipMappedFlag();
+        updateGLParameters();
+        updateGLData();
+    }
     else { updateGLData(); }
-    if ( m_isMipMapped ) { m_texture->generateMipmap(); }
 }
 
 void Texture::linearizeCubeMap( uint numComponent, bool hasAlphaChannel ) {
