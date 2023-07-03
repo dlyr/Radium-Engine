@@ -31,7 +31,7 @@ Texture::~Texture() {
     }
 }
 
-void Texture::initializeGL( bool linearize ) {
+void Texture::initialize( bool linearize ) {
     if ( !isSupportedTarget() ) return;
     // Transform texels if needed
     if ( linearize ) { this->linearize(); }
