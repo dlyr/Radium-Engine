@@ -80,6 +80,7 @@ struct ImageParameters {
     std::shared_ptr<void> texels { nullptr };
     std::array<std::shared_ptr<void>, 6> cubeMap {};
 };
+
 inline bool operator==( const ImageParameters& lhs, const ImageParameters rhs ) {
     return lhs.target == rhs.target && lhs.width == rhs.width && lhs.height == rhs.height &&
            lhs.format == rhs.format && lhs.internalFormat == rhs.internalFormat &&
@@ -124,18 +125,102 @@ class RA_ENGINE_API Texture final
     /** @brief Generate the OpenGL representation of the texture according to the stored
      * TextureData.
      *
-     * Need active OpenGL context.
      *
      * This method use the available m_textureParameters to generate and configure OpenGL
-     * texture.
+     * texture. It creates gpu tasks the engine will run during next draw call, so it can be called
+     * without active opengl context.
      *
-     * Before uploading texels to the GPU, this method will apply RGB space conversion if needed.
+     * This method will apply RGB space conversion if \a linearize is true.
      *
      * @param linearize (default false) : convert the texture from sRGB to Linear RGB color space
      * before OpenGL initialisation
-     * @note This will become soon the only way to generate an Radium Engine OpenGL texture.
      */
     void initializeGL( bool linearize = false );
+
+    /**
+     * @return Name of the texture.
+     */
+    inline std::string getName() const { return m_textureParameters.name; }
+
+    /**
+     * @return the pixel format of the texture
+     */
+    GLenum format() const { return m_textureParameters.image.format; }
+    /**
+     * @return the width of the texture
+     */
+    size_t width() const { return m_textureParameters.image.width; }
+    /**
+     * @return the height of the texture
+     */
+    size_t height() const { return m_textureParameters.image.height; }
+    /**
+     * @return the depth of the texture
+     */
+    size_t depth() const { return m_textureParameters.image.depth; }
+
+    void* texels() { return m_textureParameters.image.texels.get(); }
+    /**
+     * Get the underlying globjects::Texture. Use with care since you can brake the equivalence
+     * of image and sampler parameters between cpu Data::Texture and gpu side globlects::Texture.
+     * @return the globjects::Texture associated with the texture.
+     */
+    globjects::Texture* texture() const { return m_texture.get(); }
+
+    /// get read access to texture parameters
+    const TextureParameters& getParameters() const { return m_textureParameters; }
+
+    /**
+     * Update the cpu representation of data contained by the texture
+     * @param newData user image pointer to wrap,
+     * must contain the same number of elements than old data (no test perform).
+     * Texture use here existing pixel memory owned by the calling application.
+     * The texture does not own the pixel storage and will not free/delete that memory,
+     * even when the texture is destroyed.
+     */
+    void updateData( std::shared_ptr<void> newData );
+    /** Resize the texture.
+     *
+     * Need active OpenGL context.
+     *
+     * This allocate GPU memory to store the new resized texture and, if texels are not nullptr,
+     * upload the new content.
+     * @note : If texels are not nullptr, user must ensure the texels array is correctly
+     * dimensioned.
+     * @param w width of the texture
+     * @param h height of the texture
+     * @param d depth of the texture
+     * @param pix the new texels array corresponding the the new texture dimension
+     */
+    void resize( size_t w = 1, size_t h = 1, size_t d = 1, std::shared_ptr<void> pix = nullptr );
+
+    /** set TextureParameters.
+     * If imageParameters is changed, the method call setImageParameters() to register update GPU
+     * representation task. If samplerParameter is change, the method call setSamplerParameters() to
+     * register update GPU sample task.
+     */
+    void setParameters( const TextureParameters& textureParameters ) {
+        m_updateMutex.lock();
+        bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
+        m_updateMutex.unlock();
+        if ( test1 ) setSamplerParameters( textureParameters.sampler );
+
+        m_updateMutex.lock();
+        bool test2 = ( textureParameters.image != m_textureParameters.image );
+        m_updateMutex.unlock();
+        if ( test2 ) setImageParameters( textureParameters.image );
+    }
+
+    void setImageParameters( const ImageParameters& imageParameters ) {
+        std::lock_guard<std::mutex> lock( m_updateMutex );
+        m_textureParameters.image = imageParameters;
+        registerUpdateImageDataTask();
+    }
+    void setSamplerParameters( const SamplerParameters& samplerParameters ) {
+        std::lock_guard<std::mutex> lock( m_updateMutex );
+        m_textureParameters.sampler = samplerParameters;
+        registerUpdateSamplerParametersTask();
+    }
 
     /**
      *
@@ -161,21 +246,6 @@ class RA_ENGINE_API Texture final
     void bindImageTexture( int unit, GLint level, GLboolean layered, GLint layer, GLenum access );
 
     /**
-     * @return Name of the texture.
-     */
-    inline std::string getName() const { return m_textureParameters.name; }
-
-    /**
-     * Update the cpu representation of data contained by the texture
-     * @param newData user image pointer to wrap,
-     * must contain the same number of elements than old data (no test perform).
-     * Texture use here existing pixel memory owned by the calling application.
-     * The texture does not own the pixel storage and will not free/delete that memory,
-     * even when the texture is destroyed.
-     */
-    void updateData( std::shared_ptr<void> newData );
-
-    /**
      * Convert a color texture from sRGB to Linear RGB spaces.
      * This will transform the internal representation of the texture to GL_SCALAR (GL_FLOAT).
      * Only GL_RGB[8, 16, 16F, 32F] and GL_RGBA[8, 16, 16F, 32F] are managed.
@@ -183,85 +253,16 @@ class RA_ENGINE_API Texture final
      */
     void linearize();
 
-    /**
-     * @return the pixel format of the texture
-     */
-    GLenum format() const { return m_textureParameters.image.format; }
-    /**
-     * @return the width of the texture
-     */
-    size_t width() const { return m_textureParameters.image.width; }
-    /**
-     * @return the height of the texture
-     */
-    size_t height() const { return m_textureParameters.image.height; }
-    /**
-     * @return the depth of the texture
-     */
-    size_t depth() const { return m_textureParameters.image.depth; }
-
-    void* texels() { return m_textureParameters.image.texels.get(); }
-    /**
-     * @return the globjects::Texture associated with the texture
-     */
-    globjects::Texture* texture() const { return m_texture.get(); }
-
-    /** Resize the texture.
-     *
-     * Need active OpenGL context.
-     *
-     * This allocate GPU memory to store the new resized texture and, if texels are not nullptr,
-     * upload the new content.
-     * @note : If texels are not nullptr, user must ensure the texels array is correctly
-     * dimensioned.
-     * @param w width of the texture
-     * @param h height of the texture
-     * @param d depth of the texture
-     * @param pix the new texels array corresponding the the new texture dimension
-     */
-    void resize( size_t w = 1, size_t h = 1, size_t d = 1, std::shared_ptr<void> pix = nullptr );
-
-    /// get read access to texture parameters
-    const TextureParameters& getParameters() const { return m_textureParameters; }
-
-    /** set TextureParameters.
-     * If imageParameters is changed, the method call setImageParameters() to register update GPU
-     * representation task. If samplerParameter is change, the method call setSamplerParameters() to
-     * register update GPU sample task.
-     */
-    void setParameters( const TextureParameters& textureParameters ) {
-        m_updateMutex.lock();
-        bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
-        m_updateMutex.unlock();
-        if ( test1 ) setSamplerParameters( textureParameters.sampler );
-
-        m_updateMutex.lock();
-        bool test2 = ( textureParameters.image != m_textureParameters.image );
-        m_updateMutex.unlock();
-        if ( test2 ) setImageParameters( textureParameters.image );
-    }
-
-    void setImageParameters( const ImageParameters& imageParameters ) {
-        std::lock_guard<std::mutex> lock( m_updateMutex );
-        m_textureParameters.image = imageParameters;
-        updateData();
-    }
-    void setSamplerParameters( const SamplerParameters& samplerParameters ) {
-        std::lock_guard<std::mutex> lock( m_updateMutex );
-        m_textureParameters.sampler = samplerParameters;
-        updateParameters();
-    }
-
   private:
     bool isSupportedTarget();
     void computeIsMipMappedFlag();
     bool createTexture();
-    void updateData();
-    void updateParameters();
+    void registerUpdateImageDataTask();
+    void registerUpdateSamplerParametersTask();
     /** Send texture data to the GPU and generate mipmap if needed
      */
-    void updateGLData();
-    void updateGLParameters();
+    void sendImageDataToGPU();
+    void sendSamplerParametersToGPU();
 
     /**
      * Convert a color texture from sRGB to Linear RGB spaces.

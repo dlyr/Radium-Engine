@@ -1,3 +1,4 @@
+
 #include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
 #include <Core/Utils/Log.hpp>
@@ -30,6 +31,83 @@ Texture::~Texture() {
     }
 }
 
+void Texture::initializeGL( bool linearize ) {
+    if ( !isSupportedTarget() ) return;
+    // Transform texels if needed
+    if ( linearize ) { this->linearize(); }
+
+    computeIsMipMappedFlag();
+
+    // Update the sampler parameters
+    registerUpdateSamplerParametersTask();
+
+    // upload texture to the GPU
+    registerUpdateImageDataTask();
+}
+void Texture::updateData( std::shared_ptr<void> newData ) {
+    // register gpu task to update opengl representation before next rendering
+    std::lock_guard<std::mutex> lock( m_updateMutex );
+    m_textureParameters.image.texels = newData;
+    registerUpdateImageDataTask();
+}
+void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) {
+    m_textureParameters.image.width  = w;
+    m_textureParameters.image.height = h;
+    m_textureParameters.image.depth  = d;
+    m_textureParameters.image.texels = pix;
+    if ( createTexture() ) {
+        computeIsMipMappedFlag();
+        sendSamplerParametersToGPU();
+        sendImageDataToGPU();
+    }
+    else { sendImageDataToGPU(); }
+}
+
+void Texture::bind( int unit ) {
+    if ( unit >= 0 ) { m_texture->bindActive( uint( unit ) ); }
+    else { m_texture->bind(); }
+}
+
+void Texture::bindImageTexture( int unit,
+                                GLint level,
+                                GLboolean layered,
+                                GLint layer,
+                                GLenum access ) {
+    m_texture->bindImageTexture(
+        uint( unit ), level, layered, layer, access, m_textureParameters.image.internalFormat );
+}
+void Texture::linearize() {
+    // Only RGB and RGBA texture contains color information
+    // (others are not really colors and must be managed explicitly by the user)
+    uint numComp  = 0;
+    bool hasAlpha = false;
+    switch ( m_textureParameters.image.format ) {
+        // RED texture store a gray scale color. Verify if we need to convert
+    case GL_RED:
+        numComp = 1;
+        break;
+    case GL_RGB:
+        numComp = 3;
+        break;
+    case GL_RGBA:
+        numComp  = 4;
+        hasAlpha = true;
+        break;
+    default:
+        LOG( logERROR ) << "Textures with format " << m_textureParameters.image.format
+                        << " can't be linearized." << m_textureParameters.name;
+        return;
+    }
+    if ( m_textureParameters.image.type == GL_TEXTURE_CUBE_MAP ) {
+        linearizeCubeMap( numComp, hasAlpha );
+    }
+    else {
+        sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.image.texels.get() ),
+                         numComp,
+                         hasAlpha );
+    }
+}
+
 bool Texture::isSupportedTarget() {
     if ( ( m_textureParameters.image.target != GL_TEXTURE_1D ) &&
          ( m_textureParameters.image.target != GL_TEXTURE_2D ) &&
@@ -47,36 +125,45 @@ void Texture::computeIsMipMappedFlag() {
     m_isMipMapped = !( m_textureParameters.sampler.minFilter == GL_NEAREST ||
                        m_textureParameters.sampler.minFilter == GL_LINEAR );
 }
-
-void Texture::initializeGL( bool linearize ) {
-    if ( !isSupportedTarget() ) return;
-    // Transform texels if needed
-    if ( linearize ) { this->linearize(); }
-
-    computeIsMipMappedFlag();
-
-    // Update the sampler parameters
-    updateParameters();
-
-    // upload texture to the GPU
-    updateData();
+bool Texture::createTexture() {
+    if ( m_texture == nullptr ) {
+        m_texture = globjects::Texture::create( m_textureParameters.image.target );
+        GL_CHECK_ERROR;
+        return true;
+    }
+    return false;
 }
 
-void Texture::bind( int unit ) {
-    if ( unit >= 0 ) { m_texture->bindActive( uint( unit ) ); }
-    else { m_texture->bind(); }
+void Texture::registerUpdateImageDataTask() {
+    // register gpu task to update opengl representation before next rendering
+    if ( m_updateImageTaskId.isInvalid() ) {
+        auto taskFunc = [this]() {
+            std::lock_guard<std::mutex> taskLock( m_updateMutex );
+            // Generate OpenGL texture
+            this->createTexture();
+            this->sendImageDataToGPU();
+            m_updateImageTaskId = Core::TaskQueue::TaskId::Invalid();
+        };
+        auto task           = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
+        m_updateImageTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
+    }
 }
 
-void Texture::bindImageTexture( int unit,
-                                GLint level,
-                                GLboolean layered,
-                                GLint layer,
-                                GLenum access ) {
-    m_texture->bindImageTexture(
-        uint( unit ), level, layered, layer, access, m_textureParameters.image.internalFormat );
+void Texture::registerUpdateSamplerParametersTask() {
+    if ( m_updateSamplerTaskId.isInvalid() ) {
+        auto taskFunc = [this]() {
+            std::lock_guard<std::mutex> taskLock( m_updateMutex );
+            // Generate OpenGL texture
+            this->createTexture();
+            this->sendSamplerParametersToGPU();
+            m_updateSamplerTaskId = Core::TaskQueue::TaskId::Invalid();
+        };
+        auto task             = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
+        m_updateSamplerTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
+    }
 }
 
-void Texture::updateGLData() {
+void Texture::sendImageDataToGPU() {
     CORE_ASSERT( m_texture != nullptr, "Cannot update non initialized texture" );
     switch ( m_texture->target() ) {
     case GL_TEXTURE_1D: {
@@ -189,53 +276,8 @@ void Texture::updateGLData() {
     GL_CHECK_ERROR;
 }
 
-void Texture::updateData( std::shared_ptr<void> newData ) {
-    // register gpu task to update opengl representation before next rendering
-    std::lock_guard<std::mutex> lock( m_updateMutex );
-    m_textureParameters.image.texels = newData;
-    updateData();
-}
-
-void Texture::updateData() {
-    // register gpu task to update opengl representation before next rendering
-    if ( m_updateImageTaskId.isInvalid() ) {
-        auto taskFunc = [this]() {
-            std::lock_guard<std::mutex> taskLock( m_updateMutex );
-            // Generate OpenGL texture
-            this->createTexture();
-            this->updateGLData();
-            m_updateImageTaskId = Core::TaskQueue::TaskId::Invalid();
-        };
-        auto task           = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
-        m_updateImageTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
-    }
-}
-
-bool Texture::createTexture() {
-    if ( m_texture == nullptr ) {
-        m_texture = globjects::Texture::create( m_textureParameters.image.target );
-        GL_CHECK_ERROR;
-        return true;
-    }
-    return false;
-}
-
-void Texture::updateParameters() {
-    if ( m_updateSamplerTaskId.isInvalid() ) {
-        auto taskFunc = [this]() {
-            std::lock_guard<std::mutex> taskLock( m_updateMutex );
-            // Generate OpenGL texture
-            this->createTexture();
-            this->updateGLParameters();
-            m_updateSamplerTaskId = Core::TaskQueue::TaskId::Invalid();
-        };
-        auto task             = std::make_unique<Core::FunctionTask>( taskFunc, getName() );
-        m_updateSamplerTaskId = RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
-    }
-}
-
 // let the compiler warn about case fallthrough
-void Texture::updateGLParameters() {
+void Texture::sendSamplerParametersToGPU() {
     switch ( m_texture->target() ) {
     case GL_TEXTURE_CUBE_MAP:
     case GL_TEXTURE_3D:
@@ -258,38 +300,6 @@ void Texture::updateGLParameters() {
     GL_CHECK_ERROR;
     m_texture->setParameter( GL_TEXTURE_MAG_FILTER, m_textureParameters.sampler.magFilter );
     GL_CHECK_ERROR;
-}
-
-void Texture::linearize() {
-    // Only RGB and RGBA texture contains color information
-    // (others are not really colors and must be managed explicitly by the user)
-    uint numComp  = 0;
-    bool hasAlpha = false;
-    switch ( m_textureParameters.image.format ) {
-        // RED texture store a gray scale color. Verify if we need to convert
-    case GL_RED:
-        numComp = 1;
-        break;
-    case GL_RGB:
-        numComp = 3;
-        break;
-    case GL_RGBA:
-        numComp  = 4;
-        hasAlpha = true;
-        break;
-    default:
-        LOG( logERROR ) << "Textures with format " << m_textureParameters.image.format
-                        << " can't be linearized." << m_textureParameters.name;
-        return;
-    }
-    if ( m_textureParameters.image.type == GL_TEXTURE_CUBE_MAP ) {
-        linearizeCubeMap( numComp, hasAlpha );
-    }
-    else {
-        sRGBToLinearRGB( reinterpret_cast<uint8_t*>( m_textureParameters.image.texels.get() ),
-                         numComp,
-                         hasAlpha );
-    }
 }
 
 /// \todo template by texels type
@@ -317,19 +327,6 @@ void Texture::sRGBToLinearRGB( uint8_t* texels, uint numComponent, bool hasAlpha
             }
         }
     }
-}
-
-void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) {
-    m_textureParameters.image.width  = w;
-    m_textureParameters.image.height = h;
-    m_textureParameters.image.depth  = d;
-    m_textureParameters.image.texels = pix;
-    if ( createTexture() ) {
-        computeIsMipMappedFlag();
-        updateGLParameters();
-        updateGLData();
-    }
-    else { updateGLData(); }
 }
 
 void Texture::linearizeCubeMap( uint numComponent, bool hasAlphaChannel ) {
