@@ -85,7 +85,7 @@ void VolumeObject::updateGL() {
     if ( m_isDirty ) {
         m_mesh.updateGL();
         GL_CHECK_ERROR;
-        m_tex.initializeGL();
+        m_tex.initialize();
         GL_CHECK_ERROR;
         m_isDirty = false;
     }
