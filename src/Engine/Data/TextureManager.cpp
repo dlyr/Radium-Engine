@@ -89,10 +89,10 @@ void TextureManager::loadTextureImage( TextureParameters& texParameters ) {
 
 Texture* TextureManager::loadTexture( const TextureParameters& texParameters, bool linearize ) {
     TextureParameters texParams = texParameters;
-    // TODO : allow to keep texels in texture parameters with automatic lifetime management.
+    // No texels ? load image to texels
     if ( texParams.image.texels == nullptr ) { loadTextureImage( texParams ); }
     auto ret = new Texture( texParams );
-    ret->initialize( linearize );
+    ret->initializeNow( linearize );
     return ret;
 }
 
