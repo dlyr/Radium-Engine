@@ -141,15 +141,19 @@ inline void BlinnPhongMaterial::addTexture( const TextureSemantic& semantic,
 inline void BlinnPhongMaterial::addTexture( const TextureSemantic& semantic,
                                             const std::string& texture ) {
     CORE_ASSERT( !texture.empty(), "Invalid texture name" );
-
-    TextureParameters data;
-    data.name          = texture;
-    data.sampler.wrapS = GL_REPEAT;
-    data.sampler.wrapT = GL_REPEAT;
-    if ( semantic != TextureSemantic::TEX_NORMAL ) {
-        data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+    auto texManager = RadiumEngine::getInstance()->getTextureManager();
+    auto texHandle  = texManager->getTextureHandle( texture );
+    if ( texHandle.isValid() ) { addTexture( semantic, texHandle ); }
+    else {
+        TextureParameters data;
+        data.name          = texture;
+        data.sampler.wrapS = GL_REPEAT;
+        data.sampler.wrapT = GL_REPEAT;
+        if ( semantic != TextureSemantic::TEX_NORMAL ) {
+            data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+        }
+        addTexture( semantic, data );
     }
-    addTexture( semantic, data );
 }
 
 // Add a texture as material parameter with texture parameter set by the caller
