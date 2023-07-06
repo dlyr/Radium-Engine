@@ -23,22 +23,22 @@ namespace Engine {
 namespace Data {
 class ShaderProgram;
 
+namespace TextureSemantics {
+namespace BlinnPhongMaterial {
+enum class TextureSemantic { TEX_DIFFUSE, TEX_SPECULAR, TEX_NORMAL, TEX_SHININESS, TEX_ALPHA };
+}
+} // namespace TextureSemantics
+
 /**
  * Implementation of the Blinn-Phong Material BSDF.
  * @todo due to "Material.glsl" interface modification, must test this version with all plugins,
  * apps, ... that uses Radium Renderer
  */
-enum class BlinnPhongTextureSemantic {
-    TEX_DIFFUSE,
-    TEX_SPECULAR,
-    TEX_NORMAL,
-    TEX_SHININESS,
-    TEX_ALPHA
-};
 
-class RA_ENGINE_API BlinnPhongMaterial final : public Material,
-                                               public ParameterSetEditingInterface,
-                                               public MaterialTextureSet<BlinnPhongTextureSemantic>
+class RA_ENGINE_API BlinnPhongMaterial final
+    : public Material,
+      public ParameterSetEditingInterface,
+      public MaterialTextureSet<TextureSemantics::BlinnPhongMaterial::TextureSemantic>
 {
     friend class BlinnPhongMaterialConverter;
 
@@ -52,7 +52,7 @@ class RA_ENGINE_API BlinnPhongMaterial final : public Material,
         TEX_ALPHA
     };
 
-    using TextureSemantic = BlinnPhongTextureSemantic;
+    using TextureSemantic = TextureSemantics::BlinnPhongMaterial::TextureSemantic;
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
