@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Engine/Data/BlinnPhongMaterial.hpp"
 #include <Engine/RaEngine.hpp>
 
 #include <Core/Utils/Color.hpp>
@@ -15,19 +16,29 @@ namespace Ra {
 namespace Engine {
 namespace Data {
 
+/** @brief Namespace to define materials' texture semantics.
+ *
+ * Convention: add you're material's MyMaterial TextureSemantic Enum inside it's MyMaterial nested
+ * namespace.
+ */
+namespace TextureSemantics {
+namespace SimpleMaterial {
 /// Semantic of the texture : define which BSDF parameter is controled by the texture
-enum class SimpleTextureSemantic { TEX_COLOR, TEX_MASK };
+enum class TextureSemantic { TEX_COLOR, TEX_MASK };
+} // namespace SimpleMaterial
+} // namespace TextureSemantics
 
 /**
  * Base implementation for simple, monocolored, materials.
  * This material could not be used as is. Only derived class could be used by a renderer.
  */
-class RA_ENGINE_API SimpleMaterial : public Material,
-                                     public ParameterSetEditingInterface,
-                                     public MaterialTextureSet<SimpleTextureSemantic>
+class RA_ENGINE_API SimpleMaterial
+    : public Material,
+      public ParameterSetEditingInterface,
+      public MaterialTextureSet<TextureSemantics::SimpleMaterial::TextureSemantic>
 {
   public:
-    using TextureSemantic = SimpleTextureSemantic;
+    using TextureSemantic = TextureSemantics::SimpleMaterial::TextureSemantic;
     /**
      * Construct a named  materialhmb
      * @param name The name of the material

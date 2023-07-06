@@ -20,7 +20,7 @@ namespace Data {
 
 /// Semantic of the texture : define which BSDF parameter is controled by the texture
 
-/** @brief Base class to manage a set of textures index by semantic (enum).
+/** @brief Base class to manage a set of textures indexed by semantic (enum).
  */
 template <typename TextureSemantic>
 class MaterialTextureSet
@@ -64,11 +64,6 @@ class MaterialTextureSet
   private:
     std::map<TextureSemantic, TextureManager::TextureHandle> m_textures;
 };
-
-// not working
-template <typename Material>
-class MaterialTextureSetWrapper : MaterialTextureSet<typename Material::TextureSemantic>
-{};
 
 /**
  * Base class for materials/
