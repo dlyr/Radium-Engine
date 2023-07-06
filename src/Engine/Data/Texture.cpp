@@ -63,15 +63,8 @@ void Texture::resize( size_t w, size_t h, size_t d, std::shared_ptr<void> pix ) 
 }
 
 void Texture::setParameters( const TextureParameters& textureParameters ) {
-    m_updateMutex.lock();
-    bool test1 = ( textureParameters.sampler != m_textureParameters.sampler );
-    m_updateMutex.unlock();
-    if ( test1 ) setSamplerParameters( textureParameters.sampler );
-
-    m_updateMutex.lock();
-    bool test2 = ( textureParameters.image != m_textureParameters.image );
-    m_updateMutex.unlock();
-    if ( test2 ) setImageParameters( textureParameters.image );
+    setSamplerParameters( textureParameters.sampler );
+    setImageParameters( textureParameters.image );
 }
 
 void Texture::setImageParameters( const ImageParameters& imageParameters ) {
