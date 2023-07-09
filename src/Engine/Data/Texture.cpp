@@ -45,11 +45,9 @@ Texture::~Texture() {
     if ( m_updateSamplerTaskId.isValid() ) {
         RadiumEngine::getInstance()->removeGpuTask( m_updateSamplerTaskId );
     }
-    if ( m_texture ) {
-        auto task = std::make_unique<DeleteTextureTask>( std::move( m_texture ) );
-        RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
-        m_texture.reset();
-    }
+
+    // register delayed destroy gpu texture task
+    destroy();
 }
 
 void Texture::initialize() {
@@ -66,7 +64,7 @@ void Texture::initialize() {
 }
 
 void Texture::destroy() {
-    if ( m_destroyTaskId.isInvalid() ) {
+    if ( m_texture ) {
         auto task = std::make_unique<DeleteTextureTask>( std::move( m_texture ) );
         RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
         m_texture.reset();
