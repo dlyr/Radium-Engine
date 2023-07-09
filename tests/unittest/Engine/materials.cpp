@@ -141,7 +141,8 @@ TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
                 gl::GL_CLAMP_TO_EDGE,
                 gl::GL_NEAREST,
                 gl::GL_NEAREST },
-              { gl::GL_TEXTURE_3D, 1, 1, 1, gl::GL_RED, gl::GL_RED, gl::GL_FLOAT, d } } };
+              { gl::GL_TEXTURE_3D, 1, 1, 1, gl::GL_RED, gl::GL_RED, gl::GL_FLOAT, false, d } } };
+        density.initializeNow();
         mat.setTexture( &density );
 
         REQUIRE( mat.m_g == 0_ra );
