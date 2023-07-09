@@ -151,7 +151,7 @@ void Texture::linearize( ImageParameters& image ) {
         }
         if ( image.type == GL_TEXTURE_CUBE_MAP ) { linearizeCubeMap( image, numComp, hasAlpha ); }
         else {
-            srgbToLinearRgb( reinterpret_cast<uint8_t*>( image.texels.get() ),
+            srgbToLinearRgb( reinterpret_cast<uint8_t*>( std::get<0>( image.texels ).get() ),
                              image.width,
                              image.height,
                              image.depth,
@@ -228,7 +228,7 @@ void Texture::sendImageDataToGpu() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels.get() );
+                            getTexels() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_2D:
@@ -240,7 +240,7 @@ void Texture::sendImageDataToGpu() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels.get() );
+                            getTexels() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_3D: {
@@ -252,7 +252,7 @@ void Texture::sendImageDataToGpu() {
                             0,
                             m_textureParameters.image.format,
                             m_textureParameters.image.type,
-                            m_textureParameters.image.texels.get() );
+                            getTexels() );
         GL_CHECK_ERROR
     } break;
     case GL_TEXTURE_CUBE_MAP: {
@@ -261,6 +261,7 @@ void Texture::sendImageDataToGpu() {
         m_texture->bind();
         // track globjects updates that will hopefully support direct loading of
         // cube-maps https://github.com/cginternals/globjects/issues/368
+        const auto cubeMap = m_textureParameters.image.getCubeMap();
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_X,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -269,7 +270,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[0].get() );
+                          ( *cubeMap )[0].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -278,7 +279,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[1].get() );
+                          ( *cubeMap )[1].get() );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
                           0,
@@ -288,7 +289,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[2].get() );
+                          ( *cubeMap )[2].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -297,7 +298,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[3].get() );
+                          ( *cubeMap )[3].get() );
 
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
                           0,
@@ -307,7 +308,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[4].get() );
+                          ( *cubeMap )[4].get() );
         gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
                           0,
                           m_textureParameters.image.internalFormat,
@@ -316,7 +317,7 @@ void Texture::sendImageDataToGpu() {
                           0,
                           m_textureParameters.image.format,
                           m_textureParameters.image.type,
-                          m_textureParameters.image.cubeMap[5].get() );
+                          ( *cubeMap )[5].get() );
 
         m_texture->unbind();
         GL_CHECK_ERROR
@@ -386,8 +387,9 @@ void Texture::linearizeCubeMap( ImageParameters& image, uint numComponent, bool 
     if ( image.type == gl::GLenum::GL_UNSIGNED_BYTE ) {
         /// Only unsigned byte texture could be linearized. Considering other formats where
         /// already linear
+        const auto cubeMap = image.getCubeMap();
         for ( int i = 0; i < 6; ++i ) {
-            srgbToLinearRgb( reinterpret_cast<uint8_t*>( image.cubeMap[i].get() ),
+            srgbToLinearRgb( reinterpret_cast<uint8_t*>( ( *cubeMap )[i].get() ),
                              image.width,
                              image.height,
                              image.depth,
