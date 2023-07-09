@@ -286,7 +286,7 @@ class RA_ENGINE_API Texture final
     /// @brief This task is valid when a gpu sampler task is registered.
     /// e.g. after a call to initialize, setParamaters or setSamplerParamters).
     Core::TaskQueue::TaskId m_updateSamplerTaskId;
-    Core::TaskQueue::TaskId m_destroyTaskId;
+
     /// mutex to protect non gpu setters, in a thread safe way.
     std::mutex m_updateMutex;
 };
