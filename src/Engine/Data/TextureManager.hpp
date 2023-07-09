@@ -55,7 +55,10 @@ class RA_ENGINE_API TextureManager final
      * @return The texture as inserted into the Radium available openGL system
      */
     Texture* getTexture( const TextureHandle& handle );
-    TextureHandle getTextureHandle( const std::string& handle );
+    TextureHandle getTextureHandle( const std::string& name );
+    Texture* getTexture( const std::string& name ) {
+        return getTexture( getTextureHandle( name ) );
+    }
 
     void deleteTexture( const TextureHandle& handle );
 
