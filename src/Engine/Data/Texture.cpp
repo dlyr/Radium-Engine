@@ -257,69 +257,25 @@ void Texture::sendImageDataToGpu() {
     } break;
     case GL_TEXTURE_CUBE_MAP: {
         // Load the 6 faces of the cube-map
+        auto cubeMap = m_textureParameters.image.getCubeMap();
 
-        m_texture->bind();
-        // track globjects updates that will hopefully support direct loading of
-        // cube-maps https://github.com/cginternals/globjects/issues/368
-        const auto cubeMap = m_textureParameters.image.getCubeMap();
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_X,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[0].get() );
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[1].get() );
+        CORE_ASSERT( cubeMap != nullptr, "cubeMap variant not set" );
 
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[2].get() );
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[3].get() );
+        std::array<const gl::GLvoid*, 6> data;
+        std::transform( std::begin( *cubeMap ),
+                        std::end( *cubeMap ),
+                        std::begin( data ),
+                        []( const std::shared_ptr<void>& val ) { return val.get(); } );
 
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[4].get() );
-        gl::glTexImage2D( gl::GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
-                          0,
-                          m_textureParameters.image.internalFormat,
-                          GLsizei( m_textureParameters.image.width ),
-                          GLsizei( m_textureParameters.image.height ),
-                          0,
-                          m_textureParameters.image.format,
-                          m_textureParameters.image.type,
-                          ( *cubeMap )[5].get() );
+        m_texture->cubeMapImage( 0,
+                                 m_textureParameters.image.internalFormat,
+                                 GLsizei( m_textureParameters.image.width ),
+                                 GLsizei( m_textureParameters.image.height ),
+                                 0,
+                                 m_textureParameters.image.format,
+                                 m_textureParameters.image.type,
+                                 data );
 
-        m_texture->unbind();
         GL_CHECK_ERROR
     } break;
     default: {
