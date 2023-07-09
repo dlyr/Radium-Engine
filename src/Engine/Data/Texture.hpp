@@ -96,13 +96,13 @@ class RA_ENGINE_API Texture final
      */
     void operator=( const Texture& ) = delete;
 
-    /** @brief Texture constructor. No OpenGL initialization is done there.
+    /** @brief Texture constructor. No GPU initialization is done there.
      *
      * @param texParameters Name of the texture
      */
     explicit Texture( const TextureParameters& texParameters );
 
-    /** @brief Texture destructor. Both internal data and OpenGL stuff are deleted.
+    /** @brief Texture destructor. Both internal data and GPU representation are deleted.
      */
     ~Texture();
 
@@ -112,27 +112,24 @@ class RA_ENGINE_API Texture final
      * This method use the stored TextureParameters to generate and configure OpenGL
      * texture. It creates gpu tasks the engine will run during next draw call, so it can be called
      * without active opengl context.
-     *
-     * This method will apply RGB space conversion if \a linearize is true.
-     *
-     * @param linearize (default false) : convert the texture from sRGB to Linear RGB color space
-     * before OpenGL initialisation
      */
-    void initialize( bool linearize = false );
+    void initialize();
 
     /** @brief Generate the GPU representation of the texture <b>right now</b>. Need an active
      * OpenGL context.
      *
      * see initialze() which is the same method, but delay gpu stuff to engine gpu tasks.
      */
-    void initializeNow( bool needLinearization = false ) {
+    void initializeNow() {
         if ( !isSupportedTarget() ) return;
-        if ( needLinearization ) { linearize( m_textureParameters.image ); }
         createTexture();
         computeIsMipMappedFlag();
         sendSamplerParametersToGpu();
         sendImageDataToGpu();
     }
+
+    void destroy();
+    void destroyNow();
 
     /// @return Name of the texture.
     inline std::string getName() const { return m_textureParameters.name; }
@@ -188,9 +185,9 @@ class RA_ENGINE_API Texture final
 
     /** @brief set TextureParameters.
      *
-     * If imageParameters is changed, the method call setImageParameters() to register update GPU
-     * representation task. If samplerParameter is change, the method call setSamplerParameters() to
-     * register update GPU sample task.
+     * Call setImageParameters() and setSamplerParameters() to
+     * register update GPU sample task. No check is peformed to see if data need to be updated, gpu
+     * update is triggered inconditionnally.
      */
     void setParameters( const TextureParameters& textureParameters );
     /// @brief set TextureParameters.image
@@ -235,16 +232,18 @@ class RA_ENGINE_API Texture final
     /// @brief set m_isMipMapped according to sampler.minFilter
     void computeIsMipMappedFlag();
 
-    /** @brief Allocate m_texture if nullptr.
+    /** @brief Allocate gup texture representation (m_texture) if not already allocated (nullptr).
      *
-     * @return true if allocation is actually performed
+     * @return true if allocation is performed.
      */
     bool createTexture();
 
-    /// @brief Regiter gpu task to RadiumEngine
+    /// @brief Regiter gpu task to RadiumEngine. Will call sendImageDataToGpu during next
+    /// RadiumEngine::runGpuTasks() call.
     void registerUpdateImageDataTask();
 
-    /// @brief Regiter gpu task to RadiumEngine
+    /// @brief Regiter gpu task to RadiumEngine. Will call sendSamplerParametersToGpu during next
+    /// RadiumEngine::runGpuTasks() call.
     void registerUpdateSamplerParametersTask();
 
     /// @brief Send image data to the GPU and generate mipmap if needed
@@ -287,6 +286,7 @@ class RA_ENGINE_API Texture final
     /// @brief This task is valid when a gpu sampler task is registered.
     /// e.g. after a call to initialize, setParamaters or setSamplerParamters).
     Core::TaskQueue::TaskId m_updateSamplerTaskId;
+    Core::TaskQueue::TaskId m_destroyTaskId;
     /// mutex to protect non gpu setters, in a thread safe way.
     std::mutex m_updateMutex;
 };
