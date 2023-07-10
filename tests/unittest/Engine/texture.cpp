@@ -25,18 +25,6 @@ using namespace Ra::Core::Utils;
 using namespace gl;
 using namespace gl45core;
 
-void printGlError() {
-    gl::GLenum err = gl::glGetError();
-    if ( err != gl::GL_NO_ERROR ) {
-        const char* errBuf = glErrorString( err );
-        LOG( Ra::Core::Utils::logERROR )
-            << "OpenGL error (" << __FILE__ << ":" << __LINE__ << ", glCheckError()) : " << errBuf
-            << "(" << err << " : 0x" << std::hex << err << std::dec << ")." << '\n'
-            << Ra::Core::Utils::StackTrace();
-    }
-    else { LOG( Ra::Core::Utils::logINFO ) << "no gl error"; }
-}
-
 TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
     // Get the Engine and materials initialized
     glbinding::Version glVersion { 4, 4 };
@@ -52,7 +40,7 @@ TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
     SECTION( "Texture Init Now" ) {
         REQUIRE( code == 0 );
         viewer.bindOpenGLContext( true );
-        gl45core::GLuint id1, id2;
+        GLuint id1, id2;
         TextureParameters params = { {}, {} };
         {
             Texture texture1( params );
@@ -72,28 +60,28 @@ TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
 
             REQUIRE( id1 != id2 );
 
-            REQUIRE( gl45core::glIsTexture( id1 ) );
-            REQUIRE( gl45core::glIsTexture( id2 ) );
+            REQUIRE( glIsTexture( id1 ) );
+            REQUIRE( glIsTexture( id2 ) );
 
             texture1.destroyNow();
 
-            REQUIRE( !gl45core::glIsTexture( id1 ) );
+            REQUIRE( !glIsTexture( id1 ) );
             REQUIRE( texture1.getGpuTexture() == nullptr );
-            REQUIRE( gl45core::glIsTexture( id2 ) );
+            REQUIRE( glIsTexture( id2 ) );
             REQUIRE( texture2.getGpuTexture() == gpuTexture2 );
         }
 
         viewer.bindOpenGLContext( true );
         viewer.oneFrame();
 
-        REQUIRE( !gl45core::glIsTexture( id1 ) );
-        REQUIRE( !gl45core::glIsTexture( id2 ) );
+        REQUIRE( !glIsTexture( id1 ) );
+        REQUIRE( !glIsTexture( id2 ) );
     }
 
     SECTION( "Texture Init Delayed" ) {
         REQUIRE( code == 0 );
         viewer.bindOpenGLContext( true );
-        gl45core::GLuint id1, id2;
+        GLuint id1, id2;
         TextureParameters params = { {}, {} };
         {
             Texture texture1( params );
@@ -121,22 +109,22 @@ TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
 
             REQUIRE( id1 != id2 );
 
-            REQUIRE( gl45core::glIsTexture( id1 ) );
-            REQUIRE( gl45core::glIsTexture( id2 ) );
+            REQUIRE( glIsTexture( id1 ) );
+            REQUIRE( glIsTexture( id2 ) );
 
             texture1.destroy();
 
             // id1 is still texture
-            REQUIRE( gl45core::glIsTexture( id1 ) );
+            REQUIRE( glIsTexture( id1 ) );
             // while gpuTexture ptr directly reset
             REQUIRE( texture1.getGpuTexture() == nullptr );
 
             viewer.oneFrame();
 
-            REQUIRE( !gl45core::glIsTexture( id1 ) );
+            REQUIRE( !glIsTexture( id1 ) );
             REQUIRE( texture1.getGpuTexture() == nullptr );
 
-            REQUIRE( gl45core::glIsTexture( id2 ) );
+            REQUIRE( glIsTexture( id2 ) );
             REQUIRE( texture2.getGpuTexture() == gpuTexture2 );
             // this will register delayed update tasks, that will be removed in dtor
             texture2.setParameters( { {}, {} } );
@@ -145,8 +133,8 @@ TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
         viewer.bindOpenGLContext( true );
         viewer.oneFrame();
 
-        REQUIRE( !gl45core::glIsTexture( id1 ) );
-        REQUIRE( !gl45core::glIsTexture( id2 ) );
+        REQUIRE( !glIsTexture( id1 ) );
+        REQUIRE( !glIsTexture( id2 ) );
     }
 
     SECTION( "Texture Update and Resize" ) {
@@ -191,7 +179,7 @@ TEST_CASE( "Engine/Data/Texture", "[Engine][Engine/Data][Textures]" ) {
         REQUIRE( gpuTexture1 != nullptr );
         auto id1 = gpuTexture1->id();
 
-        REQUIRE( gl45core::glIsTexture( id1 ) );
+        REQUIRE( glIsTexture( id1 ) );
 
         auto readData1 = gpuTexture1->getImage( 0, params1.image.format, params1.image.type );
 
