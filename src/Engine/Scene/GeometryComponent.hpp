@@ -3,11 +3,13 @@
 #include <Core/Asset/GeometryData.hpp>
 #include <Core/Asset/VolumeData.hpp>
 #include <Core/Containers/MakeShared.hpp>
+#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Geometry/Volume.hpp>
 #include <Engine/Data/BlinnPhongMaterial.hpp>
 #include <Engine/Data/MaterialConverters.hpp>
 #include <Engine/Data/Mesh.hpp>
+#include <Engine/RaEngine.hpp>
 #include <Engine/Rendering/RenderObject.hpp>
 #include <Engine/Scene/Component.hpp>
 #include <Engine/Scene/ComponentMessenger.hpp>
@@ -107,10 +109,10 @@ class SurfaceMeshComponent : public GeometryComponent
     std::shared_ptr<RenderMeshType> m_displayMesh { nullptr };
 };
 
-using TriangleMeshComponent = SurfaceMeshComponent<Ra::Core::Geometry::TriangleMesh>;
-using LineMeshComponent     = SurfaceMeshComponent<Ra::Core::Geometry::LineMesh>;
-using QuadMeshComponent     = SurfaceMeshComponent<Ra::Core::Geometry::QuadMesh>;
-using PolyMeshComponent     = SurfaceMeshComponent<Ra::Core::Geometry::PolyMesh>;
+using TriangleMeshComponent        = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
+using GeometryDisplayableComponent = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
+using QuadMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
+using PolyMeshComponent            = SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>;
 
 /// \warning, WIP
 /// \todo doc.
@@ -217,6 +219,13 @@ SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent(
     generateMesh( data );
 }
 
+template <>
+RA_ENGINE_API SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::SurfaceMeshComponent(
+    const std::string& name,
+    Entity* entity,
+    Ra::Core::Geometry::MultiIndexedGeometry&& mesh,
+    Core::Asset::MaterialData* mat );
+
 template <typename CoreMeshType>
 SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent( const std::string& name,
                                                           Entity* entity,
@@ -247,6 +256,10 @@ void SurfaceMeshComponent<CoreMeshType>::generateMesh( const Ra::Core::Asset::Ge
     finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr,
                             data->getFrame() );
 }
+
+template <>
+RA_ENGINE_API void SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry>::generateMesh(
+    const Ra::Core::Asset::GeometryData* data );
 
 template <typename CoreMeshType>
 void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(
@@ -311,6 +324,12 @@ void SurfaceMeshComponent<CoreMeshType>::setupIO( const std::string& id ) {
 
     cm->registerOutput<CoreMeshType>( getEntity(), this, id, cbOut );
     cm->registerReadWrite<CoreMeshType>( getEntity(), this, id, cbRw );
+    if ( std::is_convertible<CoreMeshType*, Core::Geometry::AttribArrayGeometry*>() &&
+         !std::is_same<CoreMeshType, Core::Geometry::AttribArrayGeometry>() ) {
+
+        cm->registerOutput<Core::Geometry::AttribArrayGeometry>( getEntity(), this, id, cbOut );
+        cm->registerReadWrite<Core::Geometry::AttribArrayGeometry>( getEntity(), this, id, cbRw );
+    }
 
     base::setupIO( id );
 }
