@@ -160,7 +160,11 @@ class RA_ENGINE_API Material : public Data::ShaderParameterProvider
      */
     inline void setMaterialName( std::string newName ) { m_materialName = std::move( newName ); }
 
-  protected:
+    bool isDirty() { return m_isDirty; }
+    void setDirty() { m_isDirty = true; }
+    void setClean() { m_isDirty = false; }
+
+  private:
     /// Material instance name
     std::string m_instanceName {};
     /// Material aspect
@@ -168,8 +172,6 @@ class RA_ENGINE_API Material : public Data::ShaderParameterProvider
     /// Dirty mark : true if the openGL state of the material need to be updated before next draw
     /// call
     bool m_isDirty { true };
-
-  private:
     /// Unique material name that can be used to identify the material class
     std::string m_materialName;
 };

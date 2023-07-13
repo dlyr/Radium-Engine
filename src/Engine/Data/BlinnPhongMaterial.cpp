@@ -46,9 +46,10 @@ void BlinnPhongMaterial::updateRenderingParameters() {
 }
 
 void BlinnPhongMaterial::updateGL() {
-    if ( !m_isDirty ) { return; }
-    m_isDirty = false;
+    if ( !isDirty() ) { return; }
+
     updateRenderingParameters();
+    setClean();
 }
 
 void BlinnPhongMaterial::updateFromParameters() {

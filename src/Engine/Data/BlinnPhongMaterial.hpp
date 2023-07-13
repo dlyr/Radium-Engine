@@ -43,7 +43,6 @@ class RA_ENGINE_API BlinnPhongMaterial final
   public:
     using TextureSemantic = TextureSemantics::BlinnPhongMaterial;
 
-  public:
     /**
      * Construct a named Blinn-Phongmaterial
      * @param instanceName The name of this instance of the material
