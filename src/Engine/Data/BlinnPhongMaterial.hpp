@@ -51,12 +51,6 @@ class RA_ENGINE_API BlinnPhongMaterial final
      */
     explicit BlinnPhongMaterial( const std::string& instanceName );
 
-    /**
-     * Destructor.
-     * @note The material does not have ownership on its texture. This destructor do not delete the
-     * associated textures.
-     */
-    ~BlinnPhongMaterial() override;
     using MaterialTextureSet<TextureSemantic>::addTexture;
 
     /// \todo Fix this specialisation. Maybe assume that named texture have to be added to manager
@@ -116,7 +110,6 @@ class RA_ENGINE_API BlinnPhongMaterial final
     bool m_renderAsSplat { false };
 
   private:
-    std::map<TextureSemantic, TextureManager::TextureHandle> m_textures;
     static nlohmann::json s_parametersMetadata;
 
     /**

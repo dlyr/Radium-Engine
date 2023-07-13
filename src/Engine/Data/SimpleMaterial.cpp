@@ -12,10 +12,6 @@ SimpleMaterial::SimpleMaterial( const std::string& instanceName,
                                 MaterialAspect aspect ) :
     Material( instanceName, materialName, aspect ) {}
 
-SimpleMaterial::~SimpleMaterial() {
-    m_textures.clear();
-}
-
 void SimpleMaterial::updateRenderingParameters() {
     auto& renderParameters = getParameters();
     // update the rendering paramaters
