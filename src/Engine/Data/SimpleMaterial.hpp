@@ -43,13 +43,6 @@ class RA_ENGINE_API SimpleMaterial : public Material,
                              MaterialAspect aspect = MaterialAspect::MAT_OPAQUE );
 
     /**
-     * Destructor.
-     * @note The material does not have ownership on its texture.
-     * This destructor do not delete the associated textures.
-     */
-    ~SimpleMaterial() override;
-
-    /**
      * Update the openGL state of the material.
      * This state only consists on associated textures.
      */
@@ -71,11 +64,6 @@ class RA_ENGINE_API SimpleMaterial : public Material,
      * Update the rendering parameters for the Material
      */
     void updateRenderingParameters();
-
-    /**
-     * The openGL initialized textures.
-     */
-    std::map<TextureSemantic, TextureManager::TextureHandle> m_textures;
 
   protected:
     /// Load the material parameter description
