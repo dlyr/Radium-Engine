@@ -44,7 +44,6 @@ class RA_ENGINE_API BlinnPhongMaterial final
     using TextureSemantic = TextureSemantics::BlinnPhongMaterial;
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /**
      * Construct a named Blinn-Phongmaterial
      * @param instanceName The name of this instance of the material
