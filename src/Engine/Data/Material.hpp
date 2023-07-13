@@ -5,7 +5,7 @@
 #include <map>
 #include <string>
 
-// This include brings only the macro EIGEN_MAKE_ALIGNED_OPERATOR_NEW in the file scope.
+// This include brings only the macro  in the file scope.
 // Need to be separated to reduce compilation time
 #include <Core/Types.hpp>
 
@@ -82,8 +82,6 @@ class RA_ENGINE_API Material : public Data::ShaderParameterProvider
         MAT_TRANSPARENT, /// <- The material is TRANSPARENT
         MAT_DENSITY      /// <- The material implements the VOLUME interface
     };
-
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
     virtual ~Material() = default;
 
