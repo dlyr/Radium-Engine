@@ -26,9 +26,10 @@ void SimpleMaterial::updateRenderingParameters() {
 }
 
 void SimpleMaterial::updateGL() {
-    if ( !m_isDirty ) { return; }
-    m_isDirty = false;
+    if ( !isDirty() ) { return; }
+
     updateRenderingParameters();
+    setClean();
 }
 
 void SimpleMaterial::loadMetaData( nlohmann::json& destination ) {
