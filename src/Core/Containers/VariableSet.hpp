@@ -513,7 +513,7 @@ class RA_CORE_API VariableSet
     /// Type of the constructed visit function that returns a lambda
 
     /// Shared VariableSetFunctions among VariableSet instances.
-    class RA_CORE_API VariableSetFunctions
+    class VariableSetFunctions
     {
       public:
         using ClearFunctionType = std::function<void( VariableSet& )>;
@@ -722,8 +722,8 @@ auto VariableSet::addVariableType() -> Utils::optional<VariableContainer<T>*> {
                 -> std::pair<bool, std::function<void( DynamicVisitorBase&, std::any && )>> {
                 auto id = getVariableVisitTypeIndex<T>();
                 if ( v.accept( id ) ) {
-                    auto& storage = c.getVariableStorage<T>();
-                    auto coll     = std::ref( storage );
+                    auto& visitedStorage = c.getVariableStorage<T>();
+                    auto coll            = std::ref( visitedStorage );
                     return { true, [coll]( DynamicVisitorBase& visitor, std::any&& userParam ) {
                                 for ( auto&& t : coll.get() ) {
                                     visitor( { std::ref( t ) },
