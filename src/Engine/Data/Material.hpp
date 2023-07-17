@@ -5,10 +5,6 @@
 #include <map>
 #include <string>
 
-// This include brings only the macro  in the file scope.
-// Need to be separated to reduce compilation time
-#include <Core/Types.hpp>
-
 #include <Engine/Data/RenderParameters.hpp>
 #include <Engine/Data/Texture.hpp>
 #include <Engine/Data/TextureManager.hpp>
