@@ -5,7 +5,6 @@
 #include <map>
 #include <string>
 
-
 #include <Engine/Data/RenderParameters.hpp>
 #include <Engine/Data/Texture.hpp>
 #include <Engine/Data/TextureManager.hpp>
