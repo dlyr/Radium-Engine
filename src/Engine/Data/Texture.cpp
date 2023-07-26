@@ -299,7 +299,7 @@ void Texture::sendSamplerParametersToGpu() {
     switch ( m_texture->target() ) {
     case GL_TEXTURE_CUBE_MAP:
     case GL_TEXTURE_3D:
-        m_texture->setParameter( GL_TEXTURE_WRAP_R, m_textureParameters.sampler.wrapP );
+        m_texture->setParameter( GL_TEXTURE_WRAP_R, m_textureParameters.sampler.wrapR );
         GL_CHECK_ERROR;
         [[fallthrough]];
     case GL_TEXTURE_2D:
