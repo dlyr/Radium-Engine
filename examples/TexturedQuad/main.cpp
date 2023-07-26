@@ -24,7 +24,8 @@ int main( int argc, char* argv[] ) {
     constexpr int width  = 192;
     constexpr int height = 512;
     constexpr int size   = width * height;
-    unsigned char data[size];
+    std::shared_ptr<unsigned char[]> data( new unsigned char[size] );
+
     // fill with some function
     for ( int i = 0; i < width; ++i ) {
         for ( int j = 0; j < height; j++ ) {
@@ -33,11 +34,16 @@ int main( int argc, char* argv[] ) {
                                                    std::cos( j * i * M_PI / 96.0 ) ) );
         }
     }
-    auto& textureParameters =
-        app.m_engine->getTextureManager()->addTexture( "myTexture", width, height, data );
+
+    Ra::Engine::Data::TextureParameters textureParameters { "myTexture", {}, {} };
+    textureParameters.image.format         = gl::GLenum::GL_RED;
+    textureParameters.image.internalFormat = gl::GLenum::GL_R8;
+    textureParameters.image.width          = width;
+    textureParameters.image.height         = height;
+    textureParameters.image.texels         = data;
+
+    auto texHandle = app.m_engine->getTextureManager()->addTexture( textureParameters );
     // these values will be used when engine initialize texture GL representation.
-    textureParameters.format         = gl::GLenum::GL_RED;
-    textureParameters.internalFormat = gl::GLenum::GL_R8;
     //! [Creating a texture]
 
     //! [Create an entity and component to draw or data]

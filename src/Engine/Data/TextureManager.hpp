@@ -19,13 +19,13 @@ class RA_ENGINE_API TextureManager final
 {
 
   private:
-    using TexturePair = std::pair<std::string, Texture*>;
-
   public:
+    using TextureHandle = Ra::Core::Utils::Index;
+
     /** Add a texture giving its name, dimension and content.
      * Useful for defining procedural textures
      *
-     * @param name  name of the texture
+     * @param name name of the texture
      * @param width width of the texture
      * @param height height of the texture
      * @param data pointer to the texture content
@@ -33,17 +33,17 @@ class RA_ENGINE_API TextureManager final
      * @return a texture descriptor that could be further specialized (filtering parameters ..)
      * before the texture is inserted into Radium OpenGL system by getOrLoadTexture
      */
-    TextureParameters& addTexture( const std::string& name, uint width, uint height, void* data );
 
-    /**
-     * Get or load a named texture.
-     * If image data are not presents in texParameters.texels (this field is nullptr), this method
+    TextureHandle addTexture( const TextureParameters& );
+
+    /** @brief Get or load a named texture.
+     *
+     * If image texParameters.texels is nullptr, this method
      * will assume that the texParameters.name field contains the fully qualified filename to be
      * loaded to initialize texParameters.texels
      *
-     * If image data are presents in texParameters.texels (this field is not nullptr), the name
-     * could be of any form as no loading will occur.
-     *
+     * If texParameters.texels isn't nullptr, the name could be of any form as no loading will
+     * occur.
      *
      * This method creates, initialize OpenGL part of the texture and add the created texture to the
      * Texture cache of the engine.
@@ -54,64 +54,33 @@ class RA_ENGINE_API TextureManager final
      * sRGB to LinearRGB
      * @return The texture as inserted into the Radium available openGL system
      */
-    Texture* getOrLoadTexture( const TextureParameters& texParameters, bool linearize = false );
+    Texture* getTexture( const TextureHandle& handle );
+    TextureHandle getTextureHandle( const std::string& name );
+    Texture* getTexture( const std::string& name ) {
+        return getTexture( getTextureHandle( name ) );
+    }
 
-    /**
-     * Helper function, load the texture without adding it to the manager.
-     * @see getOrLoadTexture() for parameters description.
-     */
-    Texture* loadTexture( const TextureParameters& texParameters, bool linearize = false );
+    void deleteTexture( const TextureHandle& handle );
 
-    /**
-     * Delete a named texture from the manager
-     * @param filename
-     */
-    void deleteTexture( const std::string& filename );
-    /**
-     * Delete a texture from the manager
-     * @param texture
-     */
-    void deleteTexture( Texture* texture );
-
-    /**
-     * Lazy update the texture content from the raw pointer content.
-     * The real update will be done when calling updatePendingTextures
-     * @note User must ensure that the data pointed by content are of the good type wrt the texture.
-     * @param texture
-     * @param content
-     */
-    void updateTextureContent( const std::string& texture, void* content );
-
-    /**
-     * Update all textures that are pending after a call to updateTextureContent.
-     *
-     * The cooperation of updateTextureContent and updatePendingTextures allow applications to
-     * manage efficiently the on line texture generation by separating the content definition
-     * (updateTextureContent) from the OpenGL state modification (updatePendingTextures).
-     *
-     * @todo find a better name and description for this method that do not act on
-     * _pending textures_, i.e. textures that do not have a valid OpenGl state.
-     */
-    void updatePendingTextures();
-
-    /** Load a texture as described by texParameters.
+    /** Load \a filename and fill ImageParameters according to \a filename content.
      * @note : only loads 2D image file for now.
-     * @param texParameters parameters describing the texture to load. This parameter will be
-     * updated (width, height, ...) according to the loaded file properties.
+     * @param filename fully qualified image filename. See stbi_load_image for supported file
+     * format.
+     * @return ImageParameters corresponding to filename content, image.parameters.texels contains
+     * actual image data. In case of loading error, texels is nullptr, width = height = 0.
      */
-    void loadTextureImage( TextureParameters& texParameters );
+    static ImageParameters loadTextureImage( const std::string& filename, bool linearize = false );
 
   public:
     TextureManager();
     ~TextureManager();
+    TextureManager( TextureManager const& )            = delete;
+    TextureManager( TextureManager&& )                 = delete;
+    TextureManager& operator=( TextureManager const& ) = delete;
+    TextureManager& operator=( TextureManager&& )      = delete;
 
   private:
-    /// Textures that have a usable and up to date OpenGL state
-    std::map<std::string, Texture*> m_textures;
-    /// Textures that do not have a usable OpenGL state
-    std::map<std::string, TextureParameters> m_pendingTextures;
-    /// Textures whose OpenGl stat is not up to date
-    std::map<std::string, void*> m_pendingData;
+    std::vector<std::unique_ptr<Texture>> m_newTextures;
 };
 
 } // namespace Data

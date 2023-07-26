@@ -25,7 +25,6 @@ class RA_ENGINE_API VolumetricMaterial final : public Material, public Parameter
 {
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /**
      * Construct a named VolumetricMaterial
      * @param name The name of the material
@@ -94,6 +93,7 @@ class RA_ENGINE_API VolumetricMaterial final : public Material, public Parameter
 
   private:
     // The density matrix
+    /// \todo get rid of the raw ptr.
     Texture* m_texture;
 
     /**
