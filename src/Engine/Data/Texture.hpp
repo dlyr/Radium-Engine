@@ -23,8 +23,8 @@ struct SamplerParameters {
     GLenum wrapS { GL_CLAMP_TO_EDGE };
     /// OpenGL wrap mode in the t direction
     GLenum wrapT { GL_CLAMP_TO_EDGE };
-    /// OpenGL wrap mode in the p direction
-    GLenum wrapP { GL_CLAMP_TO_EDGE };
+    /// OpenGL wrap mode in the r direction
+    GLenum wrapR { GL_CLAMP_TO_EDGE };
     /// OpenGL minification filter ( GL_LINEAR or GL_NEAREST or GL_XXX_MIPMAP_YYY )
     GLenum minFilter { GL_LINEAR };
     /// OpenGL magnification filter ( GL_LINEAR or GL_NEAREST )
@@ -61,7 +61,7 @@ struct ImageParameters {
     GLenum target { GL_TEXTURE_2D }; //< OpenGL target
     size_t width { 1 };              //< width of the texture (s dimension)
     size_t height { 1 };             //< height of the texture (t dimension)
-    size_t depth { 1 };              //< width of the texture (p dimension)
+    size_t depth { 1 };              //< depth of the texture (r dimension)
     GLenum format { GL_RGB };        //< Format of the external data
     /// OpenGL internal format (WARNING, for Integer textures, must be GL_XXX_INTEGER)
     GLenum internalFormat { GL_RGB };
