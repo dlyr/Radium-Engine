@@ -68,7 +68,7 @@ struct ImageParameters {
     GLenum type { GL_UNSIGNED_BYTE }; //< Type of the components in external data
     /// set to true when linearize texture rgb component. If true, linearize has no effect.
     bool isLinear { false };
-    std::variant<ImageType, CubeMapType> texels; //< texels OR cubeMap, shared ownership
+    std::variant<ImageType, CubeMapType> texels { nullptr }; //< texels OR cubeMap, shared ownership
 };
 
 /** @brief Describes the content and parameters of a texture.
@@ -147,6 +147,7 @@ class RA_ENGINE_API Texture final
 
     /// @return Name of the texture.
     inline std::string getName() const { return m_textureParameters.name; }
+    inline void setName( const std::string& name ) { m_textureParameters.name = name; }
 
     /// @return the pixel format of the texture
     GLenum getFormat() const { return m_textureParameters.image.format; }
@@ -174,6 +175,7 @@ class RA_ENGINE_API Texture final
 
     /// get read access to texture parameters
     const TextureParameters& getParameters() const { return m_textureParameters; }
+    TextureParameters& getParameters() { return m_textureParameters; }
 
     /** @brief Update the cpu representation of data contained by the texture.
      *
@@ -236,6 +238,20 @@ class RA_ENGINE_API Texture final
      */
     static void linearize( ImageParameters& image );
 
+    /// @brief Regiter gpu task to RadiumEngine. Will call sendImageDataToGpu during next
+    /// RadiumEngine::runGpuTasks() call.
+    void registerUpdateImageDataTask();
+
+    /// @brief Regiter gpu task to RadiumEngine. Will call sendSamplerParametersToGpu during
+    /// next RadiumEngine::runGpuTasks() call.
+    void registerUpdateSamplerParametersTask();
+
+    /// @brief Send image data to the GPU and generate mipmap if needed
+    void sendImageDataToGpu();
+
+    /// @brief Send sampler parameters to the GPU
+    void sendSamplerParametersToGpu();
+
   private:
     /**
      * Current implementation supports GL_TEXTURE_1D, GL_TEXTURE_2D, GL_TEXTURE_RECTANGLE,
@@ -253,20 +269,6 @@ class RA_ENGINE_API Texture final
      * @return true if allocation is performed.
      */
     bool createTexture();
-
-    /// @brief Regiter gpu task to RadiumEngine. Will call sendImageDataToGpu during next
-    /// RadiumEngine::runGpuTasks() call.
-    void registerUpdateImageDataTask();
-
-    /// @brief Regiter gpu task to RadiumEngine. Will call sendSamplerParametersToGpu during
-    /// next RadiumEngine::runGpuTasks() call.
-    void registerUpdateSamplerParametersTask();
-
-    /// @brief Send image data to the GPU and generate mipmap if needed
-    void sendImageDataToGpu();
-
-    /// @brief Send sampler parameters to the GPU
-    void sendSamplerParametersToGpu();
 
     /** @brief Convert a color texture from sRGB to Linear RGB spaces.
      *
