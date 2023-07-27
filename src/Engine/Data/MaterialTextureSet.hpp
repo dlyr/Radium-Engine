@@ -21,16 +21,8 @@ class MaterialTextureSet
     }
 
     void addTexture( const TextureSemantic& semantic, const TextureParameters& texture ) {
-        auto texManager      = RadiumEngine::getInstance()->getTextureManager();
-        m_textures[semantic] = texManager->addTexture( texture );
-    }
-
-    Texture* getTexture( const TextureSemantic& semantic ) const {
-        Texture* tex    = nullptr;
         auto texManager = RadiumEngine::getInstance()->getTextureManager();
-        auto it         = m_textures.find( semantic );
-        if ( it != m_textures.end() ) { tex = texManager->getTexture( it->second ); }
-        return tex;
+        addTexture( semantic, texManager->addTexture( texture ) );
     }
 
     void addTexture( const TextureSemantic& semantic, const std::string& texture ) {
@@ -46,6 +38,14 @@ class MaterialTextureSet
             data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
             addTexture( semantic, data );
         }
+    }
+
+    Texture* getTexture( const TextureSemantic& semantic ) const {
+        Texture* tex    = nullptr;
+        auto texManager = RadiumEngine::getInstance()->getTextureManager();
+        auto it         = m_textures.find( semantic );
+        if ( it != m_textures.end() ) { tex = texManager->getTexture( it->second ); }
+        return tex;
     }
 
   private:
