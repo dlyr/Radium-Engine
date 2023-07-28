@@ -42,13 +42,16 @@ struct ImageParameters {
         return std::holds_alternative<TexelType>( texels );
     }
 
+    ImageType getImage() const {
+        CORE_ASSERT( isTexelOfType<ImageType>(), "texture variant is not ImageType" );
+        return std::get<ImageType>( texels );
+    }
+    void setImage( ImageType image ) { texels = image; }
+
     /// get texels raw pointer
     /// throws std::bad_variant_access if !isTexelOfType<ImageType>()
     /// see std::get
-    const void* getTexels() const {
-        CORE_ASSERT( isTexelOfType<ImageType>(), "texture variant is not ImageType" );
-        return std::get<ImageType>( texels ).get();
-    }
+    const void* getTexels() const { return getImage().get(); }
 
     /// get cube map array of shared ptr
     /// throws std::bad_variant_access if !isTexelOfType<CubeMapType>()
@@ -57,6 +60,7 @@ struct ImageParameters {
         CORE_ASSERT( isTexelOfType<CubeMapType>(), "texture variant is not CubeMapType" );
         return std::get<CubeMapType>( texels );
     }
+    void setCubeMap( CubeMapType cubeMap ) { texels = cubeMap; }
 
     GLenum target { GL_TEXTURE_2D }; //< OpenGL target
     size_t width { 1 };              //< width of the texture (s dimension)
@@ -248,6 +252,7 @@ class RA_ENGINE_API Texture final
 
     /// @brief Send image data to the GPU and generate mipmap if needed
     void sendImageDataToGpu();
+    void readFromGpu( int level = 0 );
 
     /// @brief Send sampler parameters to the GPU
     void sendSamplerParametersToGpu();
