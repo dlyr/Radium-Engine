@@ -294,6 +294,19 @@ void Texture::sendImageDataToGpu() {
     GL_CHECK_ERROR;
 }
 
+void Texture::readFromGpu( int level ) {
+    CORE_ASSERT( m_texture != nullptr, "Cannot get non initialized texture" );
+    CORE_ASSERT( m_textureParameters.image.isTexelOfType<ImageParameters::ImageType>(),
+                 "Can only get image typf" );
+    CORE_ASSERT( m_textureParameters.image.getTexels() != nullptr, "Can only get image type" );
+    CORE_ASSERT( GL_TEXTURE_CUBE_MAP != m_texture->target(), "Cannot get cube map" );
+
+    m_texture->getImage( level,
+                         m_textureParameters.image.format,
+                         m_textureParameters.image.type,
+                         m_textureParameters.image.getImage().get() );
+}
+
 // let the compiler warn about case fallthrough
 void Texture::sendSamplerParametersToGpu() {
     switch ( m_texture->target() ) {
