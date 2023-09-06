@@ -152,7 +152,7 @@ BlinnPhongMaterialConverter::operator()( const Ra::Core::Asset::MaterialData* to
     }
     if ( source->hasSpecularTexture() ) {
         data.name  = "specular";
-        data.image = texManager->loadTextureImage( source->m_texSpecular, false );
+        data.image = texManager->loadTextureImage( source->m_texSpecular, true );
         result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR, data );
     }
     if ( source->hasShininessTexture() ) {
@@ -164,7 +164,7 @@ BlinnPhongMaterialConverter::operator()( const Ra::Core::Asset::MaterialData* to
     if ( source->hasOpacityTexture() ) {
         data.name  = "opacity";
         data.image = texManager->loadTextureImage( source->m_texOpacity, false );
-        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA, source->m_texOpacity );
+        result->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA, data );
     }
     if ( source->hasNormalTexture() ) {
         data.name  = "normal";
