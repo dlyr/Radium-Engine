@@ -25,21 +25,6 @@ class MaterialTextureSet
         addTexture( semantic, texManager->addTexture( texture ) );
     }
 
-    void addTexture( const TextureSemantic& semantic, const std::string& texture ) {
-        CORE_ASSERT( !texture.empty(), "Invalid texture name" );
-        auto texManager = RadiumEngine::getInstance()->getTextureManager();
-        auto texHandle  = texManager->getTextureHandle( texture );
-        if ( texHandle.isValid() ) { addTexture( semantic, texHandle ); }
-        else {
-            TextureParameters data;
-            data.name              = texture;
-            data.sampler.wrapS     = GL_REPEAT;
-            data.sampler.wrapT     = GL_REPEAT;
-            data.sampler.minFilter = GL_LINEAR_MIPMAP_LINEAR;
-            addTexture( semantic, data );
-        }
-    }
-
     Texture* getTexture( const TextureSemantic& semantic ) const {
         Texture* tex    = nullptr;
         auto texManager = RadiumEngine::getInstance()->getTextureManager();
