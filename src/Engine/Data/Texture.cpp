@@ -77,8 +77,12 @@ void Texture::initializeNow() {
 
 void Texture::destroy() {
     if ( m_texture ) {
-        auto task = std::make_unique<DeleteTextureTask>( std::move( m_texture ) );
-        RadiumEngine::getInstance()->addGpuTask( std::move( task ) );
+        // if engine is still available
+        if ( auto engine = RadiumEngine::getInstance() ) {
+            auto task = std::make_unique<DeleteTextureTask>( std::move( m_texture ) );
+            engine->addGpuTask( std::move( task ) );
+        }
+        // else gpu representation will not be cleaned by the application.
         m_texture.reset();
     }
 }
