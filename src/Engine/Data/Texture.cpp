@@ -16,7 +16,9 @@ namespace Data {
 using namespace Core::Utils; // log
 
 Texture::Texture( const TextureParameters& texParameters ) :
-    m_textureParameters { texParameters }, m_texture { nullptr }, m_isMipMapped { false } {}
+    m_textureParameters { texParameters }, m_texture { nullptr }, m_isMipMapped { false } {
+    //    std::cerr << "new texture " << texParameters.name << "\n";
+}
 
 class DeleteTextureTask : public Core::Task
 {
@@ -29,6 +31,7 @@ class DeleteTextureTask : public Core::Task
 
     /// Do the task job. Will be called from the task queue threads.
     virtual void process() override {
+        //        std::cerr << "delete gl texture " << m_texture->id() << "\n";
         m_texture->detach();
         m_texture.reset();
     };
@@ -38,6 +41,7 @@ class DeleteTextureTask : public Core::Task
 };
 
 Texture::~Texture() {
+    //  std::cerr << "delete texture " << m_textureParameters.name << "\n";
     if ( m_updateImageTaskId.isValid() ) {
         RadiumEngine::getInstance()->removeGpuTask( m_updateImageTaskId );
     }
@@ -191,6 +195,8 @@ void Texture::computeIsMipMappedFlag() {
 bool Texture::createTexture() {
     if ( m_texture == nullptr ) {
         m_texture = globjects::Texture::create( m_textureParameters.image.target );
+        //        std::cerr << "new gl texture " << m_textureParameters.name << " " <<
+        //        m_texture->id() << "\n";
         GL_CHECK_ERROR;
         return true;
     }
