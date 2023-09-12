@@ -69,8 +69,9 @@ void Texture::initialize() {
 
 void Texture::initializeNow() {
     if ( !isSupportedTarget() ) return;
-    createTexture();
     computeIsMipMappedFlag();
+
+    createTexture();
     sendSamplerParametersToGpu();
     sendImageDataToGpu();
 }
