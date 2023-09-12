@@ -3,6 +3,7 @@
 
 #include <Core/Utils/Log.hpp>
 
+#include <cstdlib>
 #include <globjects/AbstractUniform.h>
 #include <stb/stb_image.h>
 
@@ -78,7 +79,7 @@ ImageParameters TextureManager::loadTextureImage( const std::string& filename, b
     }
 
     CORE_ASSERT( data, "Data is null" );
-    image.texels = std::shared_ptr<void>( data );
+    image.texels = std::shared_ptr<void>( data, free );
     image.type   = GL_UNSIGNED_BYTE;
     if ( linearize ) Texture::linearize( image );
     return image;
