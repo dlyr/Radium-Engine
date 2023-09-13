@@ -87,6 +87,8 @@ class RA_ENGINE_API BlinnPhongMaterial final
     inline const Core::Utils::Color& getSpecularColor() { return m_ks; }
     inline Scalar getSpecularExponent() { return m_ns; }
     inline bool isRenderAsSplat() { return m_renderAsSplat; }
+    inline void setAlpha( Scalar a );
+    inline Scalar getAlpha() { return m_alpha; }
 
   private:
     Core::Utils::Color m_kd { 0.7, 0.7, 0.7, 1.0 };
@@ -150,6 +152,11 @@ inline void BlinnPhongMaterial::setRenderAsSplat( bool state ) {
         m_renderAsSplat = state;
         needUpdate();
     }
+}
+
+inline void BlinnPhongMaterial::setAlpha( Scalar a ) {
+    m_alpha = a;
+    needUpdate();
 }
 
 } // namespace Data
