@@ -23,9 +23,12 @@ namespace Engine {
 namespace Data {
 class ShaderProgram;
 
+//! [TextureSemantics]
 namespace TextureSemantics {
+///@ BlinnPhongMaterial's textures
 enum class BlinnPhongMaterial { TEX_DIFFUSE, TEX_SPECULAR, TEX_NORMAL, TEX_SHININESS, TEX_ALPHA };
 } // namespace TextureSemantics
+//! [TextureSemantics]
 
 /**
  * Implementation of the Blinn-Phong Material BSDF.
