@@ -27,6 +27,9 @@ CLIViewer::CLIViewer( std::unique_ptr<OpenGLContext> context ) :
         ->check( CLI::ExistingFile );
     addOption( "-s,--size", m_parameters.m_size, "Size of the computed image." )->delimiter( 'x' );
     addFlag( "-a,--animation", m_parameters.m_animationEnable, "Enable Radium Animation system." );
+
+    m_tasks = std::make_unique<Core::TaskQueue>(
+        std::min( std::thread::hardware_concurrency(), 2u ) - 1u );
 }
 
 CLIViewer::~CLIViewer() {
@@ -100,11 +103,10 @@ int CLIViewer::oneFrame( float timeStep ) {
         m_engine->step();
     }
 
-    Ra::Core::TaskQueue tasks( std::thread::hardware_concurrency() - 1 );
-    m_engine->getTasks( &tasks, Scalar( timeStep ) );
-    tasks.startTasks();
-    tasks.waitForTasks();
-    tasks.flushTaskQueue();
+    m_engine->getTasks( m_tasks.get(), Scalar( timeStep ) );
+    m_tasks->startTasks();
+    m_tasks->waitForTasks();
+    m_tasks->flushTaskQueue();
 
     m_engine->runGpuTasks();
 
@@ -164,7 +166,9 @@ void CLIViewer::setCamera( Ra::Core::Utils::Index camIdx ) {
         Ra::Engine::RadiumEngine::getInstance()->getSystem( "DefaultCameraManager" ) );
 
     if ( camIdx.isInvalid() || cameraManager->count() <= size_t( camIdx ) ) {
-        m_camera = new Ra::Core::Asset::Camera( m_parameters.m_size[0], m_parameters.m_size[1] );
+        m_ownCamera = std::make_unique<Ra::Core::Asset::Camera>( m_parameters.m_size[0],
+                                                                 m_parameters.m_size[1] );
+        m_camera    = m_ownCamera.get();
         m_camera->setFOV( 60.0_ra * Ra::Core::Math::toRad );
         m_camera->setZNear( 0.1_ra );
         m_camera->setZFar( 100_ra );

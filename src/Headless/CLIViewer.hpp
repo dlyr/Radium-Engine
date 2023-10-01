@@ -1,4 +1,6 @@
 #pragma once
+
+#include <Core/Tasks/TaskQueue.hpp>
 #include <Headless/CLIBaseApplication.hpp>
 #include <Headless/OpenGLContext/OpenGLContext.hpp>
 
@@ -61,6 +63,7 @@ class HEADLESS_API CLIViewer : public CLIBaseApplication
 
     /// The camera for rendering
     Ra::Core::Asset::Camera* m_camera { nullptr };
+    std::unique_ptr<Ra::Core::Asset::Camera> m_ownCamera { nullptr };
 
     /// The application parameters
     ViewerParameters m_parameters;
@@ -70,6 +73,7 @@ class HEADLESS_API CLIViewer : public CLIBaseApplication
 
     /// is the window shown ?
     bool m_exposedWindow { false };
+    std::unique_ptr<Ra::Core::TaskQueue> m_tasks { nullptr };
 
   public:
     /**
