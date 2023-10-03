@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/CoreMacros.hpp"
 #include <memory>
 #include <vector>
 
@@ -146,7 +147,7 @@ class RadiumPluginInterface
      * MUST not be destroyed by the plugin
      */
     virtual void
-    addRenderers( std::vector<std::shared_ptr<Ra::Engine::Rendering::Renderer>>* /*rds*/ ) {}
+    addRenderers( std::vector<std::shared_ptr<Ra::Engine::Rendering::Renderer>>* rds ) {}
 
     /**
      * Tells if the system will add a file loader
@@ -159,7 +160,7 @@ class RadiumPluginInterface
      * @param fl The set of file loader to add
      */
     virtual void
-    addFileLoaders( std::vector<std::shared_ptr<Core::Asset::FileLoaderInterface>>* /*fl*/ ) {}
+    addFileLoaders( std::vector<std::shared_ptr<Core::Asset::FileLoaderInterface>>* fl ) {}
 
     /**
      * @brief openGlInitialize
@@ -181,7 +182,7 @@ class RadiumPluginInterface
      * and realease it after usage (viewer->doneCurrent())
      * @see Ra::Gui::Viewer
      */
-    virtual void openGlInitialize( const Context& /*context*/ ) {}
+    virtual void openGlInitialize( const Context& context ) {}
 
     /**
      * Tells if the plugin offer OpenGL based services that need to be initialized after the OpenGL

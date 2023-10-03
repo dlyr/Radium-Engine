@@ -69,15 +69,15 @@ void updateCellCorner( Vector3& cellCorner, const Scalar cellSize, const int nCe
 void AllPrimitivesComponent::initialize() {
     auto rp = Resources::getResourcesPath();
 
-    auto blinnPhongMaterial              = make_shared<BlinnPhongMaterial>( "Shaded Material" );
-    blinnPhongMaterial->m_perVertexColor = true;
-    blinnPhongMaterial->m_ks             = Color::White();
-    blinnPhongMaterial->m_ns             = 100_ra;
+    auto blinnPhongMaterial = make_shared<BlinnPhongMaterial>( "Shaded Material" );
+    blinnPhongMaterial->setColoredByVertexAttrib( true );
+    blinnPhongMaterial->setSpecularColor( Color::White() );
+    blinnPhongMaterial->setSpecularExponent( 100_ra );
 
     auto blinnPhongTexturedMaterial = make_shared<BlinnPhongMaterial>( "Shaded Textured Material" );
-    blinnPhongTexturedMaterial->m_perVertexColor = true;
-    blinnPhongTexturedMaterial->m_ks             = Color::White();
-    blinnPhongTexturedMaterial->m_ns             = 100_ra;
+    blinnPhongTexturedMaterial->setColoredByVertexAttrib( true );
+    blinnPhongTexturedMaterial->setSpecularColor( Color::White() );
+    blinnPhongTexturedMaterial->setSpecularExponent( 100_ra );
 
     Ra::Engine::Data::TextureParameters textureParameters;
     textureParameters.name = "grid";
@@ -89,11 +89,11 @@ void AllPrimitivesComponent::initialize() {
     blinnPhongTexturedMaterial->addTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE,
                                             textureParameters );
 
-    auto plainMaterial              = make_shared<PlainMaterial>( "Plain Material" );
-    plainMaterial->m_perVertexColor = true;
+    auto plainMaterial = make_shared<PlainMaterial>( "Plain Material" );
+    plainMaterial->setColoredByVertexAttrib( true );
 
-    auto lambertianMaterial              = make_shared<LambertianMaterial>( "Lambertian Material" );
-    lambertianMaterial->m_perVertexColor = true;
+    auto lambertianMaterial = make_shared<LambertianMaterial>( "Lambertian Material" );
+    lambertianMaterial->setColoredByVertexAttrib( true );
 
     //// setup ////
     Scalar colorBoost = 1_ra; /// since simple primitive are ambient only, boost their color
@@ -728,8 +728,8 @@ void AllPrimitivesComponent::initialize() {
                     roMaterial.reset( mat );
                 }
                 else {
-                    auto mat             = new Data::BlinnPhongMaterial( "_DefaultBPMaterial" );
-                    mat->m_renderAsSplat = mesh->getNumFaces() == 0;
+                    auto mat = new Data::BlinnPhongMaterial( "_DefaultBPMaterial" );
+                    mat->setRenderAsSplat( mesh->getNumFaces() == 0 );
                     roMaterial.reset( mat );
                 }
 

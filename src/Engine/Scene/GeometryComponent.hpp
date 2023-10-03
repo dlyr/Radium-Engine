@@ -7,6 +7,7 @@
 #include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Geometry/Volume.hpp>
 #include <Engine/Data/BlinnPhongMaterial.hpp>
+#include <Engine/Data/Material.hpp>
 #include <Engine/Data/MaterialConverters.hpp>
 #include <Engine/Data/Mesh.hpp>
 #include <Engine/RaEngine.hpp>
@@ -83,7 +84,10 @@ class SurfaceMeshComponent : public GeometryComponent
                                  Entity* entity,
                                  CoreMeshType&& mesh,
                                  Core::Asset::MaterialData* mat = nullptr );
-
+    inline SurfaceMeshComponent( const std::string& name,
+                                 Entity* entity,
+                                 CoreMeshType&& mesh,
+                                 std::shared_ptr<Data::Material> mat );
     ~SurfaceMeshComponent() override = default;
 
     /// Returns the current display geometry.
@@ -97,7 +101,10 @@ class SurfaceMeshComponent : public GeometryComponent
   private:
     inline void generateMesh( const Ra::Core::Asset::GeometryData* data );
 
-    inline void finalizeROFromGeometry( const Core::Asset::MaterialData* data,
+    inline std::shared_ptr<Data::Material>
+    convertMatdataToMaterial( const Core::Asset::MaterialData* data );
+
+    inline void finalizeROFromGeometry( std::shared_ptr<Data::Material> roMaterial,
                                         Core::Transform transform );
 
     // Give access to the mesh and (if deformable) to update it
@@ -231,7 +238,7 @@ SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent( const std::string& nam
                                                           Entity* entity,
                                                           std::shared_ptr<RenderMeshType> data ) :
     GeometryComponent( name, entity ), m_displayMesh( data ) {
-    finalizeROFromGeometry( nullptr, Core::Transform::Identity() );
+    finalizeROFromGeometry( convertMatdataToMaterial( nullptr ), Core::Transform::Identity() );
 }
 
 template <typename CoreMeshType>
@@ -242,9 +249,20 @@ SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent( const std::string& nam
     GeometryComponent( name, entity ),
     m_displayMesh( new RenderMeshType( name, std::move( mesh ) ) ) {
     setContentName( name );
-    finalizeROFromGeometry( mat, Core::Transform::Identity() );
+    finalizeROFromGeometry( convertMatdataToMaterial( mat ), Core::Transform::Identity() );
 }
 
+template <typename CoreMeshType>
+SurfaceMeshComponent<CoreMeshType>::SurfaceMeshComponent(
+    const std::string& name,
+    Entity* entity,
+    CoreMeshType&& mesh,
+    std::shared_ptr<Ra::Engine::Data::Material> mat ) :
+    GeometryComponent( name, entity ),
+    m_displayMesh( new RenderMeshType( name, std::move( mesh ) ) ) {
+    setContentName( name );
+    finalizeROFromGeometry( mat, Core::Transform::Identity() );
+}
 template <typename CoreMeshType>
 void SurfaceMeshComponent<CoreMeshType>::generateMesh( const Ra::Core::Asset::GeometryData* data ) {
     m_contentName     = data->getName();
@@ -253,8 +271,9 @@ void SurfaceMeshComponent<CoreMeshType>::generateMesh( const Ra::Core::Asset::Ge
 
     m_displayMesh->loadGeometry( std::move( mesh ) );
 
-    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr,
-                            data->getFrame() );
+    finalizeROFromGeometry(
+        convertMatdataToMaterial( data->hasMaterial() ? &( data->getMaterial() ) : nullptr ),
+        data->getFrame() );
 }
 
 template <>
@@ -262,9 +281,8 @@ RA_ENGINE_API void SurfaceMeshComponent<Ra::Core::Geometry::MultiIndexedGeometry
     const Ra::Core::Asset::GeometryData* data );
 
 template <typename CoreMeshType>
-void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(
-    const Core::Asset::MaterialData* data,
-    Core::Transform transform ) {
+std::shared_ptr<Data::Material> SurfaceMeshComponent<CoreMeshType>::convertMatdataToMaterial(
+    const Core::Asset::MaterialData* data ) {
     // The technique for rendering this component
     std::shared_ptr<Data::Material> roMaterial;
     // First extract the material from asset or create a default one
@@ -274,12 +292,20 @@ void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(
         roMaterial.reset( mat );
     }
     else {
-        auto mat             = new Data::BlinnPhongMaterial( m_contentName + "_DefaultBPMaterial" );
-        mat->m_renderAsSplat = m_displayMesh->getNumFaces() == 0;
-        mat->m_perVertexColor = m_displayMesh->getCoreGeometry().hasAttrib(
-            Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_COLOR ) );
+        auto mat = new Data::BlinnPhongMaterial( m_contentName + "_DefaultBPMaterial" );
+        mat->setRenderAsSplat( m_displayMesh->getNumFaces() == 0 );
+        mat->setColoredByVertexAttrib( m_displayMesh->getCoreGeometry().hasAttrib(
+            Ra::Core::Geometry::getAttribName( Ra::Core::Geometry::VERTEX_COLOR ) ) );
         roMaterial.reset( mat );
     }
+    return roMaterial;
+}
+
+template <typename CoreMeshType>
+void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(
+    std::shared_ptr<Data::Material> roMaterial,
+    Core::Transform transform ) {
+
     // initialize with a default rendertechique that draws nothing
     std::string roName( m_name + "_" + m_contentName + "_RO" );
     auto ro = Rendering::RenderObject::createRenderObject( roName,
@@ -296,6 +322,7 @@ void SurfaceMeshComponent<CoreMeshType>::finalizeROFromGeometry(
 
 #ifndef CHECK_MESH_NOT_NULL
 #    define CHECK_MESH_NOT_NULL                \
+                                               \
         CORE_ASSERT( m_displayMesh != nullptr, \
                      "DisplayMesh should exist while component is alive" );
 #    define CHECK_MESH_NOT_NULL_UNDEF

@@ -16,16 +16,11 @@
 #include <thread>
 
 int main( int argc, char* argv[] ) {
-    //! [Creating the application]
     Ra::Gui::BaseApplication app( argc, argv );
     app.initialize( Ra::Gui::SimpleWindowFactory {} );
-    //! [Creating the application]
 
-    //! [Creating a quad geometry with texture coordinates]
     auto quad = Ra::Core::Geometry::makeZNormalQuad( { 1_ra, 1_ra }, {}, true );
-    //! [Creating a quad geometry with texture coordinates]
 
-    //! [Creating a texture]
     constexpr int width  = 192;
     constexpr int height = 512;
     constexpr int size   = width * height;
@@ -39,6 +34,7 @@ int main( int argc, char* argv[] ) {
                                                    std::cos( j * i * M_PI / 96.0 ) ) );
         }
     }
+
     Ra::Engine::Data::TextureParameters textureParameters { "myTexture", {}, {} };
     textureParameters.image.format         = gl::GLenum::GL_RED;
     textureParameters.image.internalFormat = gl::GLenum::GL_R8;
@@ -47,25 +43,22 @@ int main( int argc, char* argv[] ) {
     textureParameters.image.texels         = data;
     textureParameters.sampler.minFilter    = gl::GLenum::GL_LINEAR_MIPMAP_LINEAR;
 
+    auto e = app.m_engine->getEntityManager()->createEntity( "Textured quad" );
+
+    //! [Add texture to material]
     auto textureManager = app.m_engine->getTextureManager();
     auto textureHandle  = textureManager->addTexture( textureParameters );
     auto texture        = textureManager->getTexture( textureHandle );
-    //! [Creating a texture]
+    auto material = std::make_shared<Ra::Engine::Data::BlinnPhongMaterial>( "myMaterialData" );
+    material->addTexture( Ra::Engine::Data::TextureSemantics::BlinnPhongMaterial::TEX_DIFFUSE,
+                          textureHandle );
+    //! [Add texture to material]
 
-    //! [Create an entity and component to draw or data]
-    auto e = app.m_engine->getEntityManager()->createEntity( "Textured quad" );
-
-    Ra::Core::Asset::BlinnPhongMaterialData matData( "myMaterialData" );
     // remove glossy highlight
-    matData.m_specular    = Ra::Core::Utils::Color::Black();
-    matData.m_hasSpecular = true;
-
-    matData.m_hasTexDiffuse = true;
-    // this name has to be the same as texManager added texture name
-    matData.m_texDiffuse = "myTexture";
+    material->setSpecularColor( Ra::Core::Utils::Color::Black() );
 
     // the entity get's this new component ownership. a bit wired since hidden in ctor.
-    new Ra::Engine::Scene::TriangleMeshComponent( "Quad Mesh", e, std::move( quad ), &matData );
+    new Ra::Engine::Scene::TriangleMeshComponent( "Quad Mesh", e, std::move( quad ), material );
     //! [Create an entity and component to draw or data]
 
     //! [Tell the window that something is to be displayed]
