@@ -73,7 +73,6 @@ class HEADLESS_API CLIViewer : public CLIBaseApplication
 
     /// is the window shown ?
     bool m_exposedWindow { false };
-    std::unique_ptr<Ra::Core::TaskQueue> m_tasks { nullptr };
 
   public:
     /**

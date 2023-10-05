@@ -27,9 +27,6 @@ CLIViewer::CLIViewer( std::unique_ptr<OpenGLContext> context ) :
         ->check( CLI::ExistingFile );
     addOption( "-s,--size", m_parameters.m_size, "Size of the computed image." )->delimiter( 'x' );
     addFlag( "-a,--animation", m_parameters.m_animationEnable, "Enable Radium Animation system." );
-
-    m_tasks = std::make_unique<Core::TaskQueue>(
-        std::max( std::thread::hardware_concurrency(), 2u ) - 1u );
 }
 
 CLIViewer::~CLIViewer() {
@@ -103,10 +100,12 @@ int CLIViewer::oneFrame( float timeStep ) {
         m_engine->step();
     }
 
-    m_engine->getTasks( m_tasks.get(), Scalar( timeStep ) );
-    m_tasks->startTasks();
-    m_tasks->waitForTasks();
-    m_tasks->flushTaskQueue();
+    Core::TaskQueue tasks { std::max( std::thread::hardware_concurrency(), 2u ) - 1u };
+
+    m_engine->getTasks( &tasks, Scalar( timeStep ) );
+    tasks.startTasks();
+    tasks.waitForTasks();
+    tasks.flushTaskQueue();
 
     m_engine->runGpuTasks();
 
