@@ -29,7 +29,7 @@ CLIViewer::CLIViewer( std::unique_ptr<OpenGLContext> context ) :
     addFlag( "-a,--animation", m_parameters.m_animationEnable, "Enable Radium Animation system." );
 
     m_tasks = std::make_unique<Core::TaskQueue>(
-        std::min( std::thread::hardware_concurrency(), 2u ) - 1u );
+        std::max( std::thread::hardware_concurrency(), 2u ) - 1u );
 }
 
 CLIViewer::~CLIViewer() {
