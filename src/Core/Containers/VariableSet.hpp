@@ -166,7 +166,9 @@ class RA_CORE_API VariableSet
     /// \pre The element \b name must exists with type \b T. If not verified (assert in debug mode)
     /// std::bad_any_cast exception could be thrown by the underlying management of type erasure
     template <typename T>
-    auto getVariable( const std::string& name ) const -> T&;
+    auto getVariable( const std::string& name ) const -> const T&;
+    template <typename T>
+    auto getVariable( const std::string& name ) -> T&;
 
     /// \brief get the handle on the variable with the given name
     /// \tparam T the type of the variable
@@ -174,7 +176,7 @@ class RA_CORE_API VariableSet
     /// \return an handle which can be de-referenced to obtain a std::pair<const std::string, T>
     /// representing the name and the value of the variable.
     template <typename T>
-    auto getVariableHandle( const std::string& name ) const -> VariableHandle<T>;
+    auto getVariableHandle( const std::string& name ) const -> const VariableHandle<T>;
 
     /// \brief Test the validity of a handle
     /// \tparam H Type of the handle. Expected to be VariableHandle<T> for some variable type T
@@ -673,27 +675,26 @@ auto VariableSet::insertVariable( const std::string& name, const T& value )
 }
 
 template <typename T>
-auto VariableSet::getVariable( const std::string& name ) const -> T& {
-    assert( existsVariable<T>( name ) );
+auto VariableSet::getVariable( const std::string& name ) -> T& {
+    return const_cast<T&>( const_cast<const VariableSet*>( this )->getVariable<T>( name ) );
+}
+
+template <typename T>
+auto VariableSet::getVariable( const std::string& name ) const -> const T& {
 
     if constexpr ( std::is_enum<T>::value ) {
         // need to cast to take into account the way enums are managed
         return reinterpret_cast<const T&>(
             getVariable<typename std::underlying_type<T>::type>( name ) );
     }
+    //    assert( existsVariable<T>( name ) );
 
     return getVariableHandle<T>( name )->second;
 }
 
 template <typename T>
-auto VariableSet::getVariableHandle( const std::string& name ) const -> VariableHandle<T> {
+auto VariableSet::getVariableHandle( const std::string& name ) const -> const VariableHandle<T> {
     assert( existsVariableType<T>() );
-    if constexpr ( std::is_enum<T>::value ) {
-        // need to cast to take into account the way enums are managed
-        return reinterpret_cast<const T&>(
-            getVariableStorage<typename std::underlying_type<T>::type>().find( name ) );
-    }
-
     return getVariableStorage<T>().find( name );
 }
 
