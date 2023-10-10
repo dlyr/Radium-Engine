@@ -294,12 +294,10 @@ class RA_CORE_API VariableSet
     std::string getEnumString( const std::string& name, Enum value );
 
     /**
-     * \brief (overload) Return the string associated to the actual value of a n enumeration variable, from a
-     * value with underlying_type<Enum>.
-     * \tparam EnumBaseType The underlying enum type (\see Ra::Core::Utils::EnumConverter)
-     * \param name The name of the enum variable
-     * \param value The value to convert
-     * \return
+     * \brief (overload) Return the string associated to the actual value of a n enumeration
+     * variable, from a value with underlying_type<Enum>. \tparam EnumBaseType The underlying enum
+     * type (\see Ra::Core::Utils::EnumConverter) \param name The name of the enum variable \param
+     * value The value to convert \return
      */
     template <typename EnumBaseType>
     std::string
@@ -308,11 +306,10 @@ class RA_CORE_API VariableSet
                    typename std::enable_if<!std::is_enum<EnumBaseType> {}, bool>::type = true );
 
     /**
-     * \brief set the value of the given enumeration variable, according to a string representation of an enum.
-     * \note If there is no EnumConverter associated with the variable name, the string is
-     * registered in the RenderParameter set.
-     * \param name Name of the variable
-     * \param value value of the variable
+     * \brief set the value of the given enumeration variable, according to a string representation
+     * of an enum. \note If there is no EnumConverter associated with the variable name, the string
+     * is registered in the RenderParameter set. \param name Name of the variable \param value value
+     * of the variable
      */
     void setEnumVariable( const std::string& name, const std::string& value );
     void setEnumVariable( const std::string& name, const char* value );
