@@ -264,7 +264,7 @@ class RA_CORE_API VariableSet
     /// \}
 
     /**
-     * \brief Associate a converter for enumerated type to the given parameter name
+     * \brief Associate a converter for enumerated type to the given variable name
      * \tparam EnumBaseType The enum base type to manage (\see Ra::Core::Utils::EnumConverter)
      * \param name
      * \param converter
@@ -274,7 +274,7 @@ class RA_CORE_API VariableSet
                            std::shared_ptr<Core::Utils::EnumConverter<EnumBaseType>> converter );
 
     /**
-     * \brief Search for a converter associated with an enumeration parameter
+     * \brief Search for a converter associated with an enumeration variable
      * \tparam EnumBaseType The enum base type to manage (\see Ra::Core::Utils::EnumConverter)
      * \param name the name of the parameter
      * \return an optional containing the converter or false if no converter is found.
@@ -284,7 +284,7 @@ class RA_CORE_API VariableSet
     getEnumConverter( const std::string& name );
 
     /**
-     * \brief Return the string associated to the actual value of a parameter
+     * \brief Return the string associated to the actual value of an enumeration variable
      * \tparam Enum The enum type (\see Ra::Core::Utils::EnumConverter)
      * \param name The name of the enum variable
      * \param value The value to convert
@@ -294,7 +294,7 @@ class RA_CORE_API VariableSet
     std::string getEnumString( const std::string& name, Enum value );
 
     /**
-     * \brief (overload) Return the string associated to the actual value of a parameter, from a
+     * \brief (overload) Return the string associated to the actual value of a n enumeration variable, from a
      * value with underlying_type<Enum>.
      * \tparam EnumBaseType The underlying enum type (\see Ra::Core::Utils::EnumConverter)
      * \param name The name of the enum variable
@@ -308,11 +308,11 @@ class RA_CORE_API VariableSet
                    typename std::enable_if<!std::is_enum<EnumBaseType> {}, bool>::type = true );
 
     /**
-     * \brief set the value of the given parameter, according to a string representation of an enum.
-     * \note If there is no EnumConverter associated with the parameter name, the string is
+     * \brief set the value of the given enumeration variable, according to a string representation of an enum.
+     * \note If there is no EnumConverter associated with the variable name, the string is
      * registered in the RenderParameter set.
-     * \param name Name of the parameter
-     * \param value value of the parameter
+     * \param name Name of the variable
+     * \param value value of the variable
      */
     void setEnumVariable( const std::string& name, const std::string& value );
     void setEnumVariable( const std::string& name, const char* value );
