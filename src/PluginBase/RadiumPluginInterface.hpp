@@ -182,7 +182,7 @@ class RadiumPluginInterface
      * and realease it after usage (viewer->doneCurrent())
      * @see Ra::Gui::Viewer
      */
-    virtual void openGlInitialize( const Context& context ) {}
+    virtual void openGlInitialize( [[maybe_unused]] const Context& context ) {}
 
     /**
      * Tells if the plugin offer OpenGL based services that need to be initialized after the OpenGL
