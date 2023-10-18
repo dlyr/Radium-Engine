@@ -644,8 +644,6 @@ auto VariableSet::setVariable( const std::string& name, const T& value )
     if ( !typeAccess ) { typeAccess = addVariableType<T>(); }
     // insert the parameter.
 
-    std::cerr << "setVariable " << name << " type " << Utils::demangleType( value ) << "\n";
-
     return ( *typeAccess )->insert_or_assign( name, value );
 }
 
@@ -811,7 +809,7 @@ void VariableSet::visitImplHelper( F& visitor ) const {
                    "Static visitors must provide a function with profile "
                    "void( const std::string& name, [const ]T[&] value) for each "
                    "declared visitable type T" );
-    if ( auto variables = existsVariableType<T>(); variables ) {
+    if ( auto variables = existsVariableType<T>() ) {
         for ( auto& element : *( variables.value() ) ) {
             visitor( element.first, element.second );
         }
