@@ -346,15 +346,14 @@ bool CurveEditor::processHover( std::shared_ptr<Rendering::RenderObject> ro ) {
               m_savedPoint + 1 != m_currentPoint )
         m_savedPoint = -1;
 
-    ro->getMaterial()->getParameters().addParameter( "material.color", Color::Red() );
+    ro->getMaterial()->getParameters().setVariable( "material.color", Color::Red() );
     m_selectedRo = ro;
     return true;
 }
 
 void CurveEditor::processUnhovering() {
     auto pointCmp = static_cast<PointComponent*>( m_selectedRo->getComponent() );
-    m_selectedRo->getMaterial()->getParameters().addParameter( "material.color",
-                                                               pointCmp->m_color );
+    m_selectedRo->getMaterial()->getParameters().setVariable( "material.color", pointCmp->m_color );
     m_selectedRo   = nullptr;
     m_currentPoint = -1;
 }
