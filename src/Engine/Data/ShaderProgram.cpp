@@ -357,16 +357,22 @@ void ShaderProgram::setUniform( const char* name, const std::vector<Scalar>& val
 }
 
 void ShaderProgram::setUniform( const char* name, Texture* tex, int texUnit ) const {
-    tex->bind( texUnit );
+    if ( tex ) {
+        tex->bind( texUnit );
 
-    m_program->setUniform( name, texUnit );
+        m_program->setUniform( name, texUnit );
+    }
+    else { m_program->setUniform( name, 0 ); }
 }
 
 void ShaderProgram::setUniformTexture( const char* name, Texture* tex ) const {
     auto itr = textureUnits.find( std::string( name ) );
     if ( itr != textureUnits.end() ) {
-        tex->bind( itr->second.m_texUnit );
-        m_program->setUniform( itr->second.m_location, itr->second.m_texUnit );
+        if ( tex ) {
+            tex->bind( itr->second.m_texUnit );
+            m_program->setUniform( itr->second.m_location, itr->second.m_texUnit );
+        }
+        else { m_program->setUniform( itr->second.m_location, 0 ); }
     }
 }
 
