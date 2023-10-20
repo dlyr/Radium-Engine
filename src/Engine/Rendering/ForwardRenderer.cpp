@@ -7,7 +7,6 @@
 
 #include <Core/Containers/MakeShared.hpp>
 #include <Core/Containers/VariableSetEnumManagement.hpp>
-#include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/TopologicalMesh.hpp>
 #include <Core/RaCore.hpp>
 #include <Core/Utils/Color.hpp>
@@ -523,23 +522,23 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
 
                 if ( hasTriangleLayer && !coreGeom.containsLayer( lineKey ) ) {
                     setupLineMesh<TriangleIndexLayer>( *td, "wireframe triangles" );
-                }
+                    }
 
                 if ( hasPolyLayer && !coreGeom.containsLayer( lineKey2 ) ) {
                     setupLineMesh<PolyIndexLayer>( *td, "wireframe main" );
-                }
+            }
                 else if ( hasQuadLayer && !coreGeom.containsLayer( lineKey2 ) ) {
                     setupLineMesh<QuadIndexLayer>( *td, "wireframe main" );
                 }
 
-                const Data::ShaderProgram* shader =
-                    m_shaderProgramManager->getShaderProgram( "Wireframe" );
+            const Data::ShaderProgram* shader =
+                m_shaderProgramManager->getShaderProgram( "Wireframe" );
 
                 if ( shader && ro->isVisible() ) {
                     GL_CHECK_ERROR;
                     td->updateGL();
                     GL_CHECK_ERROR;
-                    shader->bind();
+                shader->bind();
                     GL_CHECK_ERROR;
 
                     Core::Matrix4 modelMatrix = ro->getTransformAsMatrix();
@@ -559,7 +558,7 @@ void ForwardRenderer::renderInternal( const Data::ViewingParameters& renderData 
                         shader->setUniform( "pixelWidth", 2.8f );
                         GL_CHECK_ERROR;
                         td->render( shader, lineKey2 );
-                    }
+                }
 
                     GL_CHECK_ERROR;
                 }
@@ -791,7 +790,7 @@ bool ForwardRenderer::buildRenderTechnique( RenderObject* ro ) const {
     if ( !material ) {
         LOG( logWARNING ) << "ForwardRenderer : no material found when building RenderTechnique"
                           << " - adding red Lambertian material";
-        auto defMat = new Data::LambertianMaterial( "ForwardRenderer::Default material" );
+        auto defMat     = new Data::LambertianMaterial( "ForwardRenderer::Default material" );
         defMat->setColor( Ra::Core::Utils::Color::Red() );
         material.reset( defMat );
     }
