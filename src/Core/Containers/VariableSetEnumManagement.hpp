@@ -60,8 +60,12 @@ getEnumString( const VariableSet& vs,
  * is registered in the RenderParameter set. \param name Name of the variable \param value value
  * of the variable
  */
-void setEnumVariable( VariableSet& vs, const std::string& name, const std::string& value );
-void setEnumVariable( VariableSet& vs, const std::string& name, const char* value );
+void RA_CORE_API setEnumVariable( VariableSet& vs,
+                                  const std::string& name,
+                                  const std::string& value );
+
+void RA_CORE_API setEnumVariable( VariableSet& vs, const std::string& name, const char* value );
+
 template <typename T>
 void setEnumVariable( VariableSet& vs, const std::string& name, T value ) {
     auto v = static_cast<typename std::underlying_type<T>::type>( value );
