@@ -173,8 +173,8 @@ void NodeAdapterModel::restore( QJsonObject const& p ) {
 namespace NodeDataModelTools {
 
 QWidget* getWidget( Node* node ) {
-    auto controlPanel = new Ra::Gui::ParameterSetEditor( "Editable parameters", nullptr );
-    //  controlPanel->setupFromParameters( node->getParameters(), {} );
+    auto controlPanel = new Ra::Gui::VariableSetEditor( "Editable parameters", nullptr );
+    controlPanel->setupUi( node->getParameters(), {} );
 
     return controlPanel;
 }
