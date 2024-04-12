@@ -16,6 +16,7 @@ foreach(
     CoreExample
     CurveEditor
     CustomCameraManipulator
+    DataflowExamples
     DrawPrimitives
     EntityAnimation
     EnvMap
