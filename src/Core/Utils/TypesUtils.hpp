@@ -25,7 +25,7 @@ template <typename T>
 std::string demangleType( const T& ) noexcept;
 
 /// Return the human readable version of the given type name
-std::string demangleType( const std::type_index& typeIndex ) noexcept;
+RA_CORE_API std::string demangleType( const std::type_index& typeName ) noexcept;
 
 /// \brief Return the human readable version of the type name T with simplified radium type names
 template <typename T>
@@ -39,8 +39,33 @@ auto simplifiedDemangledType( const T& ) noexcept -> std::string;
 /// radium type names
 /// \param typeName The typeIndex whose simplified named is requested
 /// \return The Radium-simplified type name
-// RA_CORE_API auto simplifiedDemangledType( const std::type_index& typeName ) noexcept ->
-// std::string;
+RA_CORE_API auto simplifiedDemangledType( const std::type_index& typeName ) noexcept -> std::string;
+
+// Check if a type is a container with access to its element type and number
+// adapted from https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
+namespace detail {
+
+using std::begin;
+using std::end;
+
+template <typename T>
+auto is_container_impl( int )
+    -> decltype( begin( std::declval<T&>() ) !=
+                     end( std::declval<T&>() ), // begin/end and operator !=
+                 void(),                        // Handle evil operator ,
+                 std::declval<T&>().empty(),
+                 std::declval<T&>().size(),
+                 ++std::declval<decltype( begin( std::declval<T&>() ) )&>(), // operator ++
+                 void( *begin( std::declval<T&>() ) ),                       // operator*
+                 std::true_type {} );
+
+template <typename T>
+std::false_type is_container_impl( ... );
+
+} // namespace detail
+
+template <typename T>
+using is_container = decltype( detail::is_container_impl<T>( 0 ) );
 
 // -----------------------------------------------------------------
 // ---------------------- inline methods ---------------------------
@@ -67,61 +92,6 @@ auto simplifiedDemangledType( const T& ) noexcept -> std::string {
 inline auto simplifiedDemangledType( const std::type_index& typeName ) noexcept -> std::string {
     return TypeInternal::makeTypeReadable( Ra::Core::Utils::demangleType( typeName ) );
 }
-
-// Check if a type is a container with access to its element type and number
-// adapted from https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
-namespace detail {
-
-using std::begin;
-using std::end;
-
-template <typename T>
-auto is_container_impl( int )
-    -> decltype( begin( std::declval<T&>() ) !=
-                     end( std::declval<T&>() ), // begin/end and operator !=
-                 void(),                        // Handle evil operator ,
-                 std::declval<T&>().empty(),
-                 std::declval<T&>().size(),
-                 ++std::declval<decltype( begin( std::declval<T&>() ) )&>(), // operator ++
-                 void( *begin( std::declval<T&>() ) ),                       // operator*
-                 std::true_type {} );
-
-template <typename T>
-std::false_type is_container_impl( ... );
-
-} // namespace detail
-
-template <typename T>
-using is_container = decltype( detail::is_container_impl<T>( 0 ) );
-
-/// Return the human readable version of the given type name
-RA_CORE_API std::string demangleType( const std::type_index& typeName ) noexcept;
-
-// Check if a type is a container with access to its element type and number
-// adapted from https://stackoverflow.com/questions/13830158/check-if-a-variable-type-is-iterable
-namespace detail {
-
-using std::begin;
-using std::end;
-
-template <typename T>
-auto is_container_impl( int )
-    -> decltype( begin( std::declval<T&>() ) !=
-                     end( std::declval<T&>() ), // begin/end and operator !=
-                 void(),                        // Handle evil operator ,
-                 std::declval<T&>().empty(),
-                 std::declval<T&>().size(),
-                 ++std::declval<decltype( begin( std::declval<T&>() ) )&>(), // operator ++
-                 void( *begin( std::declval<T&>() ) ),                       // operator*
-                 std::true_type {} );
-
-template <typename T>
-std::false_type is_container_impl( ... );
-
-} // namespace detail
-
-template <typename T>
-using is_container = decltype( detail::is_container_impl<T>( 0 ) );
 
 // TypeList taken and adapted from
 // https://github.com/AcademySoftwareFoundation/openvdb/blob/master/openvdb/openvdb/TypeList.h
@@ -191,21 +161,21 @@ struct TypeList {
 // name
 inline std::string demangleType( const std::type_index& typeIndex ) noexcept {
     std::string retval = typeIndex.name();
-        removeAllInString( retval, "class " );
-        removeAllInString( retval, "struct " );
+    removeAllInString( retval, "class " );
+    removeAllInString( retval, "struct " );
     removeAllInString( retval, "__cdecl" );
     replaceAllInString( retval, "& __ptr64", "&" );
-        replaceAllInString( retval, ",", ", " );
+    replaceAllInString( retval, ",", ", " );
     replaceAllInString( retval, " >", ">" );
     replaceAllInString( retval, "__int64", "long" );
     replaceAllInString( retval, "const &", "const&" );
-        return retval;
+    return retval;
 }
 #else
 // On Linux/macos, use the C++ ABI demangler
 inline std::string demangleType( const std::type_index& typeIndex ) noexcept {
-        int error = 0;
-        std::string retval;
+    int error = 0;
+    std::string retval;
     char* name = abi::__cxa_demangle( typeIndex.name(), 0, 0, &error );
     if ( error == 0 ) { retval = name; }
     else {
@@ -213,11 +183,11 @@ inline std::string demangleType( const std::type_index& typeIndex ) noexcept {
         // error : -2 --> not a valid mangled name
         // error : other --> __cxa_demangle
         retval = std::string( "Type demangler error : " ) + std::to_string( error );
-        }
-        std::free( name );
-        removeAllInString( retval, "__1::" ); // or "::__1" ?
+    }
+    std::free( name );
+    removeAllInString( retval, "__1::" ); // or "::__1" ?
     replaceAllInString( retval, " >", ">" );
-        return retval;
+    return retval;
 }
 #endif
 template <typename T>
