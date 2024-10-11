@@ -1,12 +1,11 @@
 #pragma once
-#include "Core/Containers/VariableSet.hpp"
-#include "Core/Utils/Index.hpp"
-#include <Dataflow/RaDataflow.hpp>
 
+#include <Core/Containers/VariableSet.hpp>
+#include <Core/Utils/Index.hpp>
 #include <Dataflow/Core/EditableParameter.hpp>
 #include <Dataflow/Core/PortIn.hpp>
 #include <Dataflow/Core/PortOut.hpp>
-#include <Dataflow/Core/TypeDemangler.hpp>
+#include <Dataflow/RaDataflow.hpp>
 
 #include <nlohmann/json.hpp>
 
@@ -52,7 +51,7 @@ class RA_DATAFLOW_API Node
     template <typename Type>
     using PortOutRawPtr = typename PortOutPtr<Type>::element_type*;
 
-    using PortBasePtr    = PortPtr<PortBase>;
+    using PortBasePtr       = PortPtr<PortBase>;
     using PortBaseInPtr     = PortPtr<PortBaseIn>;
     using PortBaseOutPtr    = PortPtr<PortBaseOut>;
     using PortBaseRawPtr    = PortRawPtr<PortBase>;
@@ -121,7 +120,7 @@ class RA_DATAFLOW_API Node
     /// \param name
     /// \return the index to access the port and a raw ptr to the port.
     IndexAndPort<PortBaseRawPtr> getPortByName( const std::string& type,
-                                                      const std::string& name ) const;
+                                                const std::string& name ) const;
     IndexAndPort<PortBaseInRawPtr> getInputByName( const std::string& name ) const;
     IndexAndPort<PortBaseOutRawPtr> getOutputByName( const std::string& name ) const;
 
