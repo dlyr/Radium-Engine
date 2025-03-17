@@ -64,8 +64,7 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
 
     SECTION( "Construction, access and removal to and from a variable set" ) {
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+        REQUIRE( !params.existsVariableType<int>() );
         int i { 0 };
         float x { 1.f };
 
@@ -142,8 +141,7 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
     SECTION( "Visiting and modifying variable set using static visitor" ) {
         REQUIRE( printThemAll::types::Size == 6 );
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+        REQUIRE( !params.existsVariableType<int>() );
         int i { 0 };
 
         float x { 1.f };
@@ -175,8 +173,7 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
 
     SECTION( "Visiting and modifying variable set using dynamic visitor" ) {
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+        REQUIRE( !params.existsVariableType<int>() );
         int i { 1 };
 
         float x { 1.f };
@@ -227,8 +224,7 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
 
     SECTION( "Visiting and modifying variable set using standard range for" ) {
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+        REQUIRE( !params.existsVariableType<int>() );
         int i { 1 };
         float x { 1.f };
 
@@ -277,8 +273,7 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
 
     SECTION( "General visit using a custom visitor" ) {
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify );
+        REQUIRE( !params.existsVariableType<int>() );
         int i { 1 };
         float x { 1.f };
         std::cout << "General visit using a custom visitor" << std::endl;
@@ -317,8 +312,8 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
 
     SECTION( "Merging, copying, moving" ) {
         VariableSet params;
-        auto verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+
+        REQUIRE( !params.existsVariableType<int>() );
         params.insertVariable( "a", 1 );
         params.insertVariable( "b", 2 );
         print_container( "initial params ", params );
@@ -380,8 +375,8 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
         REQUIRE( paramsMoved.size() == sp );
         print_container( "Moved params into paramsMoved", paramsMoved );
         print_container( "params is empty", params );
-        verify = params.existsVariableType<int>();
-        REQUIRE( !verify.has_value() );
+
+        REQUIRE( !params.existsVariableType<int>() );
     }
 
     SECTION( "Iterating on stored types" ) {
@@ -412,20 +407,21 @@ TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
         REQUIRE( b );
     }
 
-    SECTION( "Verifying all" ) {
-        VariableSet pa;
-        auto verifyInt = pa.existsVariableType<int>();
-        REQUIRE( !verifyInt.has_value() );
-        auto verifyString = pa.existsVariableType<std::string>();
-        REQUIRE( !verifyString.has_value() );
+    SECTION( "Clear" ) {
+        VariableSet params;
+        REQUIRE( !params.existsVariableType<int>() );
+        REQUIRE( !params.existsVariableType<std::string>() );
 
-        pa.insertVariable( "a", 1 );
-        pa.insertVariable( "b", 2 );
-        pa.insertVariable( "s1", std::string { "String 1" } );
-        verifyInt = pa.existsVariableType<int>();
-        REQUIRE( verifyInt.has_value() );
-        verifyString = pa.existsVariableType<std::string>();
-        REQUIRE( verifyString.has_value() );
-        print_container( "initial params ", pa );
+        params.insertVariable( "a", 1 );
+        params.insertVariable( "b", 2 );
+        params.insertVariable( "s1", std::string { "String 1" } );
+        REQUIRE( params.existsVariableType<int>() );
+
+        REQUIRE( params.existsVariableType<std::string>() );
+        REQUIRE( params.size() == 3 );
+        params.clear();
+        REQUIRE( params.size() == 0 );
+        REQUIRE( !params.existsVariableType<int>() );
+        REQUIRE( !params.existsVariableType<std::string>() );
     }
 }
