@@ -222,6 +222,8 @@ endif()
 
 if(RADIUM_ENABLE_COVERAGE)
     append_coverage_compiler_flags()
+    # fix error on github's lcov
+    set(CODE_COVERAGE_VERBOSE "YES")
     setup_target_for_coverage_lcov(
         NAME
         coverage

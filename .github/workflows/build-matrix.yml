@@ -124,15 +124,12 @@ jobs:
           cache: true
           cache-key-prefix: install-qt-action-${{ matrix.config.name }}-${{ matrix.qtversion.value }}
           version: ${{ matrix.qtversion.value }}
-      - name: Install dep Linux
+      - name: Install dep Linux (normal, test, coverage)
         if: runner.os == 'Linux'
-        run: sudo apt-get install -y libglfw3-dev
-      - name: Install tests dep
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y libxml2-utils
-      - name: Install dep coverage
-        if: ${{ inputs.coverage == 'true' }}
-        run: sudo apt-get install -y lcov
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglfw3-dev libxml2-utils lcov
+          pip3 install fastcov
       - name: Install dep MacOS
         if: runner.os == 'macOS'
         run: brew install glfw
@@ -249,10 +246,19 @@ jobs:
           namedLogo: ${{ matrix.config.icon }}
           logoColor: white
           color: 1BCC1B
-      - name: Create and upload coverage report
+      - name: Create coverage report
         if: ${{ inputs.coverage == 'true' }}
         run: |
           cd build/Radium-Engine
-          cmake --build . --config Debug --target coverage
+          cmake --build . --config Debug --target coverage_fastcov
           # Uploading report to CodeCov
-          bash <(curl -s https://codecov.io/bash) -f coverage.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"
+          bash <(curl -s https://codecov.io/bash) -f coverage_fastcov.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"
+      - name: Upload coverage report
+        if: ${{ inputs.coverage == 'true' }}
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true # optional (default = false)
+          files: ./build/Radium-Engine/coverage_fastcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true # optional (default = false)
+          disable_search: true
