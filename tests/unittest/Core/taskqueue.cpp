@@ -1,9 +1,12 @@
 #include <Core/Tasks/Task.hpp>
 #include <Core/Tasks/TaskQueue.hpp>
-
+#include <Core/Utils/Index.hpp>
 #include <catch2/catch.hpp>
+#include <iosfwd>
 #include <memory>
 #include <string>
+#include <thread>
+#include <utility>
 
 using namespace Ra::Core;
 using namespace Ra::Core::Utils;

@@ -1,7 +1,10 @@
 #include <Core/Containers/Iterators.hpp>
+#include <algorithm>
 #include <catch2/catch.hpp>
-
+#include <functional>
+#include <iterator>
 #include <random>
+#include <vector>
 
 TEST_CASE( "Core/Containers/Iterators", "[Core][Core/Containers][Iterators]" ) {
     SECTION( "Test reversed Iterators" ) {

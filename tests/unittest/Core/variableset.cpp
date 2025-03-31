@@ -1,10 +1,21 @@
 #include <Core/Containers/DynamicVisitor.hpp>
+#include <Core/Containers/DynamicVisitorBase.hpp>
 #include <Core/Containers/VariableSet.hpp>
-
+#include <Core/CoreMacros.hpp>
+#include <Core/Utils/StdOptional.hpp>
 #include <Core/Utils/TypesUtils.hpp>
-
+#include <algorithm>
+#include <any>
 #include <catch2/catch.hpp>
+#include <cmath>
+#include <functional>
+#include <iostream>
+#include <map>
 #include <string>
+#include <typeindex>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 using namespace Ra::Core;
 

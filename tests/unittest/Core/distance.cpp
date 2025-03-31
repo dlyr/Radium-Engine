@@ -1,7 +1,13 @@
+#include <Core/Containers/AlignedStdVector.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Geometry/DistanceQueries.hpp>
 #include <Core/Math/LinearAlgebra.hpp> // Math::getOrthogonalVectors
 #include <Core/Math/Math.hpp>          //  Math::areApproxEqual
+#include <Core/Types.hpp>
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
+#include <cmath>
+#include <memory>
 
 TEST_CASE( "Core/Geometry/DistanceQueries", "[Core][Core/Geometry][DistanceQueries]" ) {
 

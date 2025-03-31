@@ -1,5 +1,6 @@
 #include <Core/Utils/StringUtils.hpp>
 #include <catch2/catch.hpp>
+#include <string>
 
 TEST_CASE( "Core/Utils/StringUtils", "[Core][Core/Utils][StringUtils]" ) {
     SECTION( "Test getFileExt" ) {

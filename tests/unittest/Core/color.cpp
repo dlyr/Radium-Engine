@@ -1,5 +1,7 @@
 #include <Core/Utils/Color.hpp>
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
+#include <memory>
 
 TEST_CASE( "Core/Utils/Color", "[Core][Core/Utils][Color]" ) {
     using namespace Ra::Core::Utils;

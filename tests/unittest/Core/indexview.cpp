@@ -1,7 +1,24 @@
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
+#include <Core/Geometry/AbstractGeometry.hpp>
 #include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Core/Geometry/StandardAttribNames.hpp>
+#include <Core/Geometry/TriangleMesh.hpp>
+#include <Core/Types.hpp>
+#include <Core/Utils/Attribs.hpp>
+#include <Core/Utils/Index.hpp>
+#include <Core/Utils/ObjectWithSemantic.hpp>
+#include <Core/Utils/StdMapIterators.hpp>
+#include <Eigen/Core>
+#include <algorithm>
 #include <catch2/catch.hpp>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 struct CustomTriangleIndexLayer : public Ra::Core::Geometry::TriangleIndexLayer {
     inline CustomTriangleIndexLayer() :

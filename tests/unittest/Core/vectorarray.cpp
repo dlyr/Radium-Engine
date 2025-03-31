@@ -1,7 +1,10 @@
+#include <Core/Containers/AlignedStdVector.hpp>
 #include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Types.hpp>
-
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
+#include <functional>
 #include <string>
 #include <type_traits>
 

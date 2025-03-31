@@ -2,7 +2,9 @@
 #include <Core/Geometry/Obb.hpp>
 #include <Core/Math/Math.hpp>
 #include <Core/Types.hpp>
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
+#include <memory>
 
 TEST_CASE( "Core/Geometry/Obb", "[Core][Core/Geometry][Obb]" ) {
 

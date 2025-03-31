@@ -1,5 +1,9 @@
+#include <Core/CoreMacros.hpp>
 #include <Core/Geometry/RayCast.hpp>
 #include <Core/Math/Math.hpp>
+#include <Core/Types.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include <catch2/catch.hpp>
 
 TEST_CASE( "Core/Geometry/RayCast", "[Core][Core/Geometry][RayCast]" ) {

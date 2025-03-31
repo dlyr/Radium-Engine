@@ -1,8 +1,7 @@
 #include <Core/Utils/StdMapIterators.hpp>
-
-#include <string>
-
 #include <catch2/catch.hpp>
+#include <map>
+#include <string>
 
 TEST_CASE( "Core/Utils/StdMapIterators", "[Core][Core/Utils][StdMapIterators]" ) {
     std::map<int, std::string> myMap { { 2, "2" }, { 3, "3" } };

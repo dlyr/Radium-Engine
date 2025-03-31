@@ -1,11 +1,25 @@
-#include <catch2/catch.hpp>
-
-#include <iostream>
-
 #include <Dataflow/Core/DataflowGraph.hpp>
+#include <Dataflow/Core/Enumerator.hpp>
+#include <Dataflow/Core/Node.hpp>
+#include <Dataflow/Core/NodeFactory.hpp>
 #include <Dataflow/Core/Nodes/Functionals/CoreDataFunctionals.hpp>
+#include <Dataflow/Core/Nodes/Functionals/FunctionNode.hpp>
+#include <Dataflow/Core/Nodes/Functionals/ReduceNode.hpp>
+#include <Dataflow/Core/Nodes/Functionals/TransformNode.hpp>
 #include <Dataflow/Core/Nodes/Sinks/CoreDataSinks.hpp>
 #include <Dataflow/Core/Nodes/Sources/CoreDataSources.hpp>
+#include <Dataflow/Core/Nodes/Sources/FunctionSource.hpp>
+#include <Dataflow/Core/Nodes/Sources/SingleDataSourceNode.hpp>
+#include <Dataflow/Core/PortIn.hpp>
+#include <Dataflow/Core/PortOut.hpp>
+#include <algorithm>
+#include <catch2/catch.hpp>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <string>
+#include <vector>
 
 using namespace Ra::Dataflow::Core;
 

@@ -1,6 +1,11 @@
+#include <Core/Utils/Index.hpp>
 #include <Core/Utils/IndexMap.hpp>
 #include <catch2/catch.hpp>
+#include <deque>
+#include <limits>
+#include <memory>
 #include <unittestUtils.hpp>
+#include <utility>
 
 using Ra::Core::Utils::Index;
 using Ra::Core::Utils::IndexMap;

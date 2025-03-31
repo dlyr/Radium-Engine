@@ -1,8 +1,15 @@
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Types.hpp>
 #include <Core/Utils/Attribs.hpp>
-
+#include <Core/Utils/ContainerIntrospectionInterface.hpp>
+#include <Core/Utils/Index.hpp>
+#include <Eigen/Core>
+#include <algorithm>
 #include <catch2/catch.hpp>
+#include <memory>
 #include <string>
+#include <utility>
 
 using namespace Ra::Core;
 using namespace Ra::Core::Utils;

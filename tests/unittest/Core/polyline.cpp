@@ -1,5 +1,13 @@
+#include <Core/Containers/AlignedStdVector.hpp>
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Geometry/PolyLine.hpp>
+#include <Core/Math/Math.hpp>
+#include <Core/Types.hpp>
+#include <Eigen/Core>
 #include <catch2/catch.hpp>
+#include <memory>
+#include <vector>
 
 TEST_CASE( "Core/Geometry/Polyline", "[Core][Core/Geometry][Polyline]" ) {
     using namespace Ra::Core;
