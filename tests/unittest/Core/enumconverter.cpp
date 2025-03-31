@@ -1,8 +1,9 @@
-#include <catch2/catch.hpp>
-
 #include <Core/Utils/EnumConverter.hpp>
-
-#include <random>
+#include <catch2/catch.hpp>
+#include <string>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 TEST_CASE( "Core/Utils/EnumConverter", "[Core][Core/Utils][EnumConverter]" ) {
     SECTION( "Test enum converter" ) {

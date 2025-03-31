@@ -1,10 +1,16 @@
 #include <Core/Resources/Resources.hpp>
-#include <Core/Utils/StdFilesystem.hpp>
+#include <Core/Utils/Index.hpp>
+#include <Core/Utils/Log.hpp>
 #include <Gui/Utils/KeyMappingManager.hpp>
-
+#include <QCoreApplication>
+#include <QFlags>
+#include <QSettings>
+#include <Qt>
 #include <catch2/catch.hpp>
-
-#include <QtGlobal>
+#include <filesystem>
+#include <iostream>
+#include <optional>
+#include <string>
 
 using namespace Ra;
 using namespace Ra::Gui;

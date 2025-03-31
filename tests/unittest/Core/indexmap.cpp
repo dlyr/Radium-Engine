@@ -1,9 +1,11 @@
+#include <Core/CoreMacros.hpp>
 #include <Core/Utils/Index.hpp>
 #include <Core/Utils/IndexMap.hpp>
 #include <catch2/catch.hpp>
 #include <deque>
 #include <limits>
-#include <memory>
+#include <stddef.h>
+#include <string>
 #include <unittestUtils.hpp>
 #include <utility>
 

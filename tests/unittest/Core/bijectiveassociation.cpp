@@ -1,7 +1,5 @@
 #include <Core/Utils/BijectiveAssociation.hpp>
-#include <Core/Utils/StdOptional.hpp>
 #include <catch2/catch.hpp>
-#include <initializer_list>
 #include <map>
 #include <stdexcept>
 #include <string>

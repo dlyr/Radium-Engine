@@ -4,6 +4,7 @@
 #include <functional>
 #include <iterator>
 #include <random>
+#include <string>
 #include <vector>
 
 TEST_CASE( "Core/Containers/Iterators", "[Core][Core/Containers][Iterators]" ) {

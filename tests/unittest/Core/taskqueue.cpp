@@ -2,8 +2,9 @@
 #include <Core/Tasks/TaskQueue.hpp>
 #include <Core/Utils/Index.hpp>
 #include <catch2/catch.hpp>
-#include <iosfwd>
+#include <chrono>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <thread>
 #include <utility>

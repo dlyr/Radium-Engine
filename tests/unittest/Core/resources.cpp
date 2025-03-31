@@ -1,7 +1,10 @@
 #include <Core/Resources/Resources.hpp>
 #include <catch2/catch.hpp>
+#include <filesystem>
+#include <iostream>
+#include <optional>
+#include <string>
 
-#include <Core/Utils/StdFilesystem.hpp>
 namespace fs = ::std::filesystem;
 
 int dummy() {

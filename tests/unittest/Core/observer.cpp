@@ -1,7 +1,6 @@
 #include <Core/Utils/Observable.hpp>
 #include <catch2/catch.hpp>
 #include <functional>
-#include <memory>
 #include <string>
 #include <typeinfo>
 #include <utility>
