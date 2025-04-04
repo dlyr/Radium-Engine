@@ -212,6 +212,11 @@ if(RADIUM_ENABLE_TESTING)
     # prepare integration tests
     if(NOT RADIUM_ENABLE_EXAMPLES)
         add_subdirectory(examples/CoreExample EXCLUDE_FROM_ALL)
+
+        foreach(INTEGRATION_TEST FunctionalsGraph GraphAsNode GraphSerialization HelloGraph)
+            add_subdirectory(examples/DataflowExamples/${INTEGRATION_TEST} EXCLUDE_FROM_ALL)
+        endforeach()
+
         list(FIND RADIUM_COMPONENTS "Headless" res)
         if(res GREATER "-1")
             add_subdirectory(examples/HeadlessExample EXCLUDE_FROM_ALL)
