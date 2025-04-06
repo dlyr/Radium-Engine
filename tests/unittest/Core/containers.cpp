@@ -1,13 +1,13 @@
 #include <Core/Containers/Iterators.hpp>
 #include <algorithm>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <functional>
 #include <iterator>
 #include <random>
 #include <string>
 #include <vector>
 
-TEST_CASE( "Core/Containers/Iterators", "[Core][Core/Containers][Iterators]" ) {
+TEST_CASE( "Core/Containers/Iterators", "[unittests][Core][Core/Containers][Iterators]" ) {
     SECTION( "Test reversed Iterators" ) {
         using namespace Ra::Core;
 

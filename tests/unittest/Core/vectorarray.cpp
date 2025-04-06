@@ -3,14 +3,14 @@
 #include <Core/CoreMacros.hpp>
 #include <Core/Types.hpp>
 #include <Eigen/Core>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <functional>
 #include <string>
 #include <type_traits>
 
 using namespace Ra::Core;
 
-TEST_CASE( "Core/Container/VectorArray", "[Core][Container][VectorArray]" ) {
+TEST_CASE( "Core/Container/VectorArray", "[unittests][Core][Container][VectorArray]" ) {
     enum class MyEnum : int { A, B, C };
     // type check
     REQUIRE( VectorArrayTypeHelper<float>::NumberOfComponents == 1 );

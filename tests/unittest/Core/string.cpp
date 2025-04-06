@@ -1,8 +1,8 @@
 #include <Core/Utils/StringUtils.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <string>
 
-TEST_CASE( "Core/Utils/StringUtils", "[Core][Core/Utils][StringUtils]" ) {
+TEST_CASE( "Core/Utils/StringUtils", "[unittests][Core][Core/Utils][StringUtils]" ) {
     SECTION( "Test getFileExt" ) {
         using Ra::Core::Utils::getFileExt;
         // File extension

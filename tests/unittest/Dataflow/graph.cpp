@@ -13,7 +13,7 @@
 #include <Dataflow/Core/PortIn.hpp>
 #include <Dataflow/Core/PortOut.hpp>
 #include <algorithm>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -79,7 +79,7 @@ void inspectGraph( const DataflowGraph& g ) {
 }
 using PortIndex = Ra::Dataflow::Core::Node::PortIndex;
 
-TEST_CASE( "Dataflow/Core/Graph", "[Dataflow][Core][Graph]" ) {
+TEST_CASE( "Dataflow/Core/Graph", "[unittests][Dataflow][Core][Graph]" ) {
     DataflowGraph g( "Test Graph" );
     SECTION( "not a json" ) {
         auto result = g.loadFromJson( "data/Dataflow/NotAJsonFile.json" );

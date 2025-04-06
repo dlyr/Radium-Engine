@@ -3,10 +3,10 @@
 #include <Core/Math/Math.hpp>
 #include <Core/Types.hpp>
 #include <Eigen/Core>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <memory>
 
-TEST_CASE( "Core/Geometry/Obb", "[Core][Core/Geometry][Obb]" ) {
+TEST_CASE( "Core/Geometry/Obb", "[unittests][Core][Core/Geometry][Obb]" ) {
 
     using namespace Ra::Core;
     SECTION( "Simple tests" ) {

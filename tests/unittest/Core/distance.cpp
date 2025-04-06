@@ -5,11 +5,11 @@
 #include <Core/Math/Math.hpp>          //  Math::areApproxEqual
 #include <Core/Types.hpp>
 #include <Eigen/Core>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <cmath>
 #include <memory>
 
-TEST_CASE( "Core/Geometry/DistanceQueries", "[Core][Core/Geometry][DistanceQueries]" ) {
+TEST_CASE( "Core/Geometry/DistanceQueries", "[unittests][Core][Core/Geometry][DistanceQueries]" ) {
 
     using namespace Ra::Core;
     SECTION( "Simple tests" ) {

@@ -2,7 +2,7 @@
 #include <Core/Math/Math.hpp>
 #include <Engine/Scene/CameraComponent.hpp>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace Ra::Core;
 using namespace Ra::Core::Utils;

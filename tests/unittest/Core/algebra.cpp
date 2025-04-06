@@ -5,11 +5,11 @@
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 #include <algorithm> // clamp
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <cmath>
 #include <memory>
 
-TEST_CASE( "Core/Math/Algebra", "[Core][Core/Math][Algebra]" ) {
+TEST_CASE( "Core/Math/Algebra", "[unittests][Core][Core/Math][Algebra]" ) {
     using namespace Ra::Core;
     SECTION( "Test custom vector functions" ) {
 

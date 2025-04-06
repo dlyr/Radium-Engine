@@ -6,7 +6,7 @@
 #include <Core/Utils/Index.hpp>
 #include <Eigen/Core>
 #include <algorithm>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <memory>
 #include <string>
 #include <utility>
@@ -14,7 +14,7 @@
 using namespace Ra::Core;
 using namespace Ra::Core::Utils;
 
-TEST_CASE( "Core/Utils/Attibs", "[Core][Utils][Attribs]" ) {
+TEST_CASE( "Core/Utils/Attibs", "[unittests][Core][Utils][Attribs]" ) {
 
     enum Enum1 { A, B, C };
     enum class Enum2 : char { A = 'a', B, C };
@@ -126,7 +126,7 @@ TEST_CASE( "Core/Utils/Attibs", "[Core][Utils][Attribs]" ) {
     }
 }
 
-TEST_CASE( "Core/Utils/AttibManager", "[Core][Utils][Attribs][AttribManager]" ) {
+TEST_CASE( "Core/Utils/AttibManager", "[unittests][Core][Utils][Attribs][AttribManager]" ) {
     SECTION( "init and clear" ) {
         AttribManager m1;
         auto m1attr1 = m1.addAttrib<float>( "float" );

@@ -6,7 +6,7 @@
 #include <QFlags>
 #include <QSettings>
 #include <Qt>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -71,7 +71,7 @@ void Dummy::configureKeyMapping_impl() {
 #undef KMA_VALUE
 }
 
-TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" ) {
+TEST_CASE( "Gui/Utils/KeyMappingManager", "[unittests][Gui][Gui/Utils][KeyMappingManager]" ) {
     QCoreApplication::setOrganizationName( "RadiumUnitTests" );
     QCoreApplication::setApplicationName( "KeyMappingManager" );
     QSettings settings;

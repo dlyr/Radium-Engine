@@ -12,7 +12,7 @@
 #include <Core/Utils/StdMapIterators.hpp>
 #include <Eigen/Core>
 #include <algorithm>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <map>
 #include <memory>
 #include <set>
@@ -26,7 +26,7 @@ struct CustomTriangleIndexLayer : public Ra::Core::Geometry::TriangleIndexLayer 
     static constexpr const char* staticSemanticName = "CustomSemantic";
 };
 
-TEST_CASE( "Core/Geometry/IndexedGeometry", "[Core][Core/Geometry][IndexedGeometry]" ) {
+TEST_CASE( "Core/Geometry/IndexedGeometry", "[unittests][Core][Core/Geometry][IndexedGeometry]" ) {
     using Ra::Core::Vector3;
     using namespace Ra::Core::Geometry;
     using Ra::Core::Utils::ObjectWithSemantic;
@@ -110,7 +110,8 @@ TEST_CASE( "Core/Geometry/IndexedGeometry", "[Core][Core/Geometry][IndexedGeomet
     REQUIRE( keys.size() == 0 );
 }
 
-TEST_CASE( "Core/Geometry/IndexedGeometry/Attributes", "[Core][Core/Geometry][IndexedGeometry]" ) {
+TEST_CASE( "Core/Geometry/IndexedGeometry/Attributes",
+           "[unittests][Core][Core/Geometry][IndexedGeometry]" ) {
     using Ra::Core::Vector3;
     using namespace Ra::Core::Geometry;
     using Ra::Core::Utils::ObjectWithSemantic;

@@ -4,7 +4,7 @@
 #include <Core/Utils/TypesUtils.hpp>
 #include <algorithm>
 #include <any>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <cmath>
 #include <functional>
 #include <iostream>
@@ -65,7 +65,7 @@ auto print_container = []( const std::string& name, VariableSet& ps ) {
     std::cout << std::endl;
 };
 
-TEST_CASE( "Core/Container/VariableSet", "[Core][Container][VariableSet]" ) {
+TEST_CASE( "Core/Container/VariableSet", "[unittests][Core][Container][VariableSet]" ) {
     REQUIRE( PrintThemAll::types::Size == 5 );
 
     VariableSet params;
@@ -357,7 +357,7 @@ TEST_CASE( "Core/Container/VariableSe/Iterating on stored types",
     REQUIRE( b );
 }
 
-TEST_CASE( "Core/Container/VariableSet/Clear", "[Core][Container][VariableSet]" ) {
+TEST_CASE( "Core/Container/VariableSet/Clear", "[unittests][Core][Container][VariableSet]" ) {
     VariableSet params;
     REQUIRE( !params.existsVariableType<int>() );
     REQUIRE( !params.existsVariableType<std::string>() );

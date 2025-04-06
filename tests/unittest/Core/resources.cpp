@@ -1,5 +1,5 @@
 #include <Core/Resources/Resources.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
 #include <optional>
@@ -10,7 +10,7 @@ namespace fs = ::std::filesystem;
 int dummy() {
     return 42;
 }
-TEST_CASE( "Core/Resources", "[Core]" ) {
+TEST_CASE( "Core/Resources", "[unittests][Core]" ) {
     using namespace Ra::Core::Resources;
     auto radiumResourcesPath = getRadiumResourcesPath();
     auto radiumPluginPath    = getRadiumPluginsPath();

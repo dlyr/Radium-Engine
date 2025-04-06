@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <iostream>
 
@@ -16,7 +16,7 @@
 using namespace Ra::Dataflow::Core;
 using namespace Ra::Core;
 
-TEST_CASE( "Dataflow/Core/GraphAsNode/Delta", "[Dataflow][Core][Graph]" ) {
+TEST_CASE( "Dataflow/Core/GraphAsNode/Delta", "[unittests][Dataflow][Core][Graph]" ) {
     auto port_fatcory = PortFactory::getInstance();
     port_fatcory->add_port_type<Scalar>();
 
@@ -102,7 +102,7 @@ using FunctionNode = Functionals::FunctionNode<Scalar>;
 using Source       = Sources::SingleDataSourceNode<Scalar>;
 using Sink         = Sinks::SinkNode<Scalar>;
 
-TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[Dataflow][Core][Graph]" ) {
+TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Graph]" ) {
 
     auto port_fatcory = PortFactory::createInstance();
     port_fatcory->add_port_type<Scalar>();

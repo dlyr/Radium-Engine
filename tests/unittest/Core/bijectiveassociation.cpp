@@ -1,5 +1,5 @@
 #include <Core/Utils/BijectiveAssociation.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <map>
 #include <stdexcept>
 #include <string>
@@ -7,7 +7,8 @@
 
 using namespace Ra::Core::Utils;
 
-TEST_CASE( "Core/Utils/BijectiveAssociation", "[Core][Core/Utils][BijectiveAssociation]" ) {
+TEST_CASE( "Core/Utils/BijectiveAssociation",
+           "[unittests][Core][Core/Utils][BijectiveAssociation]" ) {
 
     SECTION( "Bijection between different types" ) {
         BijectiveAssociation<std::string, int> myTranslator { { "One", 1 }, { "Two", 2 } };

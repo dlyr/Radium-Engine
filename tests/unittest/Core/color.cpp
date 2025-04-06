@@ -1,9 +1,9 @@
 #include <Core/Utils/Color.hpp>
 #include <Eigen/Core>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <memory>
 
-TEST_CASE( "Core/Utils/Color", "[Core][Core/Utils][Color]" ) {
+TEST_CASE( "Core/Utils/Color", "[unittests][Core][Core/Utils][Color]" ) {
     using namespace Ra::Core::Utils;
 
     Scalar alpha = 0.5;

@@ -167,7 +167,6 @@ endif()
 if(RADIUM_ENABLE_COVERAGE)
     set(RADIUM_ENABLE_TESTING "ON")
     include(CodeCoverage)
-    append_coverage_compiler_flags()
 endif(RADIUM_ENABLE_COVERAGE)
 
 # ------------------------------------------------------------------------------
@@ -226,7 +225,16 @@ if(RADIUM_ENABLE_TESTING)
 endif()
 
 if(RADIUM_ENABLE_COVERAGE)
-    append_coverage_compiler_flags()
+    # prevent flags on catch2 and examples, add to specific targets
+    append_coverage_compiler_flags_to_target(unittests)
+    append_coverage_compiler_flags_to_target(Core)
+    append_coverage_compiler_flags_to_target(DataflowCore)
+    append_coverage_compiler_flags_to_target(DataflowQtGui)
+    append_coverage_compiler_flags_to_target(Engine)
+    append_coverage_compiler_flags_to_target(Gui)
+    append_coverage_compiler_flags_to_target(IO)
+    append_coverage_compiler_flags_to_target(Headless)
+
     # fix error on github's lcov
     set(CODE_COVERAGE_VERBOSE "YES")
     setup_target_for_coverage_lcov(
@@ -234,6 +242,8 @@ if(RADIUM_ENABLE_COVERAGE)
         coverage
         EXECUTABLE
         ${CMAKE_CTEST_COMMAND}
+        -L
+        unittests
         --output-on-failure
         -C
         ${CMAKE_BUILD_TYPE}
@@ -246,19 +256,10 @@ if(RADIUM_ENABLE_COVERAGE)
         unittests
         integration
         EXCLUDE
-        "/*external*/"
-        "/*/glbinding/*"
-        "/*/globjects/*"
-        "/*/OpenMesh/*"
-        "/*/assimp/*"
-        "/*/eigen3/*"
-        "/*/nlohmann/*"
-        "/*/stb/*"
-        "/usr/*"
-        "${CMAKE_SOURCE_DIR}/examples*"
-        "${CMAKE_SOURCE_DIR}/*/Catch2/*"
+        "${CMAKE_BINARY_DIR}/_deps/*"
         "${CMAKE_BINARY_DIR}/*_autogen/*"
-        "${CMAKE_BINARY_DIR}/*mocs*"
+        "/*external*/"
+        "/usr/*"
     )
 
     # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
@@ -269,6 +270,8 @@ if(RADIUM_ENABLE_COVERAGE)
             coverage_fastcov
             EXECUTABLE
             ${CMAKE_CTEST_COMMAND}
+            -L
+            unittests
             --output-on-failure
             -C
             ${CMAKE_BUILD_TYPE}
@@ -281,21 +284,10 @@ if(RADIUM_ENABLE_COVERAGE)
             BASE_DIRECTORY
             "/"
             EXCLUDE
-            "/usr/"
-            "examples"
-            "glbinding"
-            "globjects"
-            "OpenMesh"
-            "assimp"
-            "eigen3"
-            "nlohmann"
-            "stb"
+            "_deps"
+            "_autogen"
             "external"
-            "install"
-            "/Catch2/"
-            "_autogen/"
-            "build"
-            "mocs"
+            "/usr"
         )
     endif()
 endif()

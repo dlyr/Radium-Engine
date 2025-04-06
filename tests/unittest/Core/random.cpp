@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <unittestUtils.hpp>
 
 #include <iomanip>
@@ -19,7 +19,7 @@ using namespace Ra::Core::Random;
         REQUIRE( isApprox( v[1], seq_verif[i].second ) ); \
     }
 
-TEST_CASE( "Core/Random/RandomPointSet", "[Core][Core/Random][PointSet]" ) {
+TEST_CASE( "Core/Random/RandomPointSet", "[unittests][Core][Core/Random][PointSet]" ) {
     SECTION( "Fibonacci sequence" ) {
         std::array<Scalar, 5> seq_verif { 0_ra,
                                           0.61803398874989479150343640867504_ra,

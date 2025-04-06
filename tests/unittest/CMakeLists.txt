@@ -41,7 +41,6 @@ set(test_src
     Engine/renderparameters.cpp
     Engine/signalmanager.cpp
     Gui/keymapping.cpp
-    unittest.cpp
     unittestUtils.hpp
 )
 
@@ -61,7 +60,7 @@ target_include_directories(unittests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_options(unittests PUBLIC ${RA_DEFAULT_COMPILE_OPTIONS})
 target_compile_definitions(unittests PRIVATE UNIT_TESTS) # add -DUNIT_TESTS define
 
-target_link_libraries(unittests PRIVATE Catch2::Catch2 Core Engine Gui Dataflow)
+target_link_libraries(unittests PRIVATE Catch2::Catch2WithMain Core Engine Gui Dataflow)
 add_dependencies(unittests Catch2 Core Engine Gui)
 
 find_package(Filesystem COMPONENTS Final Experimental REQUIRED)
@@ -82,10 +81,10 @@ if(RADIUM_ENABLE_GL_TESTING)
     add_dependencies(unittests Headless)
 endif()
 
-include(../external/Catch2/src/Catch2_download/contrib/Catch.cmake)
+include(Catch)
 
 # adds catch tests to ctest
-catch_discover_tests(unittests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+catch_discover_tests(unittests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} ADD_TAGS_AS_LABELS)
 
 # convenience target for running only the unit tests
 add_custom_target(

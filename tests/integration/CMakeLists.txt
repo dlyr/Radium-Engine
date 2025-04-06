@@ -37,6 +37,8 @@ add_test(
         "$<TARGET_FILE:integration_${INTEGRATION_TEST}> 2>&1 | cut -f4- -d: | grep -v \"Loading Time\" > ${CMAKE_CURRENT_BINARY_DIR}/output.txt"
 )
 
+set_property(TEST integration_${INTEGRATION_TEST}_save_output PROPERTY LABELS "integration")
+
 add_test(
     NAME integration_${INTEGRATION_TEST}_compare_to_ref
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${INTEGRATION_TEST}/
@@ -93,6 +95,8 @@ if(LIBXML2_XMLLINT_EXECUTABLE AND SED_EXECUTABLE)
  \"${SED_EXECUTABLE}\" -i.orig '/<!--/,/-->/d' ${CMAKE_CURRENT_BINARY_DIR}/keymapping-valid-out-lint.xml; "
     )
 
+    set_property(TEST integration_${INTEGRATION_TEST}_save_output PROPERTY LABELS "integration")
+
     add_test(
         NAME integration_${INTEGRATION_TEST}_compare_to_ref
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${INTEGRATION_TEST}/
@@ -122,6 +126,7 @@ foreach(INTEGRATION_TEST CoreExample FunctionalsGraph GraphAsNode GraphSerializa
     add_test(NAME integration_${INTEGRATION_TEST} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
              COMMAND "$<TARGET_FILE:${INTEGRATION_TEST}>"
     )
+    set_property(TEST integration_${INTEGRATION_TEST} PROPERTY LABELS "integration")
 
     add_dependencies(integration ${INTEGRATION_TEST})
 endforeach()

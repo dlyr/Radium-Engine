@@ -1,5 +1,5 @@
 #include <Core/Utils/Observable.hpp>
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <functional>
 #include <string>
 #include <typeinfo>
@@ -83,7 +83,7 @@ class A
 
 int A::m_b = 0;
 
-TEST_CASE( "Core/Utils/Observable", "[Core][Core/Utils][Observable]" ) {
+TEST_CASE( "Core/Utils/Observable", "[unittests][Core][Core/Utils][Observable]" ) {
     ObservableVoid observableVoid;
     ObservableInt observableInt;
 

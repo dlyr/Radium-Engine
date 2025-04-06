@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <string>
 #include <vector>
@@ -12,7 +12,8 @@
 #include <Dataflow/Core/Nodes/Sinks/CoreDataSinks.hpp>
 #include <Dataflow/Core/Nodes/Sources/CoreDataSources.hpp>
 
-TEST_CASE( "Dataflow/Core/DataflowGraph/Serialization", "[Dataflow][Core][DataflowGraph]" ) {
+TEST_CASE( "Dataflow/Core/DataflowGraph/Serialization",
+           "[unittests][Dataflow][Core][DataflowGraph]" ) {
     SECTION( "Execution and modification of a graph" ) {
         using namespace Ra::Dataflow::Core;
         using DataType = Scalar;
