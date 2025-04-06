@@ -183,7 +183,8 @@ find_qt_package(COMPONENTS Core Widgets OpenGL Xml REQUIRED)
 
 macro(generate_includes name)
     include(${CMAKE_SOURCE_DIR}/src/${name}/filelist.cmake)
-    string(TOLOWER ${name} lowername)
+    string(REPLACE "/" "_" name_under "${name}")
+    string(TOLOWER ${name_under} lowername)
     set(filelist "${lowername}_headers")
     set(tmp ${${filelist}})
     list(TRANSFORM tmp PREPEND "#include <${name}/")
@@ -192,6 +193,8 @@ macro(generate_includes name)
 endmacro()
 
 generate_includes(Core)
+generate_includes(Dataflow/Core)
+generate_includes(Dataflow/QtGui)
 generate_includes(Engine)
 generate_includes(Gui)
 generate_includes(IO)
@@ -205,7 +208,8 @@ add_executable(integration_${INTEGRATION_TEST} "${CMAKE_CURRENT_BINARY_DIR}/incl
 target_compile_options(integration_${INTEGRATION_TEST} PUBLIC ${RA_DEFAULT_COMPILE_OPTIONS})
 
 target_link_libraries(
-    integration_${INTEGRATION_TEST} PUBLIC Core Gui Engine PRIVATE std::filesystem ${Qt_LIBRARIES}
+    integration_${INTEGRATION_TEST} PUBLIC Core Dataflow Gui Engine PRIVATE std::filesystem
+                                                                            ${Qt_LIBRARIES}
 )
 
 target_compile_definitions(
