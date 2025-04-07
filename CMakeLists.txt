@@ -236,60 +236,59 @@ if(RADIUM_ENABLE_COVERAGE)
     append_coverage_compiler_flags_to_target(Headless)
 
     # fix error on github's lcov
-    set(CODE_COVERAGE_VERBOSE "YES")
-    setup_target_for_coverage_lcov(
-        NAME
-        coverage
-        EXECUTABLE
-        ${CMAKE_CTEST_COMMAND}
-        -L
-        unittests
-        --output-on-failure
-        -C
-        ${CMAKE_BUILD_TYPE}
-        -j
-        $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-        BASE_DIRECTORY
-        "/"
-        DEPENDENCIES
-        RadiumLibs
-        unittests
-        integration
-        EXCLUDE
-        "${CMAKE_BINARY_DIR}/_deps/*"
-        "${CMAKE_BINARY_DIR}/*_autogen/*"
-        "/*external*/"
-        "/usr/*"
-    )
-
-    # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
-    # https://github.com/RPGillespie6/fastcov/issues/36
-    if(UNIX AND NOT APPLE AND FASTCOV_PATH)
-        setup_target_for_coverage_fastcov(
+    foreach(LABEL unittests integration)
+        setup_target_for_coverage_lcov(
             NAME
-            coverage_fastcov
+            lcov_${LABEL}
             EXECUTABLE
             ${CMAKE_CTEST_COMMAND}
             -L
-            unittests
+            ${LABEL}
             --output-on-failure
             -C
             ${CMAKE_BUILD_TYPE}
             -j
             $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-            DEPENDENCIES
-            RadiumLibs
-            unittests
-            integration
             BASE_DIRECTORY
             "/"
+            DEPENDENCIES
+            RadiumLibs
+            ${LABEL}
             EXCLUDE
-            "_deps"
-            "_autogen"
-            "external"
-            "/usr"
+            "${CMAKE_BINARY_DIR}/_deps/*"
+            "${CMAKE_BINARY_DIR}/*_autogen/*"
+            "/*external*/"
+            "/usr/*"
         )
-    endif()
+
+        # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
+        # https://github.com/RPGillespie6/fastcov/issues/36
+        if(UNIX AND NOT APPLE AND FASTCOV_PATH)
+            setup_target_for_coverage_fastcov(
+                NAME
+                fastcov_${LABEL}
+                EXECUTABLE
+                ${CMAKE_CTEST_COMMAND}
+                -L
+                ${LABEL}
+                --output-on-failure
+                -C
+                ${CMAKE_BUILD_TYPE}
+                -j
+                $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
+                DEPENDENCIES
+                RadiumLibs
+                ${LABEL}
+                BASE_DIRECTORY
+                "/"
+                EXCLUDE
+                "_deps"
+                "_autogen"
+                "external"
+                "/usr"
+            )
+        endif()
+    endforeach()
 endif()
 
 # Packaging stuff (deb, rpm, windows installer) add_subdirectory(packaging)

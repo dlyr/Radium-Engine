@@ -252,15 +252,27 @@ jobs:
         if: ${{ inputs.coverage == 'true' }}
         run: |
           cd build/Radium-Engine
-          cmake --build . --config Debug --target coverage_fastcov
+          cmake --build . --config Debug --target fastcov_integration
+          cmake --build . --config Debug --target fastcov_unittests
           # Uploading report to CodeCov
-          bash <(curl -s https://codecov.io/bash) -f coverage_fastcov.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"
+          #          bash <(curl -s https://codecov.io/bash) -f coverage_fastcov.info -R ../../src/Radium-Engine || echo "Codecov did not collect coverage reports"
       - name: Upload coverage report
         if: ${{ inputs.coverage == 'true' }}
         uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true # optional (default = false)
-          files: ./build/Radium-Engine/coverage_fastcov.info
+          files: ./build/Radium-Engine/fastcov_unittests.info
+          flags: unittests
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true # optional (default = false)
+          disable_search: true
+      - name: Upload coverage report
+        if: ${{ inputs.coverage == 'true' }}
+        uses: codecov/codecov-action@v5
+        with:
+          fail_ci_if_error: true # optional (default = false)
+          files: ./build/Radium-Engine/fastcov_integration.info
+          flags: integration
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true # optional (default = false)
           disable_search: true
