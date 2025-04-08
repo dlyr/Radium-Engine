@@ -1,5 +1,4 @@
 #include <Dataflow/Core/DataflowGraph.hpp>
-#include <Dataflow/Core/Enumerator.hpp>
 #include <Dataflow/Core/Node.hpp>
 #include <Dataflow/Core/NodeFactory.hpp>
 #include <Dataflow/Core/Nodes/Functionals/CoreDataFunctionals.hpp>
