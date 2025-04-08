@@ -50,15 +50,15 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Delta", "[unittests][Dataflow][Core][Graph
 
     REQUIRE( gAsNode->input_node() );
     REQUIRE( gAsNode->output_node() );
-    REQUIRE( gAsNode->input_node()->getOutputs().size() == 3 );
-    REQUIRE( gAsNode->output_node()->getInputs().size() == 1 );
-    REQUIRE( gAsNode->getInputs().size() == 0 );
-    REQUIRE( gAsNode->getOutputs().size() == 0 );
+    REQUIRE( gAsNode->input_node()->outputs().size() == 3 );
+    REQUIRE( gAsNode->output_node()->inputs().size() == 1 );
+    REQUIRE( gAsNode->inputs().size() == 0 );
+    REQUIRE( gAsNode->outputs().size() == 0 );
 
-    gAsNode->input_node()->getInputByIndex( inputA )->setName( "a" );
-    gAsNode->input_node()->getInputByIndex( inputB )->setName( "b" );
-    gAsNode->input_node()->getInputByIndex( inputC )->setName( "c" );
-    gAsNode->output_node()->getOutputByIndex( output )->setName( "delta" );
+    gAsNode->input_node()->input_by_index( inputA )->setName( "a" );
+    gAsNode->input_node()->input_by_index( inputB )->setName( "b" );
+    gAsNode->input_node()->input_by_index( inputC )->setName( "c" );
+    gAsNode->output_node()->output_by_index( output )->setName( "delta" );
 
     REQUIRE( gAsNode->addLink( forwardB->port_out_result(), b2->port_in_data() ) );
     REQUIRE( gAsNode->addLink( forwardA->port_out_result(), fourAC->port_in_a() ) );
@@ -69,8 +69,8 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Delta", "[unittests][Dataflow][Core][Graph
 
     REQUIRE( gAsNode->compile() );
 
-    REQUIRE( gAsNode->getInputs().size() == 3 );
-    REQUIRE( gAsNode->getOutputs().size() == 1 );
+    REQUIRE( gAsNode->inputs().size() == 3 );
+    REQUIRE( gAsNode->outputs().size() == 1 );
 
     DataflowGraph g { "mainGraph" };
     auto sourceNodeA = g.addNode<Sources::SingleDataSourceNode<Scalar>>( "sa" );
@@ -81,10 +81,10 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Delta", "[unittests][Dataflow][Core][Graph
 
     REQUIRE( g.addNode( gAsNode ) );
 
-    REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->getInputByIndex( inputA ) ) );
-    REQUIRE( g.addLink( sourceNodeB->port_out_to().get(), gAsNode->getInputByIndex( inputB ) ) );
-    REQUIRE( g.addLink( sourceNodeC->port_out_to().get(), gAsNode->getInputByIndex( inputC ) ) );
-    REQUIRE( g.addLink( gAsNode->getOutputByIndex( output ), resultNode->port_in_from().get() ) );
+    REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->input_by_index( inputA ) ) );
+    REQUIRE( g.addLink( sourceNodeB->port_out_to().get(), gAsNode->input_by_index( inputB ) ) );
+    REQUIRE( g.addLink( sourceNodeC->port_out_to().get(), gAsNode->input_by_index( inputC ) ) );
+    REQUIRE( g.addLink( gAsNode->output_by_index( output ), resultNode->port_in_from().get() ) );
 
     sourceNodeA->setData( 1 );
     sourceNodeB->setData( 2 );
@@ -142,15 +142,15 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
 
     REQUIRE( gAsNode->input_node() );
     REQUIRE( gAsNode->output_node() );
-    REQUIRE( gAsNode->input_node()->getOutputs().size() == 1 );
-    REQUIRE( gAsNode->output_node()->getInputs().size() == 1 );
-    REQUIRE( gAsNode->getInputs().size() == 0 );
-    REQUIRE( gAsNode->getOutputs().size() == 0 );
+    REQUIRE( gAsNode->input_node()->outputs().size() == 1 );
+    REQUIRE( gAsNode->output_node()->inputs().size() == 1 );
+    REQUIRE( gAsNode->inputs().size() == 0 );
+    REQUIRE( gAsNode->outputs().size() == 0 );
 
     gAsNode->generate_ports();
 
-    REQUIRE( gAsNode->getInputs().size() == 1 );
-    REQUIRE( gAsNode->getOutputs().size() == 1 );
+    REQUIRE( gAsNode->inputs().size() == 1 );
+    REQUIRE( gAsNode->outputs().size() == 1 );
 
     DataflowGraph g { "mainGraph" };
 
@@ -159,8 +159,8 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
 
     REQUIRE( g.addNode( gAsNode ) );
     REQUIRE( g.canLink( sourceNodeA, PortIndex { 0 }, gAsNode, PortIndex { 0 } ) );
-    REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->getInputByIndex( 0 ) ) );
-    REQUIRE( g.addLink( gAsNode->getOutputByIndex( 0 ), resultNode->port_in_from().get() ) );
+    REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->input_by_index( 0 ) ) );
+    REQUIRE( g.addLink( gAsNode->output_by_index( 0 ), resultNode->port_in_from().get() ) );
 
     sourceNodeA->setData( 2 );
 
@@ -201,10 +201,10 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
         gAsNode->remove_unlinked_input_output_ports();
         REQUIRE( gAsNode->input_node() );
         REQUIRE( gAsNode->output_node() );
-        REQUIRE( gAsNode->input_node()->getOutputs().size() == 1 );
-        REQUIRE( gAsNode->output_node()->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getOutputs().size() == 1 );
+        REQUIRE( gAsNode->input_node()->outputs().size() == 1 );
+        REQUIRE( gAsNode->output_node()->inputs().size() == 1 );
+        REQUIRE( gAsNode->inputs().size() == 1 );
+        REQUIRE( gAsNode->outputs().size() == 1 );
 
         // re link in gAsNode
         REQUIRE( gAsNode->removeLink( f, PortIndex { 0 } ) );
@@ -217,10 +217,10 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
 
         REQUIRE( gAsNode->input_node() );
         REQUIRE( gAsNode->output_node() );
-        REQUIRE( gAsNode->input_node()->getOutputs().size() == 2 );
-        REQUIRE( gAsNode->output_node()->getInputs().size() == 2 );
-        REQUIRE( gAsNode->getInputs().size() == 2 );
-        REQUIRE( gAsNode->getOutputs().size() == 2 );
+        REQUIRE( gAsNode->input_node()->outputs().size() == 2 );
+        REQUIRE( gAsNode->output_node()->inputs().size() == 2 );
+        REQUIRE( gAsNode->inputs().size() == 2 );
+        REQUIRE( gAsNode->outputs().size() == 2 );
 
         // unlinked in g, remove unlink clean up unused port in input/output nodes
         REQUIRE( g.removeLink( gAsNode->input_node(), PortIndex { 0 } ) );
@@ -231,23 +231,23 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
         // now cleaned
         REQUIRE( gAsNode->input_node() );
         REQUIRE( gAsNode->output_node() );
-        REQUIRE( gAsNode->input_node()->getOutputs().size() == 1 );
-        REQUIRE( gAsNode->output_node()->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getOutputs().size() == 1 );
+        REQUIRE( gAsNode->input_node()->outputs().size() == 1 );
+        REQUIRE( gAsNode->output_node()->inputs().size() == 1 );
+        REQUIRE( gAsNode->inputs().size() == 1 );
+        REQUIRE( gAsNode->outputs().size() == 1 );
 
         // relink
-        REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->getInputByIndex( 0 ) ) );
-        REQUIRE( g.addLink( gAsNode->getOutputByIndex( 0 ), resultNode->port_in_from().get() ) );
+        REQUIRE( g.addLink( sourceNodeA->port_out_to().get(), gAsNode->input_by_index( 0 ) ) );
+        REQUIRE( g.addLink( gAsNode->output_by_index( 0 ), resultNode->port_in_from().get() ) );
 
         gAsNode->remove_unlinked_input_output_ports();
 
         // no change
         REQUIRE( gAsNode->input_node() );
         REQUIRE( gAsNode->output_node() );
-        REQUIRE( gAsNode->input_node()->getOutputs().size() == 1 );
-        REQUIRE( gAsNode->output_node()->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getInputs().size() == 1 );
-        REQUIRE( gAsNode->getOutputs().size() == 1 );
+        REQUIRE( gAsNode->input_node()->outputs().size() == 1 );
+        REQUIRE( gAsNode->output_node()->inputs().size() == 1 );
+        REQUIRE( gAsNode->inputs().size() == 1 );
+        REQUIRE( gAsNode->outputs().size() == 1 );
     }
 }
