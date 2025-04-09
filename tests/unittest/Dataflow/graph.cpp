@@ -348,7 +348,7 @@ TEST_CASE( "Dataflow/Core/Graph/Node failed exeution" ) {
       public:
         explicit FailFunction( const std::string& instanceName ) : FunctionNode( instanceName ) {}
         bool execute() { return false; }
-        static const std::string& getTypename() {
+        static const std::string& node_typename() {
             static std::string demangledName = std::string { "FailFunction" };
             return demangledName;
         }
