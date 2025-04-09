@@ -119,7 +119,9 @@ jobs:
         uses: seanmiddleditch/gha-setup-vsdevenv@master
         if: runner.os == 'Windows'
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jdpurcell/install-qt-action@v5
+        # https://github.com/jurplel/install-qt-action/pull/282
+        # uses: jurplel/install-qt-action@v3
         with:
           cache: true
           cache-key-prefix: install-qt-action-${{ matrix.config.name }}-${{ matrix.qtversion.value }}
