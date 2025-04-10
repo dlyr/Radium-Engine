@@ -362,7 +362,7 @@ TEST_CASE( "Dataflow/Core/Graph/Node failed exeution" ) {
 }
 
 TEST_CASE( "Dataflow/Core/Graph/Inspection of a graph" ) {
-    auto coreFactory = NodeFactoriesManager::dataFlowBuiltInsFactory();
+    auto coreFactory = NodeFactoriesManager::default_factory();
 
     using namespace Ra::Dataflow::Core;
 
