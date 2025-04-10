@@ -65,11 +65,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
 
         DataType x { 1_ra };
 
-        a->setDefaultValue( x );
+        a->set_default_value( x );
         REQUIRE( a->data<DataType>() == x );
 
         DataType y { 2_ra };
-        b->setDefaultValue( y );
+        b->set_default_value( y );
         REQUIRE( b->data<DataType>() == y );
 
         // As graph was modified since last compilation, this will recompile the graph
@@ -94,11 +94,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
         auto [g, a, b, r] = createGraph<DataType>( "test Vector3 binary op", add );
 
         DataType x { 1_ra, 2_ra, 3_ra };
-        a->setDefaultValue( x );
+        a->set_default_value( x );
         REQUIRE( a->data<DataType>() == x );
 
         DataType y { 3_ra, 2_ra, 1_ra };
-        b->setDefaultValue( y );
+        b->set_default_value( y );
         REQUIRE( b->data<DataType>() == y );
 
         g->execute();
@@ -123,11 +123,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
         auto [g, a, b, r] = createGraph<DataType>( "test Vector3 binary op", add );
 
         DataType x { { 1_ra, 2_ra }, { 3_ra, 4_ra } };
-        a->setDefaultValue( x );
+        a->set_default_value( x );
         REQUIRE( a->data<DataType>() == x );
 
         DataType y { { 5_ra, 6_ra }, { 7_ra, 8_ra } };
-        b->setDefaultValue( y );
+        b->set_default_value( y );
         REQUIRE( b->data<DataType>() == y );
 
         g->execute();
@@ -170,11 +170,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
             "test Vector2 x Scalar binary op", op );
 
         DataType_a x { { 1_ra, 2_ra }, { 3_ra, 4_ra } };
-        a->setDefaultValue( x );
+        a->set_default_value( x );
         REQUIRE( a->data<DataType_a>() == x );
 
         DataType_b y { 5_ra };
-        b->setDefaultValue( y );
+        b->set_default_value( y );
         REQUIRE( b->data<DataType_b>() == y );
 
         g->execute();
@@ -235,11 +235,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
             "test Vector2 x Scalar binary op", op );
 
         DataType_a x { 4_ra };
-        a->setDefaultValue( x );
+        a->set_default_value( x );
         REQUIRE( a->data<DataType_a>() == x );
 
         DataType_b y { { 1_ra, 2_ra }, { 3_ra, 4_ra } };
-        b->setDefaultValue( y );
+        b->set_default_value( y );
         REQUIRE( b->data<DataType_b>() == y );
 
         g->execute();
@@ -369,11 +369,11 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
         for ( size_t n = 0; n < test.capacity(); ++n ) {
             test.push_back( dis( gen ) );
         }
-        input->setDefaultValue( test );
+        input->set_default_value( test );
 
         // No need to do this as mean operator source has a copy of a functor
         ReduceOperator::function_type m1 = MeanOperator();
-        inputR->setDefaultValue( m1 );
+        inputR->set_default_value( m1 );
 
         g->execute();
 
@@ -400,9 +400,9 @@ TEST_CASE( "Dataflow/Core/Nodes", "[unittests][Dataflow][Core][Nodes]" ) {
     SECTION( "LinkMandatory" ) {
         using TestNode = Functionals::FunctionNode<int>;
         auto n         = std::make_shared<TestNode>( "test" );
-        REQUIRE( n->port_in_data()->isLinkMandatory() );
-        REQUIRE( !n->port_in_op()->isLinkMandatory() );
-        n->port_in_data()->setDefaultValue( 5 );
-        REQUIRE( !n->port_in_data()->isLinkMandatory() );
+        REQUIRE( n->port_in_data()->is_link_mandatory() );
+        REQUIRE( !n->port_in_op()->is_link_mandatory() );
+        n->port_in_data()->set_default_value( 5 );
+        REQUIRE( !n->port_in_data()->is_link_mandatory() );
     }
 }
