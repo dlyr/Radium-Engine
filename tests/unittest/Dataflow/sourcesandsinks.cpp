@@ -7,7 +7,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 using namespace Ra::Dataflow::Core;
 using namespace Ra::Core::Utils;
