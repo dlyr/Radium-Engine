@@ -8,7 +8,6 @@
 #include <cmath>
 #include <functional>
 #include <iostream>
-#include <map>
 #include <stddef.h>
 #include <string>
 #include <typeindex>
