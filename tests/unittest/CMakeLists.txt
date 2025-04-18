@@ -85,7 +85,16 @@ endif()
 include(Catch)
 
 # adds catch tests to ctest
-catch_discover_tests(unittests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} ADD_TAGS_AS_LABELS)
+
+set(TEST_PROPERTIES)
+if(DEFINED TEST_ENV_VAR)
+    set(TEST_PROPERTIES ${TEST_PROPERTIES} ENVIRONMENT ${TEST_ENV_VAR})
+endif()
+
+catch_discover_tests(
+    unittests WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} ADD_TAGS_AS_LABELS PROPERTIES
+    ${TEST_PROPERTIES}
+)
 
 # convenience target for running only the unit tests
 add_custom_target(

@@ -29,7 +29,6 @@ set(Radium_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerVersion.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerOptions.cmake)
-
 option(
     RADIUM_ENABLE_TESTING
     "Enable testing. Tests are automatically built with target all, run with target check or test."
@@ -166,7 +165,7 @@ endif()
 
 if(RADIUM_ENABLE_COVERAGE)
     set(RADIUM_ENABLE_TESTING "ON")
-    include(CodeCoverage)
+    include(RadiumCoverage)
 endif(RADIUM_ENABLE_COVERAGE)
 
 # ------------------------------------------------------------------------------
@@ -225,70 +224,7 @@ if(RADIUM_ENABLE_TESTING)
 endif()
 
 if(RADIUM_ENABLE_COVERAGE)
-    # prevent flags on catch2 and examples, add to specific targets
-    append_coverage_compiler_flags_to_target(unittests)
-    append_coverage_compiler_flags_to_target(Core)
-    append_coverage_compiler_flags_to_target(DataflowCore)
-    append_coverage_compiler_flags_to_target(DataflowQtGui)
-    append_coverage_compiler_flags_to_target(Engine)
-    append_coverage_compiler_flags_to_target(Gui)
-    append_coverage_compiler_flags_to_target(IO)
-    append_coverage_compiler_flags_to_target(Headless)
-
-    # fix error on github's lcov
-    foreach(LABEL unittests integration)
-        setup_target_for_coverage_lcov(
-            NAME
-            lcov_${LABEL}
-            EXECUTABLE
-            ${CMAKE_CTEST_COMMAND}
-            -L
-            ${LABEL}
-            --output-on-failure
-            -C
-            ${CMAKE_BUILD_TYPE}
-            -j
-            $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-            BASE_DIRECTORY
-            "/"
-            DEPENDENCIES
-            RadiumLibs
-            ${LABEL}
-            EXCLUDE
-            "${CMAKE_BINARY_DIR}/_deps/*"
-            "${CMAKE_BINARY_DIR}/*_autogen/*"
-            "/*external*/"
-            "/usr/*"
-        )
-
-        # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
-        # https://github.com/RPGillespie6/fastcov/issues/36
-        if(UNIX AND NOT APPLE AND FASTCOV_PATH)
-            setup_target_for_coverage_fastcov(
-                NAME
-                fastcov_${LABEL}
-                EXECUTABLE
-                ${CMAKE_CTEST_COMMAND}
-                -L
-                ${LABEL}
-                --output-on-failure
-                -C
-                ${CMAKE_BUILD_TYPE}
-                -j
-                $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-                DEPENDENCIES
-                RadiumLibs
-                ${LABEL}
-                BASE_DIRECTORY
-                "/"
-                EXCLUDE
-                "_deps"
-                "_autogen"
-                "external"
-                "/usr"
-            )
-        endif()
-    endforeach()
+    radium_setup_coverage_targets()
 endif()
 
 # Packaging stuff (deb, rpm, windows installer) add_subdirectory(packaging)

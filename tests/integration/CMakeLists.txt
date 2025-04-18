@@ -45,10 +45,13 @@ add_test(
     COMMAND ${CMAKE_COMMAND} -E compare_files ${CMAKE_CURRENT_BINARY_DIR}/output.txt
             ${CMAKE_CURRENT_SOURCE_DIR}/data/references/${INTEGRATION_TEST}.txt
 )
-set_tests_properties(
-    integration_${INTEGRATION_TEST}_compare_to_ref
-    PROPERTIES DEPENDS integration_${INTEGRATION_TEST}_save_output
-)
+
+set(TEST_PROPERTIES DEPENDS integration_${INTEGRATION_TEST}_save_output)
+if(DEFINED TEST_ENV_VAR)
+    set(TEST_PROPERTIES ${TEST_PROPERTIES} ENVIRONMENT ${TEST_ENV_VAR})
+endif()
+
+set_tests_properties(integration_${INTEGRATION_TEST}_compare_to_ref PROPERTIES ${TEST_PROPERTIES})
 
 add_dependencies(integration integration_${INTEGRATION_TEST})
 
@@ -126,7 +129,13 @@ foreach(INTEGRATION_TEST CoreExample FunctionalsGraph GraphAsNode GraphSerializa
     add_test(NAME integration_${INTEGRATION_TEST} WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
              COMMAND "$<TARGET_FILE:${INTEGRATION_TEST}>"
     )
-    set_property(TEST integration_${INTEGRATION_TEST} PROPERTY LABELS "integration")
+
+    set(TEST_PROPERTIES LABELS "integration")
+    if(DEFINED TEST_ENV_VAR)
+        set(TEST_PROPERTIES ${TEST_PROPERTIES} ENVIRONMENT ${TEST_ENV_VAR})
+    endif()
+
+    set_tests_properties(integration_${INTEGRATION_TEST} PROPERTIES ${TEST_PROPERTIES})
 
     add_dependencies(integration ${INTEGRATION_TEST})
 endforeach()
