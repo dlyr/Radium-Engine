@@ -29,7 +29,6 @@ set(Radium_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerVersion.cmake)
 include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompilerOptions.cmake)
-
 option(
     RADIUM_ENABLE_TESTING
     "Enable testing. Tests are automatically built with target all, run with target check or test."
@@ -57,6 +56,7 @@ option(RADIUM_GENERATE_LIB_ENGINE "Include Radium::Engine in CMake project." ON)
 option(RADIUM_GENERATE_LIB_GUI "Include Radium::Gui in CMake project." ON)
 option(RADIUM_GENERATE_LIB_PLUGINBASE "Include Radium::PluginBase in CMake project." ON)
 option(RADIUM_GENERATE_LIB_HEADLESS "Include Radium::Headless in CMake project." ON)
+option(RADIUM_GENERATE_LIB_DATAFLOW "Include Radium::Dataflow* in CMake project." ON)
 option(
     RADIUM_UPDATE_VERSION
     "Update version file each time the project is compiled (update compilation time in version.cpp)."
@@ -165,8 +165,7 @@ endif()
 
 if(RADIUM_ENABLE_COVERAGE)
     set(RADIUM_ENABLE_TESTING "ON")
-    include(CodeCoverage)
-    append_coverage_compiler_flags()
+    include(RadiumCoverage)
 endif(RADIUM_ENABLE_COVERAGE)
 
 # ------------------------------------------------------------------------------
@@ -211,6 +210,11 @@ if(RADIUM_ENABLE_TESTING)
     # prepare integration tests
     if(NOT RADIUM_ENABLE_EXAMPLES)
         add_subdirectory(examples/CoreExample EXCLUDE_FROM_ALL)
+
+        foreach(INTEGRATION_TEST FunctionalsGraph GraphAsNode GraphSerialization HelloGraph)
+            add_subdirectory(examples/DataflowExamples/${INTEGRATION_TEST} EXCLUDE_FROM_ALL)
+        endforeach()
+
         list(FIND RADIUM_COMPONENTS "Headless" res)
         if(res GREATER "-1")
             add_subdirectory(examples/HeadlessExample EXCLUDE_FROM_ALL)
@@ -220,76 +224,7 @@ if(RADIUM_ENABLE_TESTING)
 endif()
 
 if(RADIUM_ENABLE_COVERAGE)
-    append_coverage_compiler_flags()
-    setup_target_for_coverage_lcov(
-        NAME
-        coverage
-        EXECUTABLE
-        ${CMAKE_CTEST_COMMAND}
-        --output-on-failure
-        -C
-        ${CMAKE_BUILD_TYPE}
-        -j
-        $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-        BASE_DIRECTORY
-        "/"
-        DEPENDENCIES
-        RadiumLibs
-        unittests
-        integration
-        EXCLUDE
-        "/*external*/"
-        "/*/glbinding/*"
-        "/*/globjects/*"
-        "/*/OpenMesh/*"
-        "/*/assimp/*"
-        "/*/eigen3/*"
-        "/*/nlohmann/*"
-        "/*/stb/*"
-        "/usr/*"
-        "${CMAKE_SOURCE_DIR}/examples*"
-        "${CMAKE_SOURCE_DIR}/*/Catch2/*"
-        "${CMAKE_BINARY_DIR}/*_autogen/*"
-        "${CMAKE_BINARY_DIR}/*mocs*"
-    )
-
-    # Fastcov is not supported with gcov llvm: disabling for MacOS Source:
-    # https://github.com/RPGillespie6/fastcov/issues/36
-    if(UNIX AND NOT APPLE AND FASTCOV_PATH)
-        setup_target_for_coverage_fastcov(
-            NAME
-            coverage_fastcov
-            EXECUTABLE
-            ${CMAKE_CTEST_COMMAND}
-            --output-on-failure
-            -C
-            ${CMAKE_BUILD_TYPE}
-            -j
-            $ENV{CMAKE_BUILD_PARALLEL_LEVEL}
-            DEPENDENCIES
-            RadiumLibs
-            unittests
-            integration
-            BASE_DIRECTORY
-            "/"
-            EXCLUDE
-            "/usr/"
-            "examples"
-            "glbinding"
-            "globjects"
-            "OpenMesh"
-            "assimp"
-            "eigen3"
-            "nlohmann"
-            "stb"
-            "external"
-            "install"
-            "/Catch2/"
-            "_autogen/"
-            "build"
-            "mocs"
-        )
-    endif()
+    radium_setup_coverage_targets()
 endif()
 
 # Packaging stuff (deb, rpm, windows installer) add_subdirectory(packaging)
@@ -327,6 +262,7 @@ message_setting("RADIUM_GENERATE_LIB_CORE")
 message_setting("RADIUM_GENERATE_LIB_ENGINE")
 message_setting("RADIUM_GENERATE_LIB_GUI")
 message_setting("RADIUM_GENERATE_LIB_HEADLESS")
+message_setting("RADIUM_GENERATE_LIB_DATAFLOW")
 message_setting("RADIUM_GENERATE_LIB_IO")
 message_setting("RADIUM_GENERATE_LIB_PLUGINBASE")
 string(REPLACE ";" " " COMPONENTS_LIST "${RADIUM_COMPONENTS}")

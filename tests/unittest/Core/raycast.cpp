@@ -1,8 +1,12 @@
+#include <Core/CoreMacros.hpp>
 #include <Core/Geometry/RayCast.hpp>
 #include <Core/Math/Math.hpp>
-#include <catch2/catch.hpp>
+#include <Core/Types.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <catch2/catch_test_macros.hpp>
 
-TEST_CASE( "Core/Geometry/RayCast", "[Core][Core/Geometry][RayCast]" ) {
+TEST_CASE( "Core/Geometry/RayCast", "[unittests][Core][Core/Geometry][RayCast]" ) {
     using namespace Ra::Core;
     Aabb ones( -Vector3::Ones(), Vector3::Ones() );
     // For all directions x, y, z

@@ -1,7 +1,15 @@
+#include <Core/Containers/AlignedStdVector.hpp>
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
 #include <Core/Geometry/PolyLine.hpp>
-#include <catch2/catch.hpp>
+#include <Core/Math/Math.hpp>
+#include <Core/Types.hpp>
+#include <Eigen/Core>
+#include <catch2/catch_test_macros.hpp>
+#include <memory>
+#include <vector>
 
-TEST_CASE( "Core/Geometry/Polyline", "[Core][Core/Geometry][Polyline]" ) {
+TEST_CASE( "Core/Geometry/Polyline", "[unittests][Core][Core/Geometry][Polyline]" ) {
     using namespace Ra::Core;
     SECTION( "2 points polyline" ) {
         Vector3Array v2 { { 1, 2, 3 }, { 4, 5, 6 } };

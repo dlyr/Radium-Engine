@@ -4,7 +4,15 @@
 #include <Core/Animation/KeyFramedValueInterpolators.hpp>
 //! [include keyframed]
 //! [include keyframedvaluecontroller]
+#include <Core/Animation/HandleWeight.hpp>
 #include <Core/Animation/KeyFramedValueController.hpp>
+#include <Core/Animation/Pose.hpp>
+#include <Core/Containers/AdjacencyList.hpp>
+#include <Core/Containers/AlignedStdVector.hpp>
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
+#include <Core/Math/Math.hpp>
+#include <Core/Types.hpp>
 //! [include keyframedvaluecontroller]
 
 //! [include DualQuaternionSkinning ]
@@ -13,8 +21,16 @@
 
 #include <Core/Animation/PoseOperation.hpp>
 #include <Core/Animation/Skeleton.hpp>
-
-#include <catch2/catch.hpp>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include <Eigen/SparseCore>
+#include <algorithm>
+#include <catch2/catch_test_macros.hpp>
+#include <cmath>
+#include <iostream>
+#include <memory>
+#include <utility>
+#include <vector>
 
 using namespace Ra::Core;
 using namespace Ra::Core::Animation;
@@ -58,7 +74,7 @@ TEST_CASE( "Core/Animation/HandleWeightOperation",
     }
 }
 
-TEST_CASE( "Core/Animation/KeyFramedValue", "[Core][Core/Animation][KeyFramedValue]" ) {
+TEST_CASE( "Core/Animation/KeyFramedValue", "[unittests][Core][Core/Animation][KeyFramedValue]" ) {
 
     KeyFramedValue<Scalar> kf { 2_ra, 2_ra };
 
@@ -393,7 +409,7 @@ TEST_CASE( "Core/Animation/KeyFramedStruct" ) {
     }
 }
 
-TEST_CASE( "Core/Animation/Skeleton", "[Core][Core/Animation][Skeleton]" ) {
+TEST_CASE( "Core/Animation/Skeleton", "[unittests][Core][Core/Animation][Skeleton]" ) {
     using Space = HandleArray::SpaceType;
     // build the skeleton in the X direction: > - > - > - > starting at the origin
     Skeleton skel;

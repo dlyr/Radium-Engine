@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <Engine/Data/BlinnPhongMaterial.hpp>
 #include <Engine/Data/LambertianMaterial.hpp>
@@ -12,17 +12,15 @@
 #else
 #    include <Headless/OpenGLContext/GlfwOpenGLContext.hpp>
 #endif
+
+#include "../unittestUtils.hpp"
+
 using namespace Ra::Headless;
 using namespace Ra::Engine::Data;
 
-struct PrintThemAll {
-    using types = RenderParameters::BindableTypes;
-    template <typename T>
-    void operator()( const std::string& name, const T& ) {
-        std::cout << name << " with type " << typeid( T ).name() << "\n";
-    }
-};
-TEST_CASE( "Engine/Data/Materials", "[Engine][Engine/Data][Materials]" ) {
+struct PrintThemAll : public PrintAllHelper<RenderParameters::BindableTypes> {};
+
+TEST_CASE( "Engine/Data/Materials", "[unittests][Engine][Engine/Data][Materials]" ) {
 
     // Get the Engine and materials initialized
     glbinding::Version glVersion { 4, 4 };

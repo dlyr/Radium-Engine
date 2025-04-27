@@ -1,7 +1,24 @@
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/CoreMacros.hpp>
+#include <Core/Geometry/AbstractGeometry.hpp>
 #include <Core/Geometry/IndexedGeometry.hpp>
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Core/Geometry/StandardAttribNames.hpp>
-#include <catch2/catch.hpp>
+#include <Core/Geometry/TriangleMesh.hpp>
+#include <Core/Types.hpp>
+#include <Core/Utils/Attribs.hpp>
+#include <Core/Utils/Index.hpp>
+#include <Core/Utils/ObjectWithSemantic.hpp>
+#include <Core/Utils/StdMapIterators.hpp>
+#include <Eigen/Core>
+#include <algorithm>
+#include <catch2/catch_test_macros.hpp>
+#include <map>
+#include <memory>
+#include <set>
+#include <string>
+#include <utility>
+#include <vector>
 
 struct CustomTriangleIndexLayer : public Ra::Core::Geometry::TriangleIndexLayer {
     inline CustomTriangleIndexLayer() :
@@ -9,7 +26,7 @@ struct CustomTriangleIndexLayer : public Ra::Core::Geometry::TriangleIndexLayer 
     static constexpr const char* staticSemanticName = "CustomSemantic";
 };
 
-TEST_CASE( "Core/Geometry/IndexedGeometry", "[Core][Core/Geometry][IndexedGeometry]" ) {
+TEST_CASE( "Core/Geometry/IndexedGeometry", "[unittests][Core][Core/Geometry][IndexedGeometry]" ) {
     using Ra::Core::Vector3;
     using namespace Ra::Core::Geometry;
     using Ra::Core::Utils::ObjectWithSemantic;
@@ -93,7 +110,8 @@ TEST_CASE( "Core/Geometry/IndexedGeometry", "[Core][Core/Geometry][IndexedGeomet
     REQUIRE( keys.size() == 0 );
 }
 
-TEST_CASE( "Core/Geometry/IndexedGeometry/Attributes", "[Core][Core/Geometry][IndexedGeometry]" ) {
+TEST_CASE( "Core/Geometry/IndexedGeometry/Attributes",
+           "[unittests][Core][Core/Geometry][IndexedGeometry]" ) {
     using Ra::Core::Vector3;
     using namespace Ra::Core::Geometry;
     using Ra::Core::Utils::ObjectWithSemantic;

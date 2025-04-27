@@ -1,10 +1,16 @@
 #include <Core/Resources/Resources.hpp>
-#include <Core/Utils/StdFilesystem.hpp>
+#include <Core/Utils/Index.hpp>
+#include <Core/Utils/Log.hpp>
 #include <Gui/Utils/KeyMappingManager.hpp>
-
-#include <catch2/catch.hpp>
-
-#include <QtGlobal>
+#include <QCoreApplication>
+#include <QFlags>
+#include <QSettings>
+#include <Qt>
+#include <catch2/catch_test_macros.hpp>
+#include <filesystem>
+#include <iostream>
+#include <optional>
+#include <string>
 
 using namespace Ra;
 using namespace Ra::Gui;
@@ -65,7 +71,7 @@ void Dummy::configureKeyMapping_impl() {
 #undef KMA_VALUE
 }
 
-TEST_CASE( "Gui/Utils/KeyMappingManager", "[Gui][Gui/Utils][KeyMappingManager]" ) {
+TEST_CASE( "Gui/Utils/KeyMappingManager", "[unittests][Gui][Gui/Utils][KeyMappingManager]" ) {
     QCoreApplication::setOrganizationName( "RadiumUnitTests" );
     QCoreApplication::setApplicationName( "KeyMappingManager" );
     QSettings settings;
