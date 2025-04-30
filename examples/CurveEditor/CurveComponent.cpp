@@ -45,8 +45,8 @@ CurveComponent::CurveComponent( Ra::Engine::Scene::Entity* entity,
 /// This function is called when the component is properly
 /// setup, i.e. it has an entity.
 void CurveComponent::initialize() {
-    auto plainMaterial              = make_shared<PlainMaterial>( "Plain Material" );
-    plainMaterial->m_perVertexColor = true;
+    auto plainMaterial = make_shared<PlainMaterial>( "Plain Material" );
+    plainMaterial->setColoredByVertexAttrib( true );
 
     auto bezier = CubicBezier( Vector2( m_ctrlPts[0].x(), m_ctrlPts[0].z() ),
                                Vector2( m_ctrlPts[1].x(), m_ctrlPts[1].z() ),
