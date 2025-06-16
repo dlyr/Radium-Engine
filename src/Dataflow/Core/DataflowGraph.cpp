@@ -204,10 +204,16 @@ bool DataflowGraph::fromJsonInternal( const nlohmann::json& data ) {
                     if ( !instanceName.empty() ) {
                         auto [it, inserted] = nodeByName.insert( { instanceName, newNode } );
                         if ( !inserted ) {
-                            LOG( logERROR ) << "DataflowGraph::loadFromJson : duplicated node name "
-                                            << nodeTypeName;
+                            LOG( logERROR )
+                                << "DataflowGraph::loadFromJson : duplicated instance name "
+                                << instanceName << " (with type: " << nodeTypeName << ")";
                             return false;
                         }
+                    }
+                    else {
+                        LOG( logERROR )
+                            << "Found a node of type " << nodeTypeName << " without instance name";
+                        return false;
                     }
                     if ( nodeTypeName == GraphInputNode::node_typename() ) {
                         m_input_node = std::dynamic_pointer_cast<GraphInputNode>( newNode );
@@ -661,7 +667,7 @@ void DataflowGraph::Log::link_type_mismatch( const Node* nodeFrom,
                     << nodeFrom->model_name() << ") / " << portOut->name() << " with type "
                     << portOut->port_typename() << ")"
                     << " to " << nodeTo->display_name() << " (" << nodeTo->model_name() << ") / "
-                    << portIn->name() << " ( with type " << portIn->port_typename() << ") ";
+                    << portIn->name() << " (with type " << portIn->port_typename() << ") ";
 }
 
 void DataflowGraph::Log::unable_to_find( const std::string& type,
