@@ -30,7 +30,11 @@ GraphEditorWindow::~GraphEditorWindow() {}
 
 GraphEditorWindow::GraphEditorWindow( std::shared_ptr<DataflowGraph> graph ) : m_graph { graph } {
 
-    if ( !m_graph ) { m_graph = std::make_shared<DataflowGraph>( "" ); }
+    if ( !m_graph ) {
+        auto coreFactory = Ra::Dataflow::Core::NodeFactoriesManager::default_factory();
+        m_graph          = std::dynamic_pointer_cast<DataflowGraph>(
+            coreFactory->create_node( "Core DataflowGraph", {} ) );
+    }
 
     auto central_widget = new QWidget( this );
     auto central_layout = new QVBoxLayout( central_widget );
