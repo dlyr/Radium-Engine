@@ -11,6 +11,7 @@
 #include <Core/Utils/Singleton.hpp>
 
 #include <functional>
+#include <memory>
 
 namespace Ra {
 namespace Dataflow {
@@ -56,6 +57,7 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
      * name), false otherwise.
      */
     bool add_node( std::shared_ptr<Node> newNode );
+    std::string find_free_instance_name( const std::string& current_instance_name );
     void add_node_create_unique_instance_name( std::shared_ptr<Node> n );
 
     /// Conveniance typed alias
@@ -256,6 +258,41 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
 
     std::shared_ptr<GraphOutputNode> output_node() { return m_output_node; }
     std::shared_ptr<GraphInputNode> input_node() { return m_input_node; }
+
+    /// checks nodes do not contains a node two times, and each update instance name to be unique.
+    bool fixup_nodes() {
+        auto nodes_copy = nodes();
+        bool modified   = false;
+        {
+            sort( nodes_copy.begin(), nodes_copy.end() );
+            auto itr = unique( nodes_copy.begin(), nodes_copy.end() );
+            if ( itr != nodes_copy.end() ) {
+                // duplicate nodes ptr
+                nodes_copy.erase( itr, nodes_copy.end() );
+                m_nodes = nodes_copy;
+                needs_recompile();
+                modified = true;
+            }
+        }
+        {
+            auto compare_instance_name = []( const std::shared_ptr<Node>& a,
+                                             const std::shared_ptr<Node>& b ) {
+                return a->instance_name() == b->instance_name();
+            };
+            sort( nodes_copy.begin(), nodes_copy.end(), compare_instance_name );
+            auto itr = unique( nodes_copy.begin(), nodes_copy.end(), compare_instance_name );
+
+            while ( itr != nodes_copy.end() ) {
+                // updates m_nodes since nodes_copy contains shared ptr to nodes in m_nodes
+                ( *itr )->set_instance_name( find_free_instance_name( ( *itr )->instance_name() ) );
+                needs_recompile();
+                modified = true;
+                ++itr;
+            }
+        }
+        // todo recurse
+        return modified;
+    }
 
   protected:
     /**

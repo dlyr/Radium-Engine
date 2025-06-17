@@ -263,8 +263,8 @@ bool DataflowGraph::fromJsonInternal( const nlohmann::json& data ) {
 }
 
 bool DataflowGraph::add_node( std::shared_ptr<Node> newNode ) {
-    // Check if the new node already exists (= same instance name)
-    if ( !node( newNode->instance_name() ) ) {
+    // Check if the new node already exists (= same instance name or same address)
+    if ( !( contains_node_recursive( newNode.get() ) || node( newNode->instance_name() ) ) ) {
         m_nodes.emplace_back( std::move( newNode ) );
         needs_recompile();
         return true;
@@ -272,31 +272,62 @@ bool DataflowGraph::add_node( std::shared_ptr<Node> newNode ) {
     else { return false; }
 }
 
+std::string find_free_instance_name( const std::string& current_instance_name,
+                                     std::function<bool( const std::string& )> unavailable ) {
+    std::string new_instance_name = current_instance_name;
+    std::string prefix;
+    auto const pos = new_instance_name.find_last_of( '_' );
+    uint index     = 0;
+
+    if ( pos != new_instance_name.npos ) {
+        try {
+            index  = std::stoi( new_instance_name.substr( pos + 1 ) );
+            prefix = new_instance_name.substr( 0, pos + 1 );
+        }
+        catch ( ... ) {
+            index  = 0;
+            prefix = new_instance_name + "_";
+        }
+        ++index;
+        new_instance_name = prefix + std::to_string( index );
+    }
+
+    while ( unavailable( new_instance_name ) ) {
+        ++index;
+        new_instance_name = prefix + std::to_string( index );
+    }
+    return new_instance_name;
+}
+
+std::string DataflowGraph::find_free_instance_name( const std::string& current_instance_name ) {
+    std::string new_instance_name = current_instance_name;
+    std::string prefix;
+    auto const pos = new_instance_name.find_last_of( '_' );
+    uint index     = 0;
+
+    if ( pos != new_instance_name.npos ) {
+        try {
+            index  = std::stoi( new_instance_name.substr( pos + 1 ) );
+            prefix = new_instance_name.substr( 0, pos + 1 );
+        }
+        catch ( ... ) {
+            index  = 0;
+            prefix = new_instance_name + "_";
+        }
+        ++index;
+        new_instance_name = prefix + std::to_string( index );
+    }
+
+    while ( node( new_instance_name ) ) {
+        ++index;
+        new_instance_name = prefix + std::to_string( index );
+    }
+    return new_instance_name;
+}
+
 void DataflowGraph::add_node_create_unique_instance_name( std::shared_ptr<Node> n ) {
     if ( node( n->instance_name() ) ) {
-        std::string new_instance_name = n->instance_name();
-        std::string prefix;
-        auto const pos = new_instance_name.find_last_of( '_' );
-        uint index     = 0;
-
-        if ( pos != new_instance_name.npos ) {
-            try {
-                index  = std::stoi( new_instance_name.substr( pos + 1 ) );
-                prefix = new_instance_name.substr( 0, pos + 1 );
-            }
-            catch ( ... ) {
-                index  = 0;
-                prefix = new_instance_name + "_";
-            }
-            ++index;
-            new_instance_name = prefix + std::to_string( index );
-        }
-
-        while ( node( new_instance_name ) ) {
-            ++index;
-            new_instance_name = prefix + std::to_string( index );
-        }
-
+        auto new_instance_name = find_free_instance_name;
         n->set_instance_name( new_instance_name );
     }
     m_nodes.emplace_back( std::move( n ) );
