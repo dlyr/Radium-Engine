@@ -55,7 +55,9 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
      * \return true if node has been added to the graph (no other node with same model and instance
      * name), false otherwise.
      */
-    virtual bool add_node( std::shared_ptr<Node> newNode );
+    bool add_node( std::shared_ptr<Node> newNode );
+    void add_node_create_unique_instance_name( std::shared_ptr<Node> n );
+
     /// Conveniance typed alias
     template <typename T, typename... U>
     std::shared_ptr<T> add_node( U&&... u );
@@ -71,8 +73,8 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
      * \brief Connects two nodes of the graph.
      *
      * The two nodes must already be in the graph (with the add_node), in order to be linked the
-     * seconde node's in port must be free and the connected in port and out port must have the same
-     * type of data.
+     * seconde node's in port must be free and the connected in port and out port must have the
+     * same type of data.
      *
      * \param nodeFrom The node that contains the out port.
      * \param nodeFromOutputName The name of the out port in nodeFrom.
@@ -237,8 +239,8 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
      * \brief Create (if not already created) input/output node of the graph, and fills graph
      * input/output.
      *
-     * These nodes are usefull for using graph as node and stating the graph as node input/output
-     * ports.
+     * These nodes are usefull for using graph as node and stating the graph as node
+     * input/output ports.
      * ![example inner graph](images/graph_as_node_inner.png)
      */
     void add_input_output_nodes();
@@ -264,13 +266,6 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
     bool fromJsonInternal( const nlohmann::json& data ) override;
     void toJsonInternal( nlohmann::json& ) const override;
 
-    /**
-     * \brief Check if there node with same instance and model is in the graph.
-     *
-     * \param instance Instance name to search
-     * \param model Model name to search
-     */
-    bool has_node_by_name( const std::string& instance, const std::string& model ) const;
     /**
      * \brief Check if node is part of the graph, or part of its "inner" graph.
      *
@@ -352,8 +347,8 @@ class RA_DATAFLOW_CORE_API DataflowGraph : public Node
 template <typename T, typename... U>
 std::shared_ptr<T> DataflowGraph::add_node( U&&... u ) {
     auto ret = std::make_shared<T>( std::forward<U>( u )... );
-    if ( add_node( ret ) ) return ret;
-    return nullptr;
+    add_node_create_unique_instance_name( ret );
+    return ret;
 }
 
 template <typename T, typename U>

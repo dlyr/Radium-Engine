@@ -199,7 +199,9 @@ class RA_DATAFLOW_CORE_API Node
     /// \brief Gets the instance name of the node.
     const std::string& instance_name() const;
 
-    /// \brief Sets the instance name the node (unused?) instance name must be unique in a graph.
+    /// \brief Sets the instance name of the node.
+    /// instance_name() must uniquely identifies a node in a graph.
+    /// no consistency checks performs here.
     void set_instance_name( const std::string& name );
 
     /// @}
@@ -255,7 +257,7 @@ class RA_DATAFLOW_CORE_API Node
     /**
      * \brief Construct the base node given its name and type.
      *
-     * \param instanceName The name of the node, unique in a graph
+     * \param instance The name of the node, unique in a graph
      * \param typeName The type name of the node, from static typename() concrete node class.
      */
     Node( const std::string& instance, const std::string& typeName );

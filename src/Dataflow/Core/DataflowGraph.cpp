@@ -263,13 +263,44 @@ bool DataflowGraph::fromJsonInternal( const nlohmann::json& data ) {
 }
 
 bool DataflowGraph::add_node( std::shared_ptr<Node> newNode ) {
-    // Check if the new node already exists (= same name and type)
-    if ( !has_node_by_name( newNode->instance_name(), newNode->model_name() ) ) {
+    // Check if the new node already exists (= same instance name)
+    if ( !node( newNode->instance_name() ) ) {
         m_nodes.emplace_back( std::move( newNode ) );
         needs_recompile();
         return true;
     }
     else { return false; }
+}
+
+void DataflowGraph::add_node_create_unique_instance_name( std::shared_ptr<Node> n ) {
+    if ( node( n->instance_name() ) ) {
+        std::string new_instance_name = n->instance_name();
+        std::string prefix;
+        auto const pos = new_instance_name.find_last_of( '_' );
+        uint index     = 0;
+
+        if ( pos != new_instance_name.npos ) {
+            try {
+                index  = std::stoi( new_instance_name.substr( pos + 1 ) );
+                prefix = new_instance_name.substr( 0, pos + 1 );
+            }
+            catch ( ... ) {
+                index  = 0;
+                prefix = new_instance_name + "_";
+            }
+            ++index;
+            new_instance_name = prefix + std::to_string( index );
+        }
+
+        while ( node( new_instance_name ) ) {
+            ++index;
+            new_instance_name = prefix + std::to_string( index );
+        }
+
+        n->set_instance_name( new_instance_name );
+    }
+    m_nodes.emplace_back( std::move( n ) );
+    needs_recompile();
 }
 
 bool DataflowGraph::remove_node( std::shared_ptr<Node> node ) {
@@ -406,13 +437,6 @@ bool DataflowGraph::remove_link( std::shared_ptr<Node> node, const PortIndex& in
         if ( ret ) needs_recompile();
     }
     return ret;
-}
-
-bool DataflowGraph::has_node_by_name( const std::string& instance,
-                                      const std::string& model ) const {
-    return std::find_if( m_nodes.begin(), m_nodes.end(), [instance, model]( const auto& p ) {
-               return p->model_name() == model && p->instance_name() == instance;
-           } ) != m_nodes.end();
 }
 
 bool DataflowGraph::contains_node_recursive( const Node* node ) const {
