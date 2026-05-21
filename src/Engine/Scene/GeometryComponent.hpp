@@ -58,7 +58,7 @@ class RA_ENGINE_API GeometryComponent : public Component
  *  - normals: rw (if deformable)
  *  - triangles: rw (if deformable)
  */
-class SurfaceMeshComponent : public GeometryComponent
+class RA_ENGINE_API SurfaceMeshComponent : public GeometryComponent
 {
     using base = GeometryComponent;
 
@@ -237,16 +237,6 @@ inline SurfaceMeshComponent::SurfaceMeshComponent( const std::string& name,
     m_displayMesh( new RenderMeshType( name, std::move( mesh ) ) ) {
     setContentName( name );
     finalizeROFromGeometry( convertMatdataToMaterial( mat ), Core::Transform::Identity() );
-}
-
-inline SurfaceMeshComponent::SurfaceMeshComponent( const std::string& name,
-                                                   Entity* entity,
-                                                   CoreMeshType&& mesh,
-                                                   std::shared_ptr<Data::Material> mat ) :
-    GeometryComponent( name, entity ),
-    m_displayMesh( new RenderMeshType( name, std::move( mesh ) ) ) {
-    setContentName( name );
-    finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
 inline std::shared_ptr<Data::Material>
