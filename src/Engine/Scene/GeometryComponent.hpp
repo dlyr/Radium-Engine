@@ -246,7 +246,7 @@ inline SurfaceMeshComponent::SurfaceMeshComponent( const std::string& name,
     GeometryComponent( name, entity ),
     m_displayMesh( new RenderMeshType( name, std::move( mesh ) ) ) {
     setContentName( name );
-    finalizeROFromGeometry(  mat, Core::Transform::Identity() );
+    finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
 inline std::shared_ptr<Data::Material>
