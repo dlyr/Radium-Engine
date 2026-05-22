@@ -29,6 +29,7 @@ set(core_sources
     Containers/VariableSetEnumManagement.cpp
     Geometry/AttribArrayGeometry.cpp
     Geometry/CatmullClarkSubdivider.cpp
+    Geometry/Curve2D.cpp
     Geometry/IndexedGeometry.cpp
     Geometry/LoopSubdivider.cpp
     Geometry/MeshPrimitives.cpp
