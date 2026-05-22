@@ -110,8 +110,9 @@ class LeastSquareSystem
      * @brief Prints details of the current state of the system
      * @param output log level (optional)
      */
-    void log( Ra::Core::Utils::TLogLevel logL = Ra::Core::Utils::logINFO ) const {
+    void log() const {
         using namespace Ra::Core::Utils;
+        constexpr Ra::Core::Utils::TLogLevel logL = Ra::Core::Utils::logINFO;
 
         LOG( logL ) << "LSS with " << m_nvar << " variables of dimension " << m_dim << ", and "
                     << m_ncstr << " constraints";
