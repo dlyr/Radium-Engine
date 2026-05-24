@@ -303,7 +303,7 @@ void CurveEditor::addPointInCurve( const Vector3& worldPos, int mouseX, int mous
                 if ( curveIndex < 0 ) continue;
 
                 auto meshPtr  = ro->getMesh().get();
-                auto mesh     = dynamic_cast<Data::Mesh*>( meshPtr );
+                auto mesh     = dynamic_cast<Data::GeometryDisplayable*>( meshPtr );
                 auto curveCmp = static_cast<CurveComponent*>( ro->getComponent() );
                 auto ctrlPts  = curveCmp->m_ctrlPts;
 
