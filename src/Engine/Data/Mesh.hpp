@@ -605,7 +605,7 @@ void CoreGeometryDisplayable<CoreGeometry>::autoVertexAttribCheck( const ShaderP
                                << " " << loc;
             }
         }
-        else { LOG( logINFO ) << "attrib not found in trable, disable " << name << " " << loc; }
+        else { LOG( logINFO ) << "attrib not found in table, disable " << name << " " << loc; }
     }
 }
 
