@@ -19,6 +19,7 @@ foreach(
     EntityAnimation
     EnvMap
     HelloRadium
+    HelloPointCloud
     KeyEvent
     MaterialEditing
     ParameterEditing
