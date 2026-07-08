@@ -7,6 +7,7 @@
 #include <Engine/Scene/EntityManager.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 #include <Engine/Scene/GeometrySystem.hpp>
+#include <IO/TinyPlyLoader/TinyPlyFileLoader.hpp>
 
 #include <QTimer>
 
@@ -42,6 +43,12 @@ int main( int argc, char* argv[] ) {
 
     // stage 2
     // load point cloud from file
+    const std::string filename = "/home/jcai/Documents/pointcloud_50k/cow_50000 - Cloud.ply";
+
+    Ra::IO::TinyPlyFileLoader loader;
+    auto fileData = loader.loadFile( filename );
+
+    auto geometryData = fileData->getGeometryData()[0];
 
     //! [Create the engine entity for the point cloud]
     auto e = app.m_engine->getEntityManager()->createEntity( "point cloud" );
@@ -49,13 +56,17 @@ int main( int argc, char* argv[] ) {
     //todo
     // create point cloud component
     // auto c =
-    auto c = new Ra::Engine::Scene::PointCloudComponent( "manual point cloud",
-                                                         e,
-                                                         std::move( pointCloud ) );
+    //auto c = new Ra::Engine::Scene::PointCloudComponent( "manual point cloud",
+                                                         //e,
+                                                         //std::move( pointCloud ) );
+
+    auto c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud",
+                                                     e,
+                                                     geometryData );
     c->setSplatSize( 0.05f );
     //! [Register the entity/component association to the geometry system ]
     auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
-        geometrySystem->addComponent( e, c );
+    geometrySystem->addComponent( e, c );
     //! [Register the entity/component association to the geometry system ]
 
     //! [Tell the window that something is to be displayed]
