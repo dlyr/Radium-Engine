@@ -1,21 +1,77 @@
 // Include Radium base application and its simple Gui
 #include <Gui/BaseApplication.hpp>
 #include <Gui/RadiumWindow/SimpleWindowFactory.hpp>
+#include <Gui/RadiumWindow/SimpleWindow.hpp>
+#include <Gui/Utils/KeyMappingManager.hpp>
+#include <Gui/Viewer/Viewer.hpp>
+
 
 // include the Engine/entity/component interface
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Engine/Scene/EntityManager.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 #include <Engine/Scene/GeometrySystem.hpp>
+
 #include <IO/TinyPlyLoader/TinyPlyFileLoader.hpp>
 
+#include <QEvent>
 #include <QTimer>
+
+class DemoWindow : public Ra::Gui::SimpleWindow {
+    Q_OBJECT
+
+  public:
+    /// Reuse the SimpleWindow constructors
+    using Ra::Gui::SimpleWindow::SimpleWindow;
+
+    void configure() override {
+        SPLAT_UP = getViewer()->addCustomAction(
+            "SPLAT_UP",
+            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_U" ),
+            [this]( QEvent* event ) {
+                if ( event->type() == QEvent::KeyPress ) this->splatUp();
+            } );
+    }
+
+    void splatUp() {
+        if ( m_pointCloudComponent == nullptr ) return;
+
+        m_splatSize += 0.01f;
+        m_pointCloudComponent->setSplatSize( m_splatSize );
+    }
+
+  private:
+    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_UP;
+};
+
+class DemoWindowFactory : public Ra::Gui::BaseApplication::WindowFactory {
+  public:
+    ~DemoWindowFactory() = default;
+
+    inline Ra::Gui::MainWindowInterface* createMainWindow() const override {
+        auto window = new DemoWindow();
+        return window;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+#include "main.moc"
 
 int main( int argc, char* argv[] ) {
     //! [Creating the application]
     Ra::Gui::BaseApplication app( argc, argv );
     glbinding::Version glVersion { 4, 4 };
-    app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
+    //app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
+    app.initialize( DemoWindowFactory {}, glVersion );
+
     app.addRadiumMenu();
     //! [Creating the application]
 
@@ -63,7 +119,7 @@ int main( int argc, char* argv[] ) {
     auto c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud",
                                                      e,
                                                      geometryData );
-    c->setSplatSize( 0.05f );
+    c->setSplatSize( 0.01f );
     //! [Register the entity/component association to the geometry system ]
     auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
     geometrySystem->addComponent( e, c );
