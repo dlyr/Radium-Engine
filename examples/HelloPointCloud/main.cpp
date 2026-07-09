@@ -1,10 +1,9 @@
 // Include Radium base application and its simple Gui
 #include <Gui/BaseApplication.hpp>
-#include <Gui/RadiumWindow/SimpleWindowFactory.hpp>
 #include <Gui/RadiumWindow/SimpleWindow.hpp>
+#include <Gui/RadiumWindow/SimpleWindowFactory.hpp>
 #include <Gui/Utils/KeyMappingManager.hpp>
 #include <Gui/Viewer/Viewer.hpp>
-
 
 // include the Engine/entity/component interface
 #include <Core/Geometry/MeshPrimitives.hpp>
@@ -17,100 +16,14 @@
 #include <QEvent>
 #include <QTimer>
 
-class DemoWindow : public Ra::Gui::SimpleWindow {
-    Q_OBJECT
-
-  public:
-    /// Reuse the SimpleWindow constructors
-    using Ra::Gui::SimpleWindow::SimpleWindow;
-
-    void configure() override {
-        SPLAT_UP = getViewer()->addCustomAction(
-            "SPLAT_UP",
-            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_U" ),
-            [this]( QEvent* event ) {
-                if ( event->type() == QEvent::KeyPress ) this->splatUp();
-            } );
-
-        SPLAT_DOWN = getViewer()->addCustomAction(
-            "SPLAT_DOWN",
-            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_D" ),
-            [this]( QEvent* event ) {
-                if ( event->type() == QEvent::KeyPress ) this->splatDown();
-            } );
-
-        SPLAT_RESET = getViewer()->addCustomAction(
-            "SPLAT_RESET",
-            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_O" ),
-            [this]( QEvent* event ) {
-                if ( event->type() == QEvent::KeyPress ) this->splatReset();
-            } );
-    }
-
-    void resizePointCloud( Ra::Engine::Scene::PointCloudComponent* c ) {
-        m_pointCloudComponent = c;
-    }
-
-    void splatUp() {
-        if ( m_pointCloudComponent == nullptr ) return;
-
-        m_splatSize += 0.0015f;
-        m_pointCloudComponent->setSplatSize( m_splatSize );
-    }
-
-    void splatDown() {
-        if ( m_pointCloudComponent == nullptr ) return;
-
-        m_splatSize -= 0.0015f;
-
-            if ( m_splatSize < 0.001f ) {
-            m_splatSize = 0.001f; //(protection too small)
-        };
-        m_pointCloudComponent->setSplatSize( m_splatSize );
-    }
-
-    void splatReset() {
-        if ( m_pointCloudComponent == nullptr ) return;
-
-        m_splatSize = 0.01f;
-        m_pointCloudComponent->setSplatSize( m_splatSize );
-    }
-  private:
-    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_UP;
-    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_DOWN;
-    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_RESET;
-
-    Ra::Engine::Scene::PointCloudComponent* m_pointCloudComponent { nullptr };
-    float m_splatSize { 0.01f };
-};
-
-class DemoWindowFactory : public Ra::Gui::BaseApplication::WindowFactory {
-  public:
-    ~DemoWindowFactory() = default;
-
-    inline Ra::Gui::MainWindowInterface* createMainWindow() const override {
-        auto window = new DemoWindow();
-        return window;
-    }
-};
-
-
-
-
-
-
-
-
-
-
 #include "main.moc"
 
 int main( int argc, char* argv[] ) {
     //! [Creating the application]
     Ra::Gui::BaseApplication app( argc, argv );
     glbinding::Version glVersion { 4, 4 };
-    //app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
-    app.initialize( DemoWindowFactory {}, glVersion );
+    app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
+    // app.initialize( DemoWindowFactory {}, glVersion );
 
     app.addRadiumMenu();
     //! [Creating the application]
@@ -123,55 +36,68 @@ int main( int argc, char* argv[] ) {
     }
     //! [Verifying the OpenGL version available to the engine]
 
-
-    // todo
-    // stage 1
-    // create point cloud by hand
-    Ra::Core::Geometry::PointCloud pointCloud;
-    pointCloud.setVertices( { Ra::Core::Vector3( 0.0, 0.0, 0.0 ),
-                              Ra::Core::Vector3( 1.0, 0.0, 0.0 ),
-                              Ra::Core::Vector3( 0.0, 1.0, 0.0 ),
-                              Ra::Core::Vector3( 0.0, 0.0, 1.0 ) } );
-
-
-
-
-
-    // stage 2
-    // load point cloud from file
-    const std::string filename = "/home/jcai/Documents/pointcloud_50k/cow_50000 - Cloud.ply";
-
-    Ra::IO::TinyPlyFileLoader loader;
-    auto fileData = loader.loadFile( filename );
-
-    auto geometryData = fileData->getGeometryData()[0];
-
     //! [Create the engine entity for the point cloud]
     auto e = app.m_engine->getEntityManager()->createEntity( "point cloud" );
 
-    //todo
-    // create point cloud component
-    // auto c =
-    //auto c = new Ra::Engine::Scene::PointCloudComponent( "manual point cloud",
-                                                         //e,
-                                                         //std::move( pointCloud ) );
+    Ra::Engine::Scene::PointCloudComponent* c;
+    const bool stage1 = false;
 
-    auto c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud",
-                                                     e,
-                                                     geometryData );
+    if ( stage1 ) {
+        // stage 1
+        // create point cloud by hand
+        Ra::Core::Geometry::PointCloud pointCloud;
+        pointCloud.setVertices( { Ra::Core::Vector3( 0.0, 0.0, 0.0 ),
+                                  Ra::Core::Vector3( 1.0, 0.0, 0.0 ),
+                                  Ra::Core::Vector3( 0.0, 1.0, 0.0 ),
+                                  Ra::Core::Vector3( 0.0, 0.0, 1.0 ) } );
+        c = new Ra::Engine::Scene::PointCloudComponent(
+            "manual point cloud", e, std::move( pointCloud ) );
+    }
+    else {
+        // stage 2
+        // load point cloud from file
+        const std::string filename = "/home/jcai/Documents/pointcloud_50k/cow_50000 - Cloud.ply";
+
+        Ra::IO::TinyPlyFileLoader loader;
+        auto fileData     = loader.loadFile( filename );
+        auto geometryData = fileData->getGeometryData()[0];
+        c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud", e, geometryData );
+    }
+
     c->setSplatSize( 0.01f );
-
-    auto appWindow = dynamic_cast<DemoWindow*>( app.m_mainWindow.get() );
-    appWindow->resizePointCloud( c );
 
     //! [Register the entity/component association to the geometry system ]
     auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
     geometrySystem->addComponent( e, c );
     //! [Register the entity/component association to the geometry system ]
-
     //! [Tell the window that something is to be displayed]
     app.m_mainWindow->prepareDisplay();
     //! [Tell the window that something is to be displayed]
+
+    app.getViewer()->addCustomAction(
+        "SPLAT_UP",
+        Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_U" ),
+        [&c]( QEvent* event ) {
+            if ( event->type() == QEvent::KeyPress && c != nullptr ) {
+                c->setSplatSize( c->getSplatSize() + 0.0015f );
+            }
+        } );
+
+    app.getViewer()->addCustomAction(
+        "SPLAT_DOWN",
+        Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_D" ),
+        [&c]( QEvent* event ) {
+            if ( event->type() == QEvent::KeyPress && c != nullptr ) {
+                c->setSplatSize( c->getSplatSize() - 0.0015f );
+            }
+        } );
+
+    app.getViewer()->addCustomAction(
+        "SPLAT_RESET",
+        Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_O" ),
+        [&c]( QEvent* event ) {
+            if ( event->type() == QEvent::KeyPress && c != nullptr ) { c->setSplatSize( 0.01f ); }
+        } );
 
     return app.exec();
 }
