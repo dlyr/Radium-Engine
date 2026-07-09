@@ -31,6 +31,20 @@ class DemoWindow : public Ra::Gui::SimpleWindow {
             [this]( QEvent* event ) {
                 if ( event->type() == QEvent::KeyPress ) this->splatUp();
             } );
+
+        SPLAT_DOWN = getViewer()->addCustomAction(
+            "SPLAT_DOWN",
+            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_D" ),
+            [this]( QEvent* event ) {
+                if ( event->type() == QEvent::KeyPress ) this->splatDown();
+            } );
+
+        SPLAT_RESET = getViewer()->addCustomAction(
+            "SPLAT_RESET",
+            Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_O" ),
+            [this]( QEvent* event ) {
+                if ( event->type() == QEvent::KeyPress ) this->splatReset();
+            } );
     }
 
     void resizePointCloud( Ra::Engine::Scene::PointCloudComponent* c ) {
@@ -40,12 +54,31 @@ class DemoWindow : public Ra::Gui::SimpleWindow {
     void splatUp() {
         if ( m_pointCloudComponent == nullptr ) return;
 
-        m_splatSize += 0.01f;
+        m_splatSize += 0.0015f;
         m_pointCloudComponent->setSplatSize( m_splatSize );
     }
 
+    void splatDown() {
+        if ( m_pointCloudComponent == nullptr ) return;
+
+        m_splatSize -= 0.0015f;
+
+            if ( m_splatSize < 0.001f ) {
+            m_splatSize = 0.001f; //(protection too small)
+        };
+        m_pointCloudComponent->setSplatSize( m_splatSize );
+    }
+
+    void splatReset() {
+        if ( m_pointCloudComponent == nullptr ) return;
+
+        m_splatSize = 0.01f;
+        m_pointCloudComponent->setSplatSize( m_splatSize );
+    }
   private:
     Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_UP;
+    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_DOWN;
+    Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_RESET;
 
     Ra::Engine::Scene::PointCloudComponent* m_pointCloudComponent { nullptr };
     float m_splatSize { 0.01f };
