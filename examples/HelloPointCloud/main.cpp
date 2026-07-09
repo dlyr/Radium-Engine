@@ -33,6 +33,10 @@ class DemoWindow : public Ra::Gui::SimpleWindow {
             } );
     }
 
+    void resizePointCloud( Ra::Engine::Scene::PointCloudComponent* c ) {
+        m_pointCloudComponent = c;
+    }
+
     void splatUp() {
         if ( m_pointCloudComponent == nullptr ) return;
 
@@ -42,6 +46,9 @@ class DemoWindow : public Ra::Gui::SimpleWindow {
 
   private:
     Ra::Gui::KeyMappingManager::KeyMappingAction SPLAT_UP;
+
+    Ra::Engine::Scene::PointCloudComponent* m_pointCloudComponent { nullptr };
+    float m_splatSize { 0.01f };
 };
 
 class DemoWindowFactory : public Ra::Gui::BaseApplication::WindowFactory {
@@ -120,6 +127,10 @@ int main( int argc, char* argv[] ) {
                                                      e,
                                                      geometryData );
     c->setSplatSize( 0.01f );
+
+    auto appWindow = dynamic_cast<DemoWindow*>( app.m_mainWindow.get() );
+    appWindow->resizePointCloud( c );
+
     //! [Register the entity/component association to the geometry system ]
     auto geometrySystem = app.m_engine->getSystem( "GeometrySystem" );
     geometrySystem->addComponent( e, c );
