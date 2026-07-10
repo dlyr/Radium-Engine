@@ -5,6 +5,8 @@
 #include <Gui/Utils/KeyMappingManager.hpp>
 #include <Gui/Viewer/Viewer.hpp>
 
+#include <Ponca/Ponca>
+
 // include the Engine/entity/component interface
 #include <Core/Geometry/MeshPrimitives.hpp>
 #include <Engine/Scene/EntityManager.hpp>

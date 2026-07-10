@@ -36,6 +36,31 @@ else()
     status_message("eigen3" ${Eigen3_DIR})
 endif()
 
+if(NOT DEFINED Ponca_DIR)
+    check_externals_prerequisite()
+    status_message("Ponca" "remote git")
+
+    ExternalProject_Add(
+        Ponca
+        GIT_REPOSITORY https://github.com/poncateam/ponca.git
+        GIT_TAG tags/v2.0.alpha3
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
+        CMAKE_ARGS ${RADIUM_EXTERNAL_CMAKE_OPTIONS}
+                   -DEigen3_DIR=${Eigen3_DIR}
+                   -DPONCA_CONFIGURE_EXAMPLES=OFF
+                   -DPONCA_CONFIGURE_DOC=OFF
+                   -DPONCA_CONFIGURE_TESTS=OFF
+                   -DPONCA_GENERATE_IDE_TARGETS=OFF
+                   "-DCMAKE_MESSAGE_INDENT=${indent_string}\;"
+    )
+    add_dependencies(CoreExternals Ponca)
+    set_external_dir(Ponca "lib/cmake/Ponca/")
+else()
+    status_message("Ponca" ${Ponca_DIR})
+endif()
+
 if(NOT DEFINED OpenMesh_DIR)
     check_externals_prerequisite()
     status_message("OpenMesh" "remote git")
