@@ -6,6 +6,9 @@
 #include <Gui/Viewer/Viewer.hpp>
 
 #include <Ponca/Ponca>
+#include <Ponca/SpatialPartitioning>
+#include <iostream>
+#include <vector>
 
 // include the Engine/entity/component interface
 #include <Core/Geometry/MeshPrimitives.hpp>
@@ -20,12 +23,27 @@
 
 #include "main.moc"
 
+using DataPoint = Ponca::PointPosition<float, 3>;
+
 int main( int argc, char* argv[] ) {
     //! [Creating the application]
     Ra::Gui::BaseApplication app( argc, argv );
     glbinding::Version glVersion { 4, 4 };
     app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
     // app.initialize( DemoWindowFactory {}, glVersion );
+
+    std::vector<DataPoint> points;
+
+    points.emplace_back( DataPoint::VectorType( 0.f, 0.f, 0.f ) );
+    points.emplace_back( DataPoint::VectorType( 1.f, 0.f, 0.f ) );
+    points.emplace_back( DataPoint::VectorType( 0.f, 1.f, 0.f ) );
+    points.emplace_back( DataPoint::VectorType( 0.f, 0.f, 1.f ) );
+
+    Ponca::KdTreeDense<DataPoint> kdtree( points );
+
+
+    std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
+              << kdtree.nodeCount() << " nodes." << std::endl;
 
     app.addRadiumMenu();
     //! [Creating the application]
