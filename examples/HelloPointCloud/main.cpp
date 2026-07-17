@@ -23,7 +23,9 @@
 
 #include "main.moc"
 
-using DataPoint = Ponca::PointPosition<float, 3>;
+using PoncaPoint = Ponca::PointPosition<float, 3>;
+using PoncaKdTree = Ponca::KdTreeDense<PoncaPoint>;
+using PointContainer = PoncaKdTree::PointContainer;
 
 int main( int argc, char* argv[] ) {
     //! [Creating the application]
@@ -32,7 +34,7 @@ int main( int argc, char* argv[] ) {
     app.initialize( Ra::Gui::SimpleWindowFactory {}, glVersion );
     // app.initialize( DemoWindowFactory {}, glVersion );
 
-    std::vector<DataPoint> points;
+    /*std::vector<DataPoint> points;
 
     points.emplace_back( DataPoint::VectorType( 0.f, 0.f, 0.f ) );
     points.emplace_back( DataPoint::VectorType( 1.f, 0.f, 0.f ) );
@@ -44,7 +46,7 @@ int main( int argc, char* argv[] ) {
 
     std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
               << kdtree.nodeCount() << " nodes." << std::endl;
-
+*/
     app.addRadiumMenu();
     //! [Creating the application]
 
@@ -81,6 +83,23 @@ int main( int argc, char* argv[] ) {
         Ra::IO::TinyPlyFileLoader loader;
         auto fileData     = loader.loadFile( filename );
         auto geometryData = fileData->getGeometryData()[0];
+
+        PoncaKdTree::PointContainer poncaPoints;
+
+        const auto& vertices = geometryData->getGeometry().vertices();
+
+        for ( const auto& v : vertices ) {
+            poncaPoints.push_back(
+                PoncaPoint( PoncaPoint::VectorType( float( v.x() ), float( v.y() ), float( v.z() ) ) ) );
+        }
+
+        PoncaKdTree kdtree( poncaPoints );
+
+        std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
+                  << kdtree.nodeCount() << " nodes." << std::endl;
+
+        if ( !kdtree.valid() ) { return 1; }
+
         c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud", e, geometryData );
     }
 
