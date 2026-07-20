@@ -60,7 +60,7 @@ int main( int argc, char* argv[] ) {
     auto e = app.m_engine->getEntityManager()->createEntity( "point cloud" );
 
     Ra::Engine::Scene::PointCloudComponent* c;
-    const bool stage1 = true;
+    const bool stage1 = false;
 
     if ( stage1 ) {
         // stage 1
@@ -74,7 +74,7 @@ int main( int argc, char* argv[] ) {
             "manual point cloud", e, std::move( pointCloud ) );
     }
     else {
-        // stage 2
+
         // load point cloud from file
         const std::string filename = "/home/jcai/Documents/pointcloud_50k/cow_50000 - Cloud.ply";
 
@@ -88,10 +88,28 @@ int main( int argc, char* argv[] ) {
     const auto& vertices = c->getGeometry()->getCoreGeometry().vertices();
     PoncaKdTree kdtree( vertices );
 
+    if ( !kdtree.valid() ) { return 1; }
+
+    const PoncaKdTree::IndexType queryIndex = 0;
+    const PoncaKdTree::IndexType k          = 10;
+
     std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
               << kdtree.nodeCount() << " nodes." << std::endl;
 
-    if ( !kdtree.valid() ) { return 1; }
+    std::cout << "[Ponca] " << k << " nearest neighbors of point " << queryIndex << " : ";
+
+    PoncaKdTree::IndexType firstNeighbor = -1;
+    PoncaKdTree::IndexType neighborCount = 0;
+
+    for ( const auto neighborIndex : kdtree.kNearestNeighbors( queryIndex, k ) ) {
+        std::cout << neighborIndex << " ";
+        ++neighborCount;
+    }
+    std::cout << std::endl;
+    if ( neighborCount == 0 || firstNeighbor < 0 ) { return 1; }
+
+
+
 
     c->setSplatSize( 0.01f );
 
