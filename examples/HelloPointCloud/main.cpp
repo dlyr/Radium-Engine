@@ -21,10 +21,8 @@
 #include <QEvent>
 #include <QTimer>
 
-#include "main.moc"
-
-using PoncaPoint = Ponca::PointPosition<float, 3>;
-using PoncaKdTree = Ponca::KdTreeDense<PoncaPoint>;
+using PoncaPoint     = Ponca::PointPosition<Scalar, 3>;
+using PoncaKdTree    = Ponca::KdTreeDense<PoncaPoint>;
 using PointContainer = PoncaKdTree::PointContainer;
 
 int main( int argc, char* argv[] ) {
@@ -62,7 +60,7 @@ int main( int argc, char* argv[] ) {
     auto e = app.m_engine->getEntityManager()->createEntity( "point cloud" );
 
     Ra::Engine::Scene::PointCloudComponent* c;
-    const bool stage1 = false;
+    const bool stage1 = true;
 
     if ( stage1 ) {
         // stage 1
@@ -84,24 +82,16 @@ int main( int argc, char* argv[] ) {
         auto fileData     = loader.loadFile( filename );
         auto geometryData = fileData->getGeometryData()[0];
 
-        PoncaKdTree::PointContainer poncaPoints;
-
-        const auto& vertices = geometryData->getGeometry().vertices();
-
-        for ( const auto& v : vertices ) {
-            poncaPoints.push_back(
-                PoncaPoint( PoncaPoint::VectorType( float( v.x() ), float( v.y() ), float( v.z() ) ) ) );
-        }
-
-        PoncaKdTree kdtree( poncaPoints );
-
-        std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
-                  << kdtree.nodeCount() << " nodes." << std::endl;
-
-        if ( !kdtree.valid() ) { return 1; }
-
         c = new Ra::Engine::Scene::PointCloudComponent( "loaded point cloud", e, geometryData );
     }
+
+    const auto& vertices = c->getGeometry()->getCoreGeometry().vertices();
+    PoncaKdTree kdtree( vertices );
+
+    std::cout << "[Ponca] KdTree built with " << kdtree.pointCount() << " points and "
+              << kdtree.nodeCount() << " nodes." << std::endl;
+
+    if ( !kdtree.valid() ) { return 1; }
 
     c->setSplatSize( 0.01f );
 
