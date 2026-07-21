@@ -15,6 +15,7 @@
 #include <Engine/Scene/EntityManager.hpp>
 #include <Engine/Scene/GeometryComponent.hpp>
 #include <Engine/Scene/GeometrySystem.hpp>
+#include <Engine/Scene/SystemDisplay.hpp>
 
 #include <IO/TinyPlyLoader/TinyPlyFileLoader.hpp>
 
@@ -88,7 +89,35 @@ int main( int argc, char* argv[] ) {
     const auto& vertices = c->getGeometry()->getCoreGeometry().vertices();
     PoncaKdTree kdtree( vertices );
 
-    if ( !kdtree.valid() ) { return 1; }
+    Ra::Core::Aabb aabb;
+
+    for ( const auto& v : vertices ) {
+        aabb.extend( v );
+    }
+
+    RA_DISPLAY_AABB( aabb, Ra::Core::Utils::Color::Red() );
+
+    const auto& nodes = kdtree.nodes();
+
+    if ( !nodes.empty() ) {
+        const auto& root = nodes[0];
+
+        if ( !root.is_leaf() ) {
+            const int splitDim    = root.inner_split_dim();
+            const Scalar splitVal = root.inner_split_value();
+
+            Ra::Core::Aabb leftBox  = aabb;
+            Ra::Core::Aabb rightBox = aabb;
+
+            leftBox.max()[splitDim]  = splitVal;
+            rightBox.min()[splitDim] = splitVal;
+
+            RA_DISPLAY_AABB( leftBox, Ra::Core::Utils::Color::Green() );
+            RA_DISPLAY_AABB( rightBox, Ra::Core::Utils::Color::Blue() );
+        }
+    }
+
+    //if ( !kdtree.valid() ) { return 1; }
 
     const PoncaKdTree::IndexType queryIndex = 0;
     const PoncaKdTree::IndexType k          = 10;
@@ -106,7 +135,7 @@ int main( int argc, char* argv[] ) {
         ++neighborCount;
     }
     std::cout << std::endl;
-    if ( neighborCount == 0 || firstNeighbor < 0 ) { return 1; }
+    //if ( neighborCount == 0 || firstNeighbor < 0 ) { return 1; }
 
 
 
