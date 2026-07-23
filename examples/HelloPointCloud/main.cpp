@@ -26,6 +26,74 @@ using PoncaPoint     = Ponca::PointPosition<Scalar, 3>;
 using PoncaKdTree    = Ponca::KdTreeDense<PoncaPoint>;
 using PointContainer = PoncaKdTree::PointContainer;
 
+/*struct KdTreeNodeBox
+{
+    PoncaKdTree::NodeIndexType nodeId;
+    Ra::Core::Aabb box;
+};
+
+static void splitAabbFromNode( const PoncaKdTree::NodeType& node,
+                               const Ra::Core::Aabb& parentBox,
+                               int maxLevel = 1
+                               ) {
+    // pritn node box
+    RA_DISPLAY_AABB( firstChildBox, Ra::Core::Utils::Color::Green() );
+
+    if(maxLevel == 0 && !node.is_leaf()) return ;
+    const int splitDim    = node.inner_split_dim();
+    const Scalar splitVal = node.inner_split_value();
+
+    Ra::Core::Aabb firstChildBox;
+    Ra::Core::Aabb secondChildBox;
+
+    firstChildBox = parentBox ;
+    secondChildBox = parentBox ;
+
+    firstChildBox.max()[splitDim] = splitVal;
+    secondChildBox.min()[splitDim] = splitVal;
+
+    RA_DISPLAY_AABB( firstChildBox, Ra::Core::Utils::Color::Green() );
+    RA_DISPLAY_AABB( secondChildBox, Ra::Core::Utils::Color::Blue() );
+
+    fristChlid = node.inner_first_child_id();
+    fristChlid = node.inner_first_child_id();
+    splitAabbFromNode(fristChlid, firstChildBox, maxLevel-1);
+    splitAabbFromNode(secondChlid, secondChildBox, maxLevel-1);
+} */
+
+static void displayKdTreeBoxes( const PoncaKdTree& kdtree,
+                                PoncaKdTree::NodeIndexType nodeId,
+                                const Ra::Core::Aabb& nodeBox,
+                                int maxLevel ) {
+    const auto& nodes = kdtree.nodes();
+
+    if ( static_cast<std::size_t>( nodeId ) >= nodes.size() ) { //(car nodeid ca viens de ponca,ptr un c signed l'autre c unsigned)
+        return;
+    }
+
+    const auto& node = nodes[nodeId]; //NodeType& node = Base::m_bufs.nodes[node_id];
+
+    RA_DISPLAY_AABB( nodeBox, Ra::Core::Utils::Color::Green() );
+
+    if ( maxLevel == 0 || node.is_leaf() ) {
+        return;
+    }
+
+    const int splitDim    = node.inner_split_dim();
+    const Scalar splitVal = node.inner_split_value(); //node.configure_inner(aabb.center()[split_dim], ..., split_dim);
+
+    Ra::Core::Aabb firstChildBox  = nodeBox;
+    Ra::Core::Aabb secondChildBox = nodeBox;
+
+    firstChildBox.max()[splitDim]  = splitVal;
+    secondChildBox.min()[splitDim] = splitVal;
+
+    const auto firstChildId = node.inner_first_child_id();
+
+    displayKdTreeBoxes( kdtree, firstChildId, firstChildBox, maxLevel - 1 ); //(split method from ponca )buildRec(node.inner_first_child_id(), start, mid_id, level + 1); buildRec(node.inner_first_child_id() + 1, mid_id, end, level + 1);
+    displayKdTreeBoxes( kdtree, firstChildId + 1, secondChildBox, maxLevel - 1 );
+}
+
 int main( int argc, char* argv[] ) {
     //! [Creating the application]
     Ra::Gui::BaseApplication app( argc, argv );
@@ -95,12 +163,19 @@ int main( int argc, char* argv[] ) {
         aabb.extend( v );
     }
 
-    RA_DISPLAY_AABB( aabb, Ra::Core::Utils::Color::Red() );
+    //const int displayedLevel = 7;
+    //displayKdTreeBoxes( kdtree, 0, aabb, displayedLevel );
+    int currentLevel = 0;
+    const int maxDisplayedLevel = 10;
+
+    displayKdTreeBoxes( kdtree, 0, aabb, currentLevel );
+
+    /*RA_DISPLAY_AABB( aabb, Ra::Core::Utils::Color::Red() );
 
     const auto& nodes = kdtree.nodes();
 
     if ( !nodes.empty() ) {
-        const auto& root = nodes[0];
+        const auto& root = nodes[0]; //root = root node = first node
 
         if ( !root.is_leaf() ) {
             const int splitDim    = root.inner_split_dim();
@@ -114,8 +189,7 @@ int main( int argc, char* argv[] ) {
 
             RA_DISPLAY_AABB( leftBox, Ra::Core::Utils::Color::Green() );
             RA_DISPLAY_AABB( rightBox, Ra::Core::Utils::Color::Blue() );
-        }
-    }
+        } */
 
     //if ( !kdtree.valid() ) { return 1; }
 
@@ -173,6 +247,29 @@ int main( int argc, char* argv[] ) {
         Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_O" ),
         [&c]( QEvent* event ) {
             if ( event->type() == QEvent::KeyPress && c != nullptr ) { c->setSplatSize( 0.01f ); }
+        } );
+
+    app.getViewer()->addCustomAction(
+        "KDTREE_LEVEL_UP",
+        Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_Up" ),
+        [&kdtree, &aabb, &currentLevel, maxDisplayedLevel]( QEvent* event ) {
+            if ( event->type() == QEvent::KeyPress ) {
+                if ( currentLevel < maxDisplayedLevel ) {
+                    ++currentLevel;
+                    displayKdTreeBoxes( kdtree, 0, aabb, currentLevel );
+                }
+            }
+        } );
+
+    app.getViewer()->addCustomAction(
+        "KDTREE_LEVEL_DOWN",
+        Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_Down" ),
+        [&currentLevel]( QEvent* event ) {
+            if ( event->type() == QEvent::KeyPress ) {
+                if ( currentLevel > 0 ) {
+                    --currentLevel;
+                }
+            }
         } );
 
     return app.exec();
