@@ -184,8 +184,8 @@ FileData* TinyPlyFileLoader::loadFile( const std::string& filename ) {
              return e.name == "face" && e.size != 0;
          } ) ) {
         // Mesh found. Let the other loaders handle it
-        LOG( logINFO ) << "[TinyPLY] Faces found. Aborting" << std::endl;
-        return nullptr;
+        LOG( logINFO ) << "[TinyPLY] Faces found. Ignoring them" << std::endl;
+        //        return nullptr;
     }
 
     // we are now sure to have a point-cloud
