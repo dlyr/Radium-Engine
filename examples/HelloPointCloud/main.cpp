@@ -17,6 +17,7 @@
 #include <Engine/Scene/GeometrySystem.hpp>
 #include <Engine/Scene/SystemDisplay.hpp>
 
+#include <Core/Resources/Resources.hpp>
 #include <IO/TinyPlyLoader/TinyPlyFileLoader.hpp>
 
 #include <QEvent>
@@ -67,20 +68,20 @@ static void displayKdTreeBoxes( const PoncaKdTree& kdtree,
                                 int maxLevel ) {
     const auto& nodes = kdtree.nodes();
 
-    if ( static_cast<std::size_t>( nodeId ) >= nodes.size() ) { //(car nodeid ca viens de ponca,ptr un c signed l'autre c unsigned)
+    if ( static_cast<std::size_t>( nodeId ) >=
+         nodes.size() ) { //(car nodeid ca viens de ponca,ptr un c signed l'autre c unsigned)
         return;
     }
 
-    const auto& node = nodes[nodeId]; //NodeType& node = Base::m_bufs.nodes[node_id];
+    const auto& node = nodes[nodeId]; // NodeType& node = Base::m_bufs.nodes[node_id];
 
     RA_DISPLAY_AABB( nodeBox, Ra::Core::Utils::Color::Green() );
 
-    if ( maxLevel == 0 || node.is_leaf() ) {
-        return;
-    }
+    if ( maxLevel == 0 || node.is_leaf() ) { return; }
 
-    const int splitDim    = node.inner_split_dim();
-    const Scalar splitVal = node.inner_split_value(); //node.configure_inner(aabb.center()[split_dim], ..., split_dim);
+    const int splitDim = node.inner_split_dim();
+    const Scalar splitVal =
+        node.inner_split_value(); // node.configure_inner(aabb.center()[split_dim], ..., split_dim);
 
     Ra::Core::Aabb firstChildBox  = nodeBox;
     Ra::Core::Aabb secondChildBox = nodeBox;
@@ -90,7 +91,13 @@ static void displayKdTreeBoxes( const PoncaKdTree& kdtree,
 
     const auto firstChildId = node.inner_first_child_id();
 
-    displayKdTreeBoxes( kdtree, firstChildId, firstChildBox, maxLevel - 1 ); //(split method from ponca )buildRec(node.inner_first_child_id(), start, mid_id, level + 1); buildRec(node.inner_first_child_id() + 1, mid_id, end, level + 1);
+    displayKdTreeBoxes(
+        kdtree,
+        firstChildId,
+        firstChildBox,
+        maxLevel -
+            1 ); //(split method from ponca )buildRec(node.inner_first_child_id(), start, mid_id,
+                 // level + 1); buildRec(node.inner_first_child_id() + 1, mid_id, end, level + 1);
     displayKdTreeBoxes( kdtree, firstChildId + 1, secondChildBox, maxLevel - 1 );
 }
 
@@ -145,7 +152,8 @@ int main( int argc, char* argv[] ) {
     else {
 
         // load point cloud from file
-        const std::string filename = "/home/jcai/Documents/pointcloud_50k/cow_50000 - Cloud.ply";
+        auto rp              = Ra::Core::Resources::getResourcesPath();
+        std::string filename = *rp + "/Examples/HelloPointCloud/Assets/Armadillo.ply";
 
         Ra::IO::TinyPlyFileLoader loader;
         auto fileData     = loader.loadFile( filename );
@@ -163,9 +171,9 @@ int main( int argc, char* argv[] ) {
         aabb.extend( v );
     }
 
-    //const int displayedLevel = 7;
-    //displayKdTreeBoxes( kdtree, 0, aabb, displayedLevel );
-    int currentLevel = 0;
+    // const int displayedLevel = 7;
+    // displayKdTreeBoxes( kdtree, 0, aabb, displayedLevel );
+    int currentLevel            = 0;
     const int maxDisplayedLevel = 10;
 
     displayKdTreeBoxes( kdtree, 0, aabb, currentLevel );
@@ -191,7 +199,7 @@ int main( int argc, char* argv[] ) {
             RA_DISPLAY_AABB( rightBox, Ra::Core::Utils::Color::Blue() );
         } */
 
-    //if ( !kdtree.valid() ) { return 1; }
+    // if ( !kdtree.valid() ) { return 1; }
 
     const PoncaKdTree::IndexType queryIndex = 0;
     const PoncaKdTree::IndexType k          = 10;
@@ -209,10 +217,7 @@ int main( int argc, char* argv[] ) {
         ++neighborCount;
     }
     std::cout << std::endl;
-    //if ( neighborCount == 0 || firstNeighbor < 0 ) { return 1; }
-
-
-
+    // if ( neighborCount == 0 || firstNeighbor < 0 ) { return 1; }
 
     c->setSplatSize( 0.01f );
 
@@ -266,9 +271,7 @@ int main( int argc, char* argv[] ) {
         Ra::Gui::KeyMappingManager::createEventBindingFromStrings( "", "", "Key_Down" ),
         [&currentLevel]( QEvent* event ) {
             if ( event->type() == QEvent::KeyPress ) {
-                if ( currentLevel > 0 ) {
-                    --currentLevel;
-                }
+                if ( currentLevel > 0 ) { --currentLevel; }
             }
         } );
 
