@@ -84,11 +84,11 @@ bool GraphNode::fromJsonInternal( const nlohmann::json& data ) {
     std::map<size_t, PortBaseOutPtr> outputs;
     using namespace std::placeholders;
     if ( const auto& ports = data.find( "inputs" ); ports != data.end() ) {
-        auto ctor = std::bind( &PortFactory::make_input_port_from_name, factory, _1, _2, _3 );
+        auto ctor = std::bind( &PortFactory::make_input_port, factory, _1, _2, _3 );
         make_port_helper<PortBaseInPtr>( this, *ports, inputs, ctor );
     }
     if ( const auto& ports = data.find( "outputs" ); ports != data.end() ) {
-        auto ctor = std::bind( &PortFactory::make_output_port_from_name, factory, _1, _2, _3 );
+        auto ctor = std::bind( &PortFactory::make_output_port, factory, _1, _2, _3 );
         make_port_helper<PortBaseOutPtr>( this, *ports, outputs, ctor );
     }
 

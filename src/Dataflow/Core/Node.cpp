@@ -125,7 +125,7 @@ void Node::toJsonInternal( nlohmann::json& data ) const {
         nlohmann::json port;
         p->to_json( port );
         port["port_index"] = i;
-        port["type"]       = Ra::Core::Utils::simplifiedDemangledType( p->type() );
+        port["type"]       = p->type();
         data["inputs"].push_back( port );
     }
     for ( size_t i = 0; i < m_outputs.size(); ++i ) {
@@ -133,7 +133,7 @@ void Node::toJsonInternal( nlohmann::json& data ) const {
         nlohmann::json port;
         p->to_json( port );
         port["port_index"] = i;
-        port["type"]       = Ra::Core::Utils::simplifiedDemangledType( p->type() );
+        port["type"]       = p->type();
         data["outputs"].push_back( port );
     }
 
