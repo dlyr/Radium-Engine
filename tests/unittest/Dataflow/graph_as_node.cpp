@@ -183,7 +183,9 @@ TEST_CASE( "Dataflow/Core/GraphAsNode/Forward", "[unittests][Dataflow][Core][Gra
         REQUIRE( g.shouldBeSaved() );
         g.saveToJson( test_file.string() );
 
-        std::cerr << std::filesystem::current_path() << "\n";
+        // output test_file path in case of error to ease checks.
+        std::cerr << test_file << "\n";
+
         REQUIRE( !g.shouldBeSaved() );
 
         // Create a new graph and load from the saved graph
