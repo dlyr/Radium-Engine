@@ -13,6 +13,7 @@
 
 using std::string;
 
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 
 class DummyNode : public Node

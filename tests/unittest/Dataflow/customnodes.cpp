@@ -15,6 +15,7 @@
 #include <Dataflow/Core/Sinks/Types.hpp>
 #include <Dataflow/Core/Sources/Types.hpp>
 
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 
 namespace Customs {

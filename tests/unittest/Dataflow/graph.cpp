@@ -21,6 +21,7 @@
 #include <string>
 #include <vector>
 
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 
 void inspectGraph( const DataflowGraph& g ) {

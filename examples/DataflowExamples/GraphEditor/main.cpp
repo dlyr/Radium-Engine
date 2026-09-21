@@ -8,6 +8,8 @@
 
 #include <QtNodes/ConnectionStyle>
 
+using namespace Ra;
+
 static void setStyle() {
     QtNodes::ConnectionStyle::setConnectionStyle(
         R"( { "ConnectionStyle": { "UseDataDefinedColors": true } } )" );

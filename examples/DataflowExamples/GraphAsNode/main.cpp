@@ -6,6 +6,7 @@
 #include <Dataflow/Core/Sinks/SinkNode.hpp>
 #include <Dataflow/Core/Sources/Types.hpp>
 
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 
 /* ----------------------------------------------------------------------------------- */

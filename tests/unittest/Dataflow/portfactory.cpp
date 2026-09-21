@@ -4,8 +4,11 @@
 
 #include <Dataflow/Core/PortFactory.hpp>
 #include <string>
+
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 using namespace Ra::Core;
+
 TEST_CASE( "Dataflow/Core/PortFactory", "[unittests][Dataflow][PortFactory]" ) {
 
     /// singleton is init in core lib init

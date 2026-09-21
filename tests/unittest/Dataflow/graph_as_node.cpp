@@ -16,6 +16,7 @@
 
 #include "tempdir.hpp"
 
+using namespace Ra;
 using namespace Ra::Dataflow::Core;
 using namespace Ra::Core;
 
