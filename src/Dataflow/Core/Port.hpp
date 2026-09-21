@@ -54,7 +54,8 @@ class RA_DATAFLOW_CORE_API PortBase
     const std::string& name() const { return m_name; }
     /// \brief Set's port name
     void set_name( const std::string& name ) { m_name = name; }
-    /// \brief Gets the type of the data (efficient for comparisons).
+    /// \brief Gets data's type (as string since type_info isn't consistent across dll made with
+    /// different compilers.
     std::string type() const { return m_type; }
     /// \brief Gets a pointer to the node this port belongs to.
     Node* node() const { return m_node; }
